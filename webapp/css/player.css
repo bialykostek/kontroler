@@ -1,0 +1,66 @@
+#player {
+    width: 100%;
+    background-color: #30392f;
+    border-radius: 1em;
+}
+
+.panelRow {
+    width: 100%;
+    padding: 0.3em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    max-width: 100%;
+    overflow: overlay;
+}
+
+.panelButton {
+    height: 100%;
+    background-color: rgb(32, 52, 38);
+    padding: 0.2em;
+    border-radius: 0.2em;
+    cursor: pointer;
+    max-width: 30%;
+    flex-shrink: 0;
+    display: flex;
+}
+
+.panelButton:hover { 
+    background-color: rgb(0, 0, 0);
+}
+
+.panelButton:active {
+    background-color: rgb(0, 0, 0);
+}
+
+.panelButtonImg {
+    height: 2em;
+    max-width: 100%;
+}
+
+.panelButtonSeparator {
+    flex-shrink: 1;
+    width: 2em;
+}
+
+#playerSpeed input {
+    margin-right: 1em;
+    margin-left: 1em;
+}
+
+#playerSpeedValue {
+    text-align: center;
+    color: white;
+    padding: 0.2em;
+    border-radius: 0.3em;
+}
+
+#nowPlaying {
+    font-style: italic;
+}
+
+#playingTimeline {
+    width: 100%;
+}

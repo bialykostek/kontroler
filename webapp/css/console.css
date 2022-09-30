@@ -1,0 +1,36 @@
+#console {
+    font-family: 'Lucida Console';
+    color: white;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.consoleTime {
+    white-space: nowrap;
+    vertical-align: top;
+}
+
+.consoleMessage {
+    padding-left: 0.4em;
+    overflow-wrap: anywhere;
+}
+
+#consoleInput {
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+#consoleOutput {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow-y: scroll;
+}
+
+#consoleInputText {
+    background-color: black;
+    width: 100%;
+    border: 1px lightgray solid;
+    color: white;
+}

@@ -1,0 +1,14 @@
+html, body {
+    height: 100%;
+    overflow-y: hidden;
+    color: white;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    padding: 1em;
+    background-color: #021500;
+}
