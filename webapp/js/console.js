@@ -1,5 +1,4 @@
 var consoleAutoscroll = true;
-var websocket;
 var inputHistory = [];
 var historyIndex = 0;
 
@@ -31,15 +30,6 @@ function addConsoleOutput(time, direction, text, type="default"){
     }
 }
 
-function sendToRemote(text){
-    if(websocket.readyState == 1){
-        websocket.send(JSON.stringify({
-            type: 0,
-            text: text
-        }));
-    }
-}
-
 function consoleInit(){
     $('#consoleOutput').on('mousedown', (e) => {
         var focus = true;
@@ -62,7 +52,7 @@ function consoleInit(){
         if(keycode == '13' && $('#consoleInputText').val() != ''){
             consoleAutoscroll = true;
             addConsoleOutput("now", '<', $('#consoleInputText').val());
-            sendToRemote($('#consoleInputText').val());
+            sendToPlane($('#consoleInputText').val());
             $('#consoleInputText').val('');
         }
     });
@@ -74,15 +64,18 @@ function consoleInit(){
             if(historyIndex > 0){
                 historyIndex--;
                 $('#consoleInputText').val(inputHistory[historyIndex]);
+                $('#consoleInputText').focus();
             }
         }
         if(keycode == '40'){
             if(historyIndex < inputHistory.length-1){
                 historyIndex++;
                 $('#consoleInputText').val(inputHistory[historyIndex]);
+                $('#consoleInputText').focus();
             }else{
                 historyIndex = inputHistory.length;
                 $('#consoleInputText').val('');
+                $('#consoleInputText').focus();
             }
             
         }
@@ -94,18 +87,4 @@ function consoleInit(){
             consoleAutoscroll = true;
         }
     });
-
-    websocket = new WebSocket('ws://jkostecki.ddns.net:1111');
-    websocket.onopen = _ => {
-        websocket.send(JSON.stringify({
-            type: 2,
-            clientType: 2
-        }));
-    };
-    websocket.onmessage = (data) => {
-        data = JSON.parse(data.data);
-        if(data.type == 1){
-            addConsoleOutput("now", ">", data.text);
-        }
-    }
 }

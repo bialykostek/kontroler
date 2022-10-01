@@ -1,4 +1,3 @@
-
 void setup()
 {
   // Otwarcie portu do komunikacji
@@ -13,6 +12,11 @@ void loop()
     Serial.write(Serial2.read());
   }
   if(Serial.available()){
-    Serial2.write(Serial.read());
+    char in = Serial.read();
+    if(in == 35){
+      Serial.println("#");
+    }else{
+      Serial2.write(in);
+    }
   }
 }

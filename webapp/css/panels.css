@@ -6,11 +6,11 @@
 }
 
 .bigCol {
-    width: calc(50% - 0.5em);
     height: 100%;
     margin: 0px;
     float: left;
     clear: none;  
+    width: calc(50% - 0.5em);
 }
 
 #columnDivider {
@@ -31,11 +31,11 @@
 }
 
 .quater {
-    height: calc(50% - 0.5em);
     border: 1px rgb(164, 164, 164) solid;
     display: flex;
     flex-direction: column;
     border-radius: 0.3em;
+    height: calc(50% - 0.5em);
 }
 
 .page {

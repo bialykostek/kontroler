@@ -1,0 +1,17 @@
+#echoTestTable {
+    width: 100%;
+    text-align: center;
+}
+#echoTestTable td{
+    width: 33.3%;
+    padding: 0.3em;
+}
+#echoTestTable .default{
+    background-color: rgb(76, 76, 76);
+    border-radius: 2em;
+    padding: 0.3em;
+}
+
+#echoTestTable .active{
+    background-color: rgb(8, 104, 8);
+}

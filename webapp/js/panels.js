@@ -1,6 +1,15 @@
-var verticalRatioL = 0.5;
-var verticalRatioR = 0.5;
-var horizontalRatio = 0.5;
+var verticalRatioL = 0.6;
+var verticalRatioR = 0.3;
+var horizontalRatio = 0.6;
+
+function resizeHandler(){
+    $('#leftColumn').css('width', 'calc(' + Math.round(horizontalRatio*100) + '% - 0.5em)');
+    $('#rightColumn').css('width', 'calc(' + (100 - Math.round(horizontalRatio*100)) + '% - 0.5em)');
+    $('#quaterTL').css('height', 'calc(' + Math.round(verticalRatioL*100) + '% - 0.5em)');
+    $('#quaterBL').css('height', 'calc(' + (100 - Math.round(verticalRatioL*100)) + '% - 0.5em)');
+    $('#quaterTR').css('height', 'calc(' + Math.round(verticalRatioR*100) + '% - 0.5em)');
+    $('#quaterBR').css('height', 'calc(' + (100 - Math.round(verticalRatioR*100)) + '% - 0.5em)');
+}
 
 function relocatePage(id, quater){
     if($('#'+id).closest('.quater').attr('id') == 'quater'+quater) {
@@ -64,14 +73,7 @@ function titleDragHandler(e){
 
 function panelsInit(){
 
-    $(window).on('resize', _ => {
-        $('#leftColumn').css('width', 'calc(' + Math.round(horizontalRatio*100) + '% - 0.5em)');
-        $('#rightColumn').css('width', 'calc(' + (100 - Math.round(horizontalRatio*100)) + '% - 0.5em)');
-        $('#quaterTL').css('height', 'calc(' + Math.round(verticalRatioL*100) + '% - 0.5em)');
-        $('#quaterBL').css('height', 'calc(' + (100 - Math.round(verticalRatioL*100)) + '% - 0.5em)');
-        $('#quaterTR').css('height', 'calc(' + Math.round(verticalRatioR*100) + '% - 0.5em)');
-        $('#quaterBR').css('height', 'calc(' + (100 - Math.round(verticalRatioR*100)) + '% - 0.5em)');
-    });
+    $(window).on('resize', resizeHandler);
 
     $('#columnDivider').on('mousedown', (e) => {
         e.preventDefault();
@@ -152,6 +154,8 @@ function panelsInit(){
     $('.pageTitle').on('mousedown', (e) => {
         titleDragHandler(e);
     });
+
+    resizeHandler();
 
     $('.quaterHeader').sortable();
 }
