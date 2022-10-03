@@ -10,6 +10,9 @@ Responses [#]:
 0 - heartbeat (1 - ok)
 1 - start mode (0 - normal, 1 - emergency)
 2 - arm info (0 - disarmed, 1 - armed)
+3 - ICM initialization result (0 - error, 1 - success)
+4 - DMP initialization result (0 - error, 1 - success)
+5 - GPS initialization result (0 - error, 1 - success)
 
 Websocket message type:
 0 - Web App -> Ground Station

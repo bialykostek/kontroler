@@ -39,7 +39,7 @@ if __name__ == "__main__":
     while True:
         try:
             serialString = serialPort.readline().decode("utf-8").replace("\n", "").replace("\r", "")
-            if serialString != "":
+            if serialString != "":  
                 if serialString[len(serialString) - 1] == '%':
                     ws.send(json.dumps({
                         "type": 4,

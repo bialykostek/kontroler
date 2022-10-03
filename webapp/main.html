@@ -117,7 +117,7 @@
         <div id="mapDiv"></div>
     </div>
 
-    <div class="page" id="pageChart" data-title="Chart" data-default="TR">
+    <div class="page" id="pageChart" data-title="Chart" data-default="BL">
         <div id="chartDiv"></div>
     </div>
 
@@ -174,28 +174,56 @@
         <table>
             <tbody>
                 <tr>
-                    <td>Input 1</td>
+                    <td class="dataName">Input 1</td>
                     <td id="liveData0"></td>
                 </tr>
                 <tr>
-                    <td>Input 2</td>
+                    <td class="dataName">Input 2</td>
                     <td id="liveData1"></td>
                 </tr>
                 <tr>
-                    <td>Input 3</td>
+                    <td class="dataName">Input 3</td>
                     <td id="liveData2"></td>
                 </tr>
                 <tr>
-                    <td>Input 4</td>
+                    <td class="dataName">Input 4</td>
                     <td id="liveData3"></td>
                 </tr>
                 <tr>
-                    <td>Input 5</td>
+                    <td class="dataName">Input 5</td>
                     <td id="liveData4"></td>
                 </tr>
                 <tr>
-                    <td>Input 6</td>
+                    <td class="dataName">Input 6</td>
                     <td id="liveData5"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Roll</td>
+                    <td id="liveData6"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Pitch</td>
+                    <td id="liveData7"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Yaw</td>
+                    <td id="liveData8"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Latitude</td>
+                    <td id="liveData9"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Longitude</td>
+                    <td id="liveData10"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Altitude GPS</td>
+                    <td id="liveData11"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">SIV</td>
+                    <td id="liveData12"></td>
                 </tr>
             </tbody>
         </table>
@@ -246,7 +274,7 @@
             chartInit();
             
             //setActive('pageSettings');
-            setActive('pageConfig');
+            setActive('pageChart');
           
 
             //---------------notes----------------------------

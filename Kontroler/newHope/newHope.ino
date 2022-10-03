@@ -1,24 +1,35 @@
 #include <EEPROM.h>
 #include "PWM.hpp"
 #include <Servo.h>
+#include "ICM_20948.h"
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+#include <Wire.h>
 
 #define COM Serial3
+#define WIRE_PORT Wire
+#define AD0_VAL 1
 
+SFE_UBLOX_GNSS myGNSS;
+ICM_20948_I2C myICM;
 
 int receiverInterval = 20;
 int heartbeatInterval = 7;
 int sendDataInterval = 50;
+int gpsInterval = 500;
 
 float heartbeatValue = 0;
+
+double yaw, pitch, roll;
 
 int mode = 0;
 bool armed = false;
 
 bool emergency = false;
 
-int heartbeatTimer = 0;
-int receiverTimer = 0;
-int sendDataTimer = 0;
+long heartbeatTimer = 0;
+long receiverTimer = 0;
+long sendDataTimer = 0;
+long gpsTimer = 0;
 
 PWM ch1(2);
 PWM ch2(3);
@@ -33,6 +44,11 @@ Servo servo3;
 Servo servo4;
 Servo esc;
 
+long latitude;
+long longitude;
+long GPSaltitude;
+byte SIV;
+
 int inp1, inp2, inp3, inp4, inp5, inp6;
 
 int requestStatus = 0;
@@ -41,7 +57,6 @@ int requestType = 0;
 float requestValue = 0;
 bool requestComma = false;
 int requestCommaPlace = 0;
-
 
 void queryValue(int query){
   switch(query) {
@@ -168,25 +183,12 @@ void readReceiver(){
 void setup() {
   //heart
   pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
   
   //communication
   COM.begin(38400);
   Serial.begin(38400);
-
-  //start mode
-  mode = EEPROM.read(0);
-  if(mode == 0){
-    //normal start
-    COM.println();
-    COM.println("#1|0");
-  }else{
-    //emergency
-    armed = true;
-    emergency = true;
-    COM.println();
-    COM.println("#1|1");
-  }
-
+  
   //receiver
   //PWM
   ch1.begin(true);
@@ -202,7 +204,68 @@ void setup() {
   servo3.attach(11);
   servo4.attach(10);
   esc.attach(9, 1000, 2000);
-  
+
+  //start mode
+  mode = EEPROM.read(0);
+  if(mode == 0){
+    //normal start
+    COM.println();
+    COM.println("#1|0");
+
+    WIRE_PORT.begin();
+
+    while(true){
+      myICM.begin(WIRE_PORT, AD0_VAL);
+      if (myICM.status != ICM_20948_Stat_Ok){
+        COM.println();
+        COM.println("#3|0");
+        delay(500);
+      }else{
+        COM.println();
+        COM.println("#3|1");
+        break;
+      }
+    }
+    
+    bool success = true;
+    success &= (myICM.initializeDMP() == ICM_20948_Stat_Ok);
+    success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
+    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 0) == ICM_20948_Stat_Ok);
+    success &= (myICM.enableFIFO() == ICM_20948_Stat_Ok);
+    success &= (myICM.enableDMP() == ICM_20948_Stat_Ok);
+    success &= (myICM.resetDMP() == ICM_20948_Stat_Ok);
+    success &= (myICM.resetFIFO() == ICM_20948_Stat_Ok);
+    if (success){
+      COM.println();
+      COM.println("#4|1");
+    }
+    else
+    {
+      while(true){
+        COM.println();
+        COM.println("#4|0");
+        delay(500);
+      }
+    }
+
+    while(!myGNSS.begin()){
+      COM.println();
+      COM.println("#5|0");
+      delay(500);
+    }
+    myGNSS.setI2COutput(COM_TYPE_UBX);
+    myGNSS.setNavigationFrequency(2);
+    myGNSS.setAutoPVT(true);
+
+    COM.println("#5|1");
+    
+  }else{
+    //emergency
+    armed = true;
+    emergency = true;
+    COM.println();
+    COM.println("#1|1");
+  }
 }
 
 void loop() {
@@ -250,8 +313,60 @@ void loop() {
     COM.print(inp5);
     COM.print(",");
     COM.print(inp6);
+    COM.print(",");
+    COM.print(roll);
+    COM.print(",");
+    COM.print(pitch);
+    COM.print(",");
+    COM.print(yaw);
+    COM.print(",");
+    COM.print(latitude);
+    COM.print(",");
+    COM.print(longitude);
+    COM.print(",");
+    COM.print(GPSaltitude);
+    COM.print(",");
+    COM.print(SIV);
     COM.println();
     sendDataTimer=millis();
   }
 
+  if(!emergency){
+    icm_20948_DMP_data_t data;
+    myICM.readDMPdataFromFIFO(&data);
+  
+    if ((myICM.status == ICM_20948_Stat_Ok) || (myICM.status == ICM_20948_Stat_FIFOMoreDataAvail)){
+      if ((data.header & DMP_header_bitmap_Quat6) > 0){
+        double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+        double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+        double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+        double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+        double q2sqr = q2 * q2;
+        double t0 = +2.0 * (q0 * q1 + q2 * q3);
+        double t1 = +1.0 - 2.0 * (q1 * q1 + q2sqr);
+        roll = atan2(t0, t1) * 180.0 / PI;
+        double t2 = +2.0 * (q0 * q2 - q3 * q1);
+        t2 = t2 > 1.0 ? 1.0 : t2;
+        t2 = t2 < -1.0 ? -1.0 : t2;
+        pitch = asin(t2) * 180.0 / PI;
+        double t3 = +2.0 * (q0 * q3 + q1 * q2);
+        double t4 = +1.0 - 2.0 * (q2sqr + q3 * q3);
+        yaw = atan2(t3, t4) * 180.0 / PI;
+        yaw *= -1;
+        yaw += 180;
+       }
+    }
+  }
+  
+  if(!emergency && millis() - gpsTimer > gpsInterval){
+    if (myGNSS.getPVT() && (myGNSS.getInvalidLlh() == false)){
+      latitude = myGNSS.getLatitude();
+      longitude = myGNSS.getLongitude();
+      GPSaltitude = myGNSS.getAltitude();
+      SIV = myGNSS.getSIV();
+      
+      gpsTimer = millis();
+    }
+  }
+  
 }

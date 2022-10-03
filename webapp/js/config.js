@@ -21,6 +21,30 @@ function responseArmed(response){
     }
 }
 
+function ICMinit(response){
+    if(response == "1"){
+        planeLog("ICM successfully initialized", "positive");
+    }else{
+        planeLog("ICM initialization error, trying again...", "negative");
+    }
+}
+
+function GPSinit(response){
+    if(response == "1"){
+        planeLog("GPS successfully initialized", "positive");
+    }else{
+        planeLog("GPS initialization error, trying again...", "negative");
+    }
+}
+
+function DMPinit(response){
+    if(response == "1"){
+        planeLog("DMP successfully initialized", "positive");
+    }else{
+        planeLog("DMP initialization error, restart device", "negative");
+    }
+}
+
 function downloadConfig(){
     planeQuery(1);
 }

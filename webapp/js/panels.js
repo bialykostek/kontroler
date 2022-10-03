@@ -1,5 +1,5 @@
 var verticalRatioL = 0.6;
-var verticalRatioR = 0.3;
+var verticalRatioR = 0.4;
 var horizontalRatio = 0.6;
 
 function resizeHandler(){

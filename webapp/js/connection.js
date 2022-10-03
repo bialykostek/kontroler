@@ -47,7 +47,6 @@ function connectToServer(){
     websocket.onmessage = (data) => {
         data = JSON.parse(data.data);
         if(data.type == 1){
-            planeLog(data.text);
             if(data.text[0] == '#'){
                 var messageType = parseInt(data.text.split('|')[0].split('#')[1]);
                 var response = data.text.split('|')[1];
@@ -62,10 +61,18 @@ function connectToServer(){
                     case 2:
                         responseArmed(response);
                         break;
+                    case 3:
+                        ICMinit(response);
+                        break;
+                    case 4:
+                        DMPinit(response);
+                        break;
+                    case 5:
+                        GPSinit(response);
+                        break;
                     default:
                       clog("Unknow message type " + messageType + ": " + response, "negative");
-                  }
-                  
+                  }  
             }
         }
         if(data.type == 4){

@@ -21,6 +21,7 @@ function echoStart(){
 function echoPlane(response){
     if(response == "1"){
         $('#echoControler').addClass('active');
+        clog("Connected to plane", "positive");
         downloadConfig();
     }
 }
