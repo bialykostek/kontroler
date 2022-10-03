@@ -13,6 +13,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="js/OpenLayers-2.13.1/OpenLayers.js"></script>
+    <script src="js/canvasjs-3.6.7/canvasjs.min.js"></script>
+
 
     <script src="js/panels.js"></script>
     <script src="js/visualization.js"></script>
@@ -21,6 +23,7 @@
     <script src="js/connection.js"></script>
     <script src="js/map.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/chart.js"></script>
     <script src="js/live.js"></script>
     
     <link rel="stylesheet" type="text/css" href="css/console.css">
@@ -30,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="css/live.css">
     <link rel="stylesheet" type="text/css" href="css/player.css">
     <link rel="stylesheet" type="text/css" href="css/map.css">
+    <link rel="stylesheet" type="text/css" href="css/chart.css">
     <link rel="stylesheet" type="text/css" href="css/visualization.css">
     <link rel="stylesheet" type="text/css" href="css/settings.css">
     <link rel="stylesheet" type="text/css" href="css/config.css">
@@ -113,6 +117,10 @@
         <div id="mapDiv"></div>
     </div>
 
+    <div class="page" id="pageChart" data-title="Chart" data-default="TR">
+        <div id="chartDiv"></div>
+    </div>
+
     <div class="page" id="pageConsole" data-title="Console" data-default="BR">
         <div id="console">
             <div id="consoleOutput">
@@ -139,8 +147,7 @@
     <div class="page" id="pageSettings" data-title="Settings" data-default="BR">
         <div class="serverButtons">
             <button class="ui inverted button" id="echoStart">Echo</button>
-            <button class="ui inverted button" id="connectButton">Connect</button>
-            <button class="ui inverted button" id="toogleServerOn">Start Server</button>    
+            <button class="ui inverted button" id="connectButton">Connect</button>  
         </div>
         <table id="echoTestTable">
             <tbody>
@@ -236,6 +243,7 @@
             connectionInit();
             initConfig();
             initLiveData();
+            chartInit();
             
             //setActive('pageSettings');
             setActive('pageConfig');
