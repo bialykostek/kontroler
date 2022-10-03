@@ -70,6 +70,9 @@ function connectToServer(){
                     case 5:
                         GPSinit(response);
                         break;
+                    case 6:
+                        LPSinit(response);
+                        break;
                     default:
                       clog("Unknow message type " + messageType + ": " + response, "negative");
                   }  

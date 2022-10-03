@@ -29,6 +29,14 @@ function ICMinit(response){
     }
 }
 
+function LPSinit(response){
+    if(response == "1"){
+        planeLog("LPS successfully initialized", "positive");
+    }else{
+        planeLog("LPS initialization error, trying again...", "negative");
+    }
+}
+
 function GPSinit(response){
     if(response == "1"){
         planeLog("GPS successfully initialized", "positive");

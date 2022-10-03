@@ -13,6 +13,7 @@ Responses [#]:
 3 - ICM initialization result (0 - error, 1 - success)
 4 - DMP initialization result (0 - error, 1 - success)
 5 - GPS initialization result (0 - error, 1 - success)
+6 - LPS initialization result (0 - error, 1 - success)
 
 Websocket message type:
 0 - Web App -> Ground Station

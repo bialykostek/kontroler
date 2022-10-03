@@ -4,6 +4,7 @@
 #include "ICM_20948.h"
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 #include <Wire.h>
+#include <LPS.h>
 
 #define COM Serial3
 #define WIRE_PORT Wire
@@ -11,11 +12,13 @@
 
 SFE_UBLOX_GNSS myGNSS;
 ICM_20948_I2C myICM;
+LPS ps;
 
 int receiverInterval = 20;
 int heartbeatInterval = 7;
 int sendDataInterval = 50;
 int gpsInterval = 500;
+int sensorInterval = 50;
 
 float heartbeatValue = 0;
 
@@ -26,10 +29,15 @@ bool armed = false;
 
 bool emergency = false;
 
+float altiPress;
+
+float vPitot;
+
 long heartbeatTimer = 0;
 long receiverTimer = 0;
 long sendDataTimer = 0;
 long gpsTimer = 0;
+long sensorTimer = 0;
 
 PWM ch1(2);
 PWM ch2(3);
@@ -47,7 +55,9 @@ Servo esc;
 long latitude;
 long longitude;
 long GPSaltitude;
+long gspeed;
 byte SIV;
+float heading;
 
 int inp1, inp2, inp3, inp4, inp5, inp6;
 
@@ -170,6 +180,45 @@ void checkForMessage(){
   }
 }
 
+float getPitot() {
+  byte address, Press_H, Press_L, _status;
+  unsigned int P_dat;
+  unsigned int T_dat;
+  byte Temp_L;
+  byte Temp_H;
+  address = 0x28;
+  Wire.requestFrom((int) address, (int) 4);
+  uint16_t millis_start = millis();
+  bool ok = true;
+  while (Wire.available() < 4) {
+    if (((uint16_t) millis() - millis_start) > 1) {
+      ok = false;
+      Wire.endTransmission();
+      return 0;
+    }
+  }
+  if (ok) {
+    Press_H = Wire.read();
+    Press_L = Wire.read();
+    Temp_H = Wire.read();
+    Temp_L = Wire.read();
+  }
+  Wire.endTransmission();
+  _status = (Press_H >> 6) & 0x03;
+  Press_H = Press_H & 0x3f;
+  P_dat = (((unsigned int) Press_H) << 8) | Press_L;
+  Temp_L = (Temp_L >> 5);
+  T_dat = (((unsigned int) Temp_H) << 3) | Temp_L;
+  double PR = (double)((P_dat - 819.15) / (14744.7));
+  PR = (PR - 0.49060678);
+  if(PR < 0){
+    PR *= -1;
+  } 
+  double V = ((PR * 13789.5144) / 1.225);
+  float VV = (sqrt((V)));
+  return VV;
+}
+
 
 void readReceiver(){
   inp1 = map(ch4.getValue(), 1100, 1900, 0, 180);
@@ -258,6 +307,14 @@ void setup() {
     myGNSS.setAutoPVT(true);
 
     COM.println("#5|1");
+
+    while(!ps.init()) {
+      COM.println("#6|0");
+      delay(500);
+    }
+    ps.enableDefault();
+
+    COM.println("#6|1");
     
   }else{
     //emergency
@@ -327,8 +384,17 @@ void loop() {
     COM.print(GPSaltitude);
     COM.print(",");
     COM.print(SIV);
+    COM.print(",");
+    COM.print(gspeed);
+    COM.print(",");
+    COM.print(heading);
+    COM.print(",");
+    COM.print(altiPress);
+    COM.print(",");
+    COM.print(vPitot);
     COM.println();
-    sendDataTimer=millis();
+    
+    sendDataTimer = millis();
   }
 
   if(!emergency){
@@ -364,9 +430,18 @@ void loop() {
       longitude = myGNSS.getLongitude();
       GPSaltitude = myGNSS.getAltitude();
       SIV = myGNSS.getSIV();
-      
+      gspeed = myGNSS.getGroundSpeed();
+      heading = heading = (float)((float)myGNSS.getHeading())/100000.0;
       gpsTimer = millis();
     }
   }
-  
+
+  if(!emergency && millis() - sensorTimer > sensorInterval){
+    float pressure = ps.readPressureMillibars();
+    altiPress = ps.pressureToAltitudeMeters(pressure);
+    
+    vPitot = getPitot();
+    
+    sensorTimer = millis();
+  }
 }
