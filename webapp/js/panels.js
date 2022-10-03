@@ -158,4 +158,6 @@ function panelsInit(){
     resizeHandler();
 
     $('.quaterHeader').sortable();
+
+    clog("Panel layout ready", "info");
 }

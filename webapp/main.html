@@ -20,15 +20,19 @@
     <script src="js/settings.js"></script>
     <script src="js/connection.js"></script>
     <script src="js/map.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/live.js"></script>
     
     <link rel="stylesheet" type="text/css" href="css/console.css">
     <link rel="stylesheet" type="text/css" href="css/logs.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <link rel="stylesheet" type="text/css" href="css/panels.css">
+    <link rel="stylesheet" type="text/css" href="css/live.css">
     <link rel="stylesheet" type="text/css" href="css/player.css">
     <link rel="stylesheet" type="text/css" href="css/map.css">
     <link rel="stylesheet" type="text/css" href="css/visualization.css">
     <link rel="stylesheet" type="text/css" href="css/settings.css">
+    <link rel="stylesheet" type="text/css" href="css/config.css">
 
 </head>
 
@@ -113,38 +117,8 @@
         <div id="console">
             <div id="consoleOutput">
                 <table>
-                    <tr>
-                        <td class="consoleTime">
-                            12:32:34 >
-                        </td>
-                        <td>
-                            Hello World
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="consoleTime">
-                            12:32:35 >
-                        </td>
-                        <td>
-                            All Init done
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="consoleTime">
-                            12:32:36 >
-                        </td>
-                        <td class="consoleMessage">
-                            51.43242342,21.432425235,34.2,56.3,45.2,23.5,245.54,232452.24,51.43242342,21.432425235,34.2,56.3,45.2,23.5,245.54,232452.24
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="consoleTime">
-                            12:32:36 >
-                        </td>
-                        <td class="consoleMessage">
-                            51.43242342,21.432425235,34.2,56.3,45.2,23.5,245.54,232452.24,51.43242342,21.432425235,34.2,56.3,45.2,23.5,245.54,232452.24
-                        </td>
-                    </tr>
+                    <tbody>
+                    </tbody>
                 </table>
             </div>
             <div id="consoleInput">
@@ -155,14 +129,71 @@
     </div>
 
     <div class="page" id="pageConfig" data-title="Config" data-default="BL">
-        <button class="ui inverted button">Connect with device</button>
-        <button class="ui inverted button" onclick="toogleTestAnimation()">Toogle test animation</button>
+        <button class="ui inverted button" id="armButton">Arm</button>
     </div>
 
     <div class="page" id="pageAI" data-title="AI" data-default="BR">
         <button class="ui inverted button">Check status</button>
     </div>
 
+    <div class="page" id="pageSettings" data-title="Settings" data-default="BR">
+        <div class="serverButtons">
+            <button class="ui inverted button" id="echoStart">Echo</button>
+            <button class="ui inverted button" id="connectButton">Connect</button>
+            <button class="ui inverted button" id="toogleServerOn">Start Server</button>    
+        </div>
+        <table id="echoTestTable">
+            <tbody>
+                <tr>
+                    <td><div id="echoWebApp" class="default active">Web App</div></td>
+                    <td></td>
+                    <td><div id="echoControler" class="default">Controler</div></td>
+                </tr>
+                <tr>
+                    <td><div id="echoServer" class="default">Serwer</div></td>
+                    <td><div id="echoRelayApp" class="default">Relay App</div></td>
+                    <td><div id="echoGroundStation" class="default">Ground Station</div></td>
+                </tr>
+                <tr>
+                    <td><div id="echoAIApp" class="default">AI App</div></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page" id="pageLiveData" data-title="Live" data-default="TR">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input 1</td>
+                    <td id="liveData0"></td>
+                </tr>
+                <tr>
+                    <td>Input 2</td>
+                    <td id="liveData1"></td>
+                </tr>
+                <tr>
+                    <td>Input 3</td>
+                    <td id="liveData2"></td>
+                </tr>
+                <tr>
+                    <td>Input 4</td>
+                    <td id="liveData3"></td>
+                </tr>
+                <tr>
+                    <td>Input 5</td>
+                    <td id="liveData4"></td>
+                </tr>
+                <tr>
+                    <td>Input 6</td>
+                    <td id="liveData5"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
     <div class="page" id="pageLogs" data-title="Logs" data-default="TR">
         <table class="ui selectable inverted table" id="logsList">
             <thead>
@@ -192,34 +223,6 @@
           </table>
     </div>
 
-    <div class="page" id="pageSettings" data-title="Settings" data-default="BR">
-        <button class="ui inverted button" id="echoStart">Echo</button>
-        <table id="echoTestTable">
-            <tbody>
-                <tr>
-                    <td><div id="echoWebApp" class="default active">Web App</div></td>
-                    <td></td>
-                    <td><div id="echoControler" class="default">Controler</div></td>
-                </tr>
-                <tr>
-                    <td><div id="echoServer" class="default">Serwer</div></td>
-                    <td><div id="echoRelayApp" class="default">Relay App</div></td>
-                    <td><div id="echoGroundStation" class="default">Ground Station</div></td>
-                </tr>
-                <tr>
-                    <td><div id="echoAIApp" class="default">AI App</div></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-        <button class="ui inverted button" id="startServer">Run server</button> 
-    </div>
-
-    <div class="page" id="pageLiveData" data-title="Live" data-default="TR">
-        
-    </div>
-    
     <script>
         mapInit();
         
@@ -231,8 +234,11 @@
             consoleInit();
             settingsInit();
             connectionInit();
-
-            setActive('pageSettings');
+            initConfig();
+            initLiveData();
+            
+            //setActive('pageSettings');
+            setActive('pageConfig');
           
 
             //---------------notes----------------------------

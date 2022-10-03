@@ -11,16 +11,6 @@ var animation;
 var playing = false;
 var playingSpeed = 1;
 
-function toogleTestAnimation(){
-    if(!testAnim){
-        animation = setInterval(visualizationFrame, 60);
-        testAnim = true;
-    }else{
-        testAnim = false;
-        clearInterval(animation);
-    }
-}
-
 function visualizationFrame(){
     var canvas = document.getElementById("visualizationCanvas");
     var ctx = canvas.getContext("2d");
@@ -94,5 +84,7 @@ function visualizationInit(){
             $('#playPauseButton img').attr('src', 'static/pause.png');
         }
     });
+
+    clog("Visualization ready", "info");
 }
 

@@ -2,7 +2,15 @@ var consoleAutoscroll = true;
 var inputHistory = [];
 var historyIndex = 0;
 
-function addConsoleOutput(time, direction, text, type="default"){
+function clog(text, style){
+    addConsoleOutput("now", "~", text, style);
+}
+
+function planeLog(text, style){
+    addConsoleOutput("now", ">", text, style);
+}
+
+function addConsoleOutput(time, direction, text, style=""){
     let date = new Date();
     var h = date.getHours();
     var m = date.getMinutes();
@@ -20,7 +28,7 @@ function addConsoleOutput(time, direction, text, type="default"){
         time = h + ':' + m + ':' + s;
     }
 
-    $('#consoleOutput tbody').append('<tr class="' + type + '"><td class="consoleTime">' + time + ' ' + direction + '</td><td class="consoleMessage">' + text + '</td></tr>');
+    $('#consoleOutput tbody').append('<tr class="' + style + '"><td class="consoleTime">' + time + ' ' + direction + '</td><td class="consoleMessage">' + text + '</td></tr>');
     if(consoleAutoscroll){
         $('#consoleOutput')[0].scrollTop = $('#consoleOutput')[0].scrollHeight;
     }
@@ -51,7 +59,6 @@ function consoleInit(){
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if(keycode == '13' && $('#consoleInputText').val() != ''){
             consoleAutoscroll = true;
-            addConsoleOutput("now", '<', $('#consoleInputText').val());
             sendToPlane($('#consoleInputText').val());
             $('#consoleInputText').val('');
         }
@@ -77,7 +84,6 @@ function consoleInit(){
                 $('#consoleInputText').val('');
                 $('#consoleInputText').focus();
             }
-            
         }
     });
 
@@ -87,4 +93,6 @@ function consoleInit(){
             consoleAutoscroll = true;
         }
     });
+
+    clog("Console ready", "info");
 }

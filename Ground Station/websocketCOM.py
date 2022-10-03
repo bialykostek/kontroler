@@ -40,10 +40,15 @@ if __name__ == "__main__":
         try:
             serialString = serialPort.readline().decode("utf-8").replace("\n", "").replace("\r", "")
             if serialString != "":
-                if(serialString[len(serialString) - 1] == '#'):
+                if serialString[len(serialString) - 1] == '%':
                     ws.send(json.dumps({
                         "type": 4,
                         "from": 3
+                    }))
+                elif serialString[0] == "$":
+                    ws.send(json.dumps({
+                        "type": 5,
+                        "text": serialString.replace("$", "")
                     }))
                 else:
                     ws.send(json.dumps({

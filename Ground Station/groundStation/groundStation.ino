@@ -14,7 +14,7 @@ void loop()
   if(Serial.available()){
     char in = Serial.read();
     if(in == 35){
-      Serial.println("#");
+      Serial.println("%");
     }else{
       Serial2.write(in);
     }

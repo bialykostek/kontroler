@@ -1,6 +1,8 @@
 function echoStart(){
     $('#echoTestTable .default').removeClass('active');
-    $('#echoWebApp').addClass('active');
+    setTimeout(_ => { 
+        $('#echoWebApp').addClass('active');
+    }, 50);
     sendObject({
         type: 3,
         target: 1
@@ -13,6 +15,14 @@ function echoStart(){
         type: 3,
         target: 3
     });
+    planeQuery(0);
+}
+
+function echoPlane(response){
+    if(response == "1"){
+        $('#echoControler').addClass('active');
+        downloadConfig();
+    }
 }
 
 function echoResponse(from){
@@ -29,4 +39,6 @@ function echoResponse(from){
 
 function settingsInit(){
     $('#echoStart').click(echoStart);
+
+    clog("Settings initialized", "info");
 }

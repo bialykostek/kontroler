@@ -7,5 +7,7 @@ function mapInit(){
     var zoom           = 15; 
 
     map.addLayer(mapnik);
-    map.setCenter(position, zoom );
+    map.setCenter(position, zoom);
+
+    clog("Map ready", "info");
 }

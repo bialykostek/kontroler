@@ -34,3 +34,24 @@
     border: 1px lightgray solid;
     color: white;
 }
+
+#consoleOutput .info {
+    font-style: italic;
+    color: lightgray;
+}
+
+#consoleOutput .order {
+    color: lightgrey;
+}
+
+#consoleOutput .positive {
+    color: green;
+}
+
+#consoleOutput .negative {
+    color: red;
+}
+
+#consoleOutput .notdelivered {
+    color: darkorange;
+}
