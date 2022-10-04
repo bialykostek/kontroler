@@ -1,4 +1,15 @@
 var armed = false;
+var saving = false;
+
+function toogleSaving(response){
+    if(response == "true"){
+        saving = true;
+        $('#savingButton').html("Stop saving");
+    }else{
+        saving = false;
+        $('#savingButton').html("Start saving");
+    }
+}
 
 function startInfo(response){
     if(response == "0"){
@@ -53,6 +64,12 @@ function DMPinit(response){
     }
 }
 
+function emergency(response){
+    if(response == "1"){
+        planeLog("Entered emergency mode", "negative");
+    }
+}
+
 function downloadConfig(){
     planeQuery(1);
 }
@@ -69,6 +86,33 @@ function toogleArm(){
 function initConfig(){
     $('#armButton').click(_ => {
         toogleArm();
+    });
+
+    $('#savingButton').click(_ => {
+        if(!saving){
+            sendObject({
+                type: 6,
+                action: 0
+            });
+        }else{
+            sendObject({
+                type: 6,
+                action: 1
+            });
+        }
+        sendObject({
+            type: 6,
+            action: 2
+        });
+        sendObject({
+            type: 6,
+            action: 3
+        });
+    });
+
+    sendObject({
+        type: 6,
+        action: 2
     });
 
     clog("Config initialization done", "info");

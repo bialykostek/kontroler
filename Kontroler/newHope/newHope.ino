@@ -39,6 +39,10 @@ long sendDataTimer = 0;
 long gpsTimer = 0;
 long sensorTimer = 0;
 
+long emergencyTimer = 0;
+int emergencyCounter = 0;
+int emergencySafety = 200;
+
 PWM ch1(2);
 PWM ch2(3);
 PWM ch3(4);
@@ -327,10 +331,28 @@ void setup() {
 
 void loop() {
   checkForMessage();
+
+  if(emergency && millis() - emergencyTimer > 1000){
+    COM.println();
+    COM.println("#7|1");
+    emergencyTimer = millis();
+  }
   
   if(millis() - receiverTimer > receiverInterval){
     readReceiver();
 
+    if(!emergency && armed){
+      if(millis() - emergencyTimer > emergencySafety){
+        emergencyCounter++;
+        if(emergencyCounter >= 3){
+          emergency = true;         
+        }
+      }else{
+        emergencyCounter = 0;
+      }
+      emergencyTimer = millis();
+    }
+    
     servo1.write(inp1);
     servo2.write(inp2);
     servo3.write(inp3);

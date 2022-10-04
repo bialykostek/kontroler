@@ -25,6 +25,8 @@
     <script src="js/config.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/live.js"></script>
+    <script src="js/logs.js"></script>
+
     
     <link rel="stylesheet" type="text/css" href="css/console.css">
     <link rel="stylesheet" type="text/css" href="css/logs.css">
@@ -138,6 +140,7 @@
 
     <div class="page" id="pageConfig" data-title="Config" data-default="BL">
         <button class="ui inverted button" id="armButton">Arm</button>
+        <button class="ui inverted button" id="savingButton">Start saving data</button>
     </div>
 
     <div class="page" id="pageAI" data-title="AI" data-default="BR">
@@ -171,7 +174,7 @@
     </div>
 
     <div class="page" id="pageLiveData" data-title="Live" data-default="TR">
-        <table>
+        <table class="liveTable">
             <tbody>
                 <tr>
                     <td class="dataName">Input 1</td>
@@ -209,6 +212,11 @@
                     <td class="dataName">Yaw</td>
                     <td id="liveData8"></td>
                 </tr>
+                
+            </tbody>
+        </table>
+        <table class="liveTable">
+            <tbody>
                 <tr>
                     <td class="dataName">Latitude</td>
                     <td id="liveData9"></td>
@@ -243,6 +251,7 @@
                 </tr>
             </tbody>
         </table>
+
     </div>
     
     <div class="page" id="pageLogs" data-title="Logs" data-default="TR">
@@ -250,26 +259,10 @@
             <thead>
               <tr>
                 <th class="collapsing">ID</th>
-                <th>Date</th>
-                <th>Time</th>
+                <th>LOG</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>1</td>
-                <td>12.04.22 13:57:34</td>
-                <td>10s</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>12.04.22 13:58:28</td>
-                <td>40s</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>12.04.22 13:59:56</td>
-                <td>50s</td>
-              </tr>
             </tbody>
           </table>
     </div>

@@ -3,6 +3,7 @@ function updateLiveData(data){
     data.forEach((val, ind) => {
         $('#liveData' + ind).html(val);
     });
+    updateChart(parseFloat(data[3]));
 }
 
 function initLiveData(){
