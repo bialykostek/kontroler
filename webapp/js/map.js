@@ -2,7 +2,7 @@ var map;
 var markers;
 
 function addMarker(point, icon){
-    var lonLat = new OpenLayers.LonLat(point[1], point[0]).transform(new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject());
+    var lonLat = new OpenLayers.LonLat(point[0], point[1]).transform(new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject());
     var marker = new OpenLayers.Marker(lonLat);
     markers.addMarker(marker);
     marker.setUrl(icon);
@@ -23,9 +23,10 @@ function markersToMap(){
     addMarker(localToGlobal([1800, 1300]), 'static/border.png');
     addMarker(localToGlobal([100, 1300]), 'static/border.png');
 
-    addMarker(localToGlobal(visLeftColumn), 'static/column.png');
-    addMarker(localToGlobal(visRightColumn), 'static/column.png');
+    addMarker(leftColumn, 'static/column.png');
+    addMarker(rightColumn, 'static/column.png');
 
+    addMarker([planeVis.long, planeVis.lat], 'static/plane.png');    
 }
 
 function mapInit(){
@@ -41,7 +42,6 @@ function mapInit(){
 
     markers = new OpenLayers.Layer.Markers("Markers");
     map.addLayer(markers);
-     
 
     clog("Map ready", "info");
 }

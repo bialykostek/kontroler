@@ -1,16 +1,14 @@
 var leftColumn = [19.8747786801465, 50.05427240641037];
 var rightColumn = [19.87556705467462, 50.05478046358079];
 
-var yRatio = 1;
 var angle = 0;
-var distanceRatio = 1;
 var visualizationScale = 10;
 
 var visLeftColumn = [550, 700];
 var visRightColumn = [1350, 700];
 
-var versorX;
-var versorY;
+var scaleEW = 1;
+var scaleNS = 1;
 
 var scaleH = 11;
 var scaleV = 9;
@@ -67,9 +65,6 @@ var planeVis = {
     size: 70
 }
 
-var testAnim = false;
-var animation;
-
 var playing = false;
 var playingSpeed = 1;
 
@@ -82,37 +77,29 @@ function rotate(point, angle){
 
 function localToGlobal(point){
     point = point.slice();
-    console.log(point);
     point[0] -= visLeftColumn[0];
     point[1] -= visLeftColumn[1];
-    console.log(point);
-    var point2 = rotate(point, angle);
-    console.log(angle);
-    console.log(point2);
-    point2[0] /= distanceRatio * visualizationScale;
-    point2[1] /= distanceRatio * visualizationScale;
-    console.log(point2);
-    point2[1] /= yRatio;
-    console.log(point2);
-    point2[0] += leftColumn[0];
-    point2[1] += leftColumn[1];
-    console.log(point2);
-    return point2;
+    point = rotate(point.slice(), angle);
+    point[0] /= scaleEW * visualizationScale;
+    point[1] /= scaleNS * visualizationScale;
+    point[0] += leftColumn[0];
+    point[1] += leftColumn[1];
+    return point;
 }
 
-function translateToLocal(point){
+function globalToLocal(point){
+    point = point.slice();
     point[0] -= leftColumn[0];
     point[1] -= leftColumn[1];
-    point[1] *= yRatio;
-    point[0] *= distanceRatio * visualizationScale;
-    point[1] *= distanceRatio * visualizationScale;
-    var point2 = rotate(point, -angle);
-    point2[0] += visLeftColumn[0];
-    point2[1] += visLeftColumn[1];
-    return point2;
+    point[0] *= scaleEW * visualizationScale;
+    point[1] *= scaleNS * visualizationScale;
+    point = rotate(point.slice(), -angle);
+    point[0] += visLeftColumn[0];
+    point[1] += visLeftColumn[1];
+    return point;
 }
 
-function distance(lat1, lon1, lat2, lon2) {
+function distance(lon1, lat1, lon2, lat2) {
     if ((lat1 == lat2) && (lon1 == lon2)) {
         return 0;
     }else{
@@ -142,9 +129,12 @@ function centerWp(wp){
 
 
 function updatePlanePosition(position){
-    position = translateToLocal(position);
+    planeVis.long = position[0];
+    planeVis.lat = position[1];
+    position = globalToLocal(position);
     planeVis.x = position[0];
     planeVis.y = position[1];
+    markersToMap();
 }
 
 function visualizationFrame(){
@@ -257,9 +247,7 @@ function visualizationInit(){
         visualizationFrame();
     });
     
-    yRatio = distance(leftColumn[1], leftColumn[0], rightColumn[1], leftColumn[0]) / distance(leftColumn[1], leftColumn[0], leftColumn[1], leftColumn[0] + Math.abs(rightColumn[0] - leftColumn[0]))
-
-    angle = Math.atan(distance(rightColumn[1], leftColumn[0], rightColumn[1], rightColumn[0])/distance(leftColumn[1], leftColumn[0], rightColumn[1], leftColumn[0]));
+    angle = Math.atan(distance(leftColumn[0], rightColumn[1], rightColumn[0], rightColumn[1])/distance(leftColumn[0], leftColumn[1], leftColumn[0], rightColumn[1]));
     if(rightColumn[1] < leftColumn[1]){
         angle += Math.PI/2;
         if(rightColumn[0] < leftColumn[0]){
@@ -271,13 +259,8 @@ function visualizationInit(){
         }
     }
 
-    distanceRatio = distance(leftColumn[1], leftColumn[0], rightColumn[1], leftColumn[0])/Math.abs(leftColumn[1] - rightColumn[1]);
-
-    versorX = [rightColumn[0] - leftColumn[0], rightColumn[1] - leftColumn[1]];
-    versorY = [-(rightColumn[1] - leftColumn[1]), rightColumn[0] - leftColumn[0]];
-
-    versorXlen = Math.sqrt(versorX[0]*versorX[0] + versorX[1]*versorX[1]);
-    versorX[0] /= versorXlen;
+    scaleEW = distance(leftColumn[0], leftColumn[1], leftColumn[0] + 0.003, leftColumn[1])/0.003;
+    scaleNS = distance(leftColumn[0], leftColumn[1], leftColumn[0], leftColumn[1] + 0.002)/0.002;
 
     var tempPlane = [19.875438578825595,  50.05479358675747];
 
