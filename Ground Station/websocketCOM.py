@@ -8,6 +8,20 @@ import serial
 
 PORT = "COM14"
 
+def reconnect():
+    ws = websocket.WebSocketApp("ws://jkostecki.ddns.net:1111", on_message = on_message, on_open = on_open, on_close=on_close)
+    wst = threading.Thread(target=ws.run_forever)
+    wst.daemon = False
+    wst.start()
+
+def set_interval(func, sec):
+    def func_wrapper():
+        set_interval(func, sec)
+        func()
+    t = threading.Timer(sec, func_wrapper)
+    t.start()
+    return t
+
 def on_message(ws, message):
     message = json.loads(message)
     if message["type"] == 0:

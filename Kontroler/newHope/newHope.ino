@@ -14,6 +14,8 @@ SFE_UBLOX_GNSS myGNSS;
 ICM_20948_I2C myICM;
 LPS ps;
 
+bool sendingData = false;
+
 int receiverInterval = 20;
 int heartbeatInterval = 7;
 int sendDataInterval = 50;
@@ -32,6 +34,12 @@ bool emergency = false;
 float altiPress;
 
 float vPitot;
+
+const int waypointNumber = 28;
+int waypoints[waypointNumber][2];
+int sendingWaypointsIndex = 0;
+
+int uploadingWaypointsIndex = 0;
 
 long heartbeatTimer = 0;
 long receiverTimer = 0;
@@ -88,6 +96,15 @@ void queryValue(int query){
         COM.println("#2|0");
       }
       break;
+    case 2:
+      //send waypoints
+      COM.println();
+      for(int i = 0; i < waypointNumber; i++){
+        COM.print(waypoints[i][0]);
+        COM.print(" ");
+        COM.println(waypoints[i][1]);
+      }
+      break;
     default:
       COM.print("Query ");
       COM.print(query);
@@ -96,11 +113,31 @@ void queryValue(int query){
 }
 
 void changeValue(int target, float value){
-  COM.print("Zmiana o wartosci ");
-  COM.print(target);
-  COM.print(" na wartosc ");
-  COM.print(value);
-  COM.println(".");
+  bool okMessage = true;
+  switch(target) {
+    case 0:
+      if((int)value == 0){
+        sendingData = false;
+      }else{
+        sendingData = true;
+      }
+      break;
+    case 1:
+      sendingWaypointsIndex = (int) value;
+      break;
+    case 2:
+      waypoints[sendingWaypointsIndex/2][sendingWaypointsIndex%2] = (int) value;
+      break;
+    default:
+      okMessage = false;
+      COM.print("Value to change ");
+      COM.print(target);
+      COM.println(" is not defined.");
+  }
+  if(okMessage){
+    COM.println();
+    COM.println("#8|1");
+  }
 }
 
 void executeOrder(int order){
@@ -330,6 +367,7 @@ void setup() {
 }
 
 void loop() {
+  Serial.println("messages");
   checkForMessage();
 
   if(emergency && millis() - emergencyTimer > 1000){
@@ -339,6 +377,7 @@ void loop() {
   }
   
   if(millis() - receiverTimer > receiverInterval){
+    Serial.println("receiver");
     readReceiver();
 
     if(!emergency && armed){
@@ -367,6 +406,7 @@ void loop() {
   }
   
   if(millis() - heartbeatTimer > heartbeatInterval){
+    Serial.println("heartbeat");
     int val = (int)(sin(heartbeatValue)*255);
     if(val < 0){
       val = 0;
@@ -379,7 +419,8 @@ void loop() {
     heartbeatTimer = millis();
   }
 
-  if(!emergency && millis() - sendDataTimer > sendDataInterval){
+  if(!emergency && sendingData && millis() - sendDataTimer > sendDataInterval){
+    Serial.println("sending");
     COM.print("$");
     COM.print(inp1);
     COM.print(",");
@@ -420,6 +461,7 @@ void loop() {
   }
 
   if(!emergency){
+    Serial.println("icm");
     icm_20948_DMP_data_t data;
     myICM.readDMPdataFromFIFO(&data);
   
@@ -447,6 +489,7 @@ void loop() {
   }
   
   if(!emergency && millis() - gpsTimer > gpsInterval){
+    Serial.println("gps");
     if (myGNSS.getPVT() && (myGNSS.getInvalidLlh() == false)){
       latitude = myGNSS.getLatitude();
       longitude = myGNSS.getLongitude();
@@ -459,9 +502,10 @@ void loop() {
   }
 
   if(!emergency && millis() - sensorTimer > sensorInterval){
+    Serial.println("pressure");
     float pressure = ps.readPressureMillibars();
     altiPress = ps.pressureToAltitudeMeters(pressure);
-    
+    Serial.println("pitot");
     vPitot = getPitot();
     
     sensorTimer = millis();

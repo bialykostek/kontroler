@@ -1,5 +1,9 @@
 var websocket;
 var connected = false;
+var changeValueCallback = null;
+var sendingWaypointsStatus = -1;
+var changingValueInterval;
+var sendingWaypointsIndex = 0;
 
 function sendToPlane(text){
     if(websocket.readyState == 1){
@@ -11,7 +15,6 @@ function sendToPlane(text){
     }else{
         addConsoleOutput("now", "<", text, "notdelivered");
     }
-    
 }
 
 function planeExecute(order){
@@ -22,6 +25,11 @@ function planeQuery(order){
     sendToPlane("?"+order+";");
 }
 
+function planeChangeValue(target, value, callback=null){
+    sendToPlane("!"+target+";"+value+";");
+    changeValueCallback = callback;
+}
+
 function sendObject(object){
     if(websocket.readyState == 1){
         websocket.send(JSON.stringify(object));
@@ -30,6 +38,59 @@ function sendObject(object){
 
 function disconnectFromServer(){
     websocket.close();
+}
+
+function confirmChangeValue(){
+    if(changeValueCallback != null){
+        window[changeValueCallback]();
+    }
+}
+
+function sendWaypointsConfirm(){
+    if(sendingWaypointsStatus == -1){
+        sendingWaypointsStatus = 0;
+        sendingWaypointsIndex = 0;
+    }else if(sendingWaypointsStatus == 0){
+        sendingWaypointsStatus++;
+        clog("Updating waypoints index ok");
+    }else if(sendingWaypointsStatus == 1){
+        sendingWaypointsStatus--;
+        sendingWaypointsIndex++;
+        if(sendingWaypointsIndex >= waypointsTransformed.length * 2){
+            sendingWaypointsStatus = 2;
+        }
+        clog("Updating waypoint " + sendingWaypointsIndex  + " value ok");
+    }
+    clearInterval(changingValueInterval);
+    sendWaypoints();
+}
+
+function sendWaypoints(){
+    if(sendingWaypointsStatus == -1){
+        var tmpFunc = _ => {
+            planeChangeValue(0, 0, callback = "sendWaypointsConfirm");
+        };
+        changingValueInterval = setInterval(tmpFunc, 200);
+        tmpFunc();
+    }
+    if(sendingWaypointsStatus == 0){
+        var tmpFunc = _ => {
+            planeChangeValue(1, sendingWaypointsIndex, callback = "sendWaypointsConfirm");
+        };
+        changingValueInterval = setInterval(tmpFunc, 200);
+        tmpFunc();
+    }
+    if(sendingWaypointsStatus == 1){
+        var tmpFunc = _ => {
+            planeChangeValue(2, waypointsTransformed[parseInt(sendingWaypointsIndex/2)][sendingWaypointsIndex%2], callback = "sendWaypointsConfirm");
+        };
+        changingValueInterval = setInterval(tmpFunc, 200);
+        tmpFunc();
+    }
+    if(sendingWaypointsStatus == 2){
+        clog("Updating waypoints data complete!", "positive");
+        sendingWaypointsStatus = -1;
+    }
 }
 
 function connectToServer(){
@@ -84,9 +145,14 @@ function connectToServer(){
                     case 7:
                         emergency(response);
                         break;
+                    case 8:
+                        confirmChangeValue(response);
+                        break;
                     default:
                       clog("Unknow message type " + messageType + ": " + response, "negative");
                   }  
+            }else{
+                planeLog(data.text);
             }
         }
 

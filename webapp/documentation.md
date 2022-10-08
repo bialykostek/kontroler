@@ -3,8 +3,14 @@ Orders [@]:
 1 - disarm
 
 Information request [?]:
-0 - heartbeat
+0 - is alive?
 1 - is armed?
+2 - show waypoints
+
+Change value [!]:
+0 - sending data (0 - false, 1 true)
+1 - change waypoints sending index
+2 - change waypoint value
 
 Responses [#]:
 0 - heartbeat (1 - ok)
@@ -15,6 +21,7 @@ Responses [#]:
 5 - GPS initialization result (0 - error, 1 - success)
 6 - LPS initialization result (0 - error, 1 - success)
 7 - emergency mode (1 - emergency)
+8 - change value confirmation (1 - ok)
 
 Websocket message type:
 0 - Web App -> Ground Station
