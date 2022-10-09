@@ -46,53 +46,6 @@ function confirmChangeValue(){
     }
 }
 
-function sendWaypointsConfirm(){
-    if(sendingWaypointsStatus == -1){
-        sendingWaypointsStatus = 0;
-        sendingWaypointsIndex = 0;
-    }else if(sendingWaypointsStatus == 0){
-        sendingWaypointsStatus++;
-        clog("Updating waypoints index ok");
-    }else if(sendingWaypointsStatus == 1){
-        sendingWaypointsStatus--;
-        sendingWaypointsIndex++;
-        if(sendingWaypointsIndex >= waypointsTransformed.length * 2){
-            sendingWaypointsStatus = 2;
-        }
-        clog("Updating waypoint " + sendingWaypointsIndex  + " value ok");
-    }
-    clearInterval(changingValueInterval);
-    sendWaypoints();
-}
-
-function sendWaypoints(){
-    if(sendingWaypointsStatus == -1){
-        var tmpFunc = _ => {
-            planeChangeValue(0, 0, callback = "sendWaypointsConfirm");
-        };
-        changingValueInterval = setInterval(tmpFunc, 200);
-        tmpFunc();
-    }
-    if(sendingWaypointsStatus == 0){
-        var tmpFunc = _ => {
-            planeChangeValue(1, sendingWaypointsIndex, callback = "sendWaypointsConfirm");
-        };
-        changingValueInterval = setInterval(tmpFunc, 200);
-        tmpFunc();
-    }
-    if(sendingWaypointsStatus == 1){
-        var tmpFunc = _ => {
-            planeChangeValue(2, waypointsTransformed[parseInt(sendingWaypointsIndex/2)][sendingWaypointsIndex%2], callback = "sendWaypointsConfirm");
-        };
-        changingValueInterval = setInterval(tmpFunc, 200);
-        tmpFunc();
-    }
-    if(sendingWaypointsStatus == 2){
-        clog("Updating waypoints data complete!", "positive");
-        sendingWaypointsStatus = -1;
-    }
-}
-
 function connectToServer(){
     websocket = new WebSocket('ws://jkostecki.ddns.net:1111');
     websocket.onopen = _ => {

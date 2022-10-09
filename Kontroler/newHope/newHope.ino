@@ -1,4 +1,4 @@
-#include <EEPROM.h>
+#include <EEPROMex.h>
 #include "PWM.hpp"
 #include <Servo.h>
 #include "ICM_20948.h"
@@ -14,6 +14,8 @@ SFE_UBLOX_GNSS myGNSS;
 ICM_20948_I2C myICM;
 LPS ps;
 
+void* comBuffer[100];
+
 bool sendingData = false;
 
 int receiverInterval = 20;
@@ -26,6 +28,9 @@ float heartbeatValue = 0;
 
 double yaw, pitch, roll;
 
+int planeX, planeY = 0;
+int previousSide = 0;
+
 int mode = 0;
 bool armed = false;
 
@@ -35,8 +40,8 @@ float altiPress;
 
 float vPitot;
 
-const int waypointNumber = 28;
-int waypoints[waypointNumber][2];
+const int waypointsNumber = 28;
+int waypoints[waypointsNumber][2];
 int sendingWaypointsIndex = 0;
 
 int uploadingWaypointsIndex = 0;
@@ -71,6 +76,9 @@ long gspeed;
 byte SIV;
 float heading;
 
+float lineA, lineB, lineC = 1;
+int currentWaypoint = 0;
+
 int inp1, inp2, inp3, inp4, inp5, inp6;
 
 int requestStatus = 0;
@@ -79,6 +87,53 @@ int requestType = 0;
 float requestValue = 0;
 bool requestComma = false;
 int requestCommaPlace = 0;
+
+long leftColumnLon = 0;
+double leftColumnLat = 0;
+
+int visLeftColumnLon = 550;
+int visLeftColumnLat = 700;
+
+double scaleEW = 1;
+double scaleNS = 1;
+
+double angle;
+
+int visualizationScale = 10;
+
+int globalToLocalX(long lon, long lat){
+  double point[2];
+  point[0] = (double)lon/10000000 - leftColumnLon;
+  point[1] = (double)lat/10000000 - leftColumnLat;
+
+  point[0] *= scaleEW * visualizationScale;
+  point[1] *= scaleNS * visualizationScale;
+
+  point[0] = point[0] * cos(angle) - point[1] * sin(angle);
+  point[1] = point[0] * sin(angle) + point[1] * sin(angle);
+
+  point[0] += visLeftColumnLon;
+  point[1] += visLeftColumnLat;
+  
+  return (int) point[0];
+}
+
+int globalToLocalY(long lon, long lat){
+  double point[2];
+  point[0] = (double)lon/10000000 - leftColumnLon;
+  point[1] = (double)lat/10000000 - leftColumnLat;
+
+  point[0] *= scaleEW * visualizationScale;
+  point[1] *= scaleNS * visualizationScale;
+
+  point[0] = point[0] * cos(angle) - point[1] * sin(angle);
+  point[1] = point[0] * sin(angle) + point[1] * sin(angle);
+
+  point[0] += visLeftColumnLon;
+  point[1] += visLeftColumnLat;
+  
+  return (int) point[1];
+}
 
 void queryValue(int query){
   switch(query) {
@@ -99,7 +154,7 @@ void queryValue(int query){
     case 2:
       //send waypoints
       COM.println();
-      for(int i = 0; i < waypointNumber; i++){
+      for(int i = 0; i < waypointsNumber; i++){
         COM.print(waypoints[i][0]);
         COM.print(" ");
         COM.println(waypoints[i][1]);
@@ -127,6 +182,23 @@ void changeValue(int target, float value){
       break;
     case 2:
       waypoints[sendingWaypointsIndex/2][sendingWaypointsIndex%2] = (int) value;
+      EEPROM.writeInt(sendingWaypointsIndex*2+1, (int) value);
+      break;
+    case 3:
+      if((int)value == 0){
+        leftColumnLon = longitude;
+        EEPROM.writeLong(114, leftColumnLon);
+        COM.println();
+        COM.println("Left column longitude updated");
+      }
+      break;
+    case 4:
+      if((int)value == 0){
+        leftColumnLat = latitude;
+        EEPROM.writeLong(118, leftColumnLat);
+        COM.println();
+        COM.println("Left column latitude updated");
+      }
       break;
     default:
       okMessage = false;
@@ -221,6 +293,31 @@ void checkForMessage(){
   }
 }
 
+float getAngle(float p1x,float  p1y, float p2x, float p2y, float p3x, float p3y){
+    float x1 = p2x-p1x;
+    float y1 = p2y-p1y;
+    float x2 = p3x-p2x;
+    float y2 = p3y-p2y;
+    float angle = acos((x1*x2 + y1*y2)/(sqrt(x1*x1+y1*y1)*sqrt(x2*x2+y2*y2)))*180/3.14;
+    if(x1*y2-x2*y1 > 0){
+        angle *= -1;
+    }
+    return angle;
+}
+
+int distance(int p1x, int p1y, int p2x, int p2y){
+    float x1 = p2x-p1x;
+    float y1 = p2y-p1y;
+    return sqrt(x1*x1+y1*y1); 
+}
+
+int mathAbs(int x){
+  if(x >= 0){
+    return x;
+  }
+  return x*-1;
+}
+
 float getPitot() {
   byte address, Press_H, Press_L, _status;
   unsigned int P_dat;
@@ -228,14 +325,17 @@ float getPitot() {
   byte Temp_L;
   byte Temp_H;
   address = 0x28;
+  Serial.print("x ");
+  Serial.println(millis());
   Wire.requestFrom((int) address, (int) 4);
-  uint16_t millis_start = millis();
+  Serial.print("d ");
+  Serial.println(millis());
+  long millis_start = millis();
   bool ok = true;
   while (Wire.available() < 4) {
-    if (((uint16_t) millis() - millis_start) > 1) {
+    if (millis() - millis_start > 2) {
       ok = false;
-      Wire.endTransmission();
-      return 0;
+      break;
     }
   }
   if (ok) {
@@ -244,7 +344,7 @@ float getPitot() {
     Temp_H = Wire.read();
     Temp_L = Wire.read();
   }
-  Wire.endTransmission();
+  Wire.endTransmission(false);
   _status = (Press_H >> 6) & 0x03;
   Press_H = Press_H & 0x3f;
   P_dat = (((unsigned int) Press_H) << 8) | Press_L;
@@ -278,6 +378,8 @@ void setup() {
   //communication
   COM.begin(38400);
   Serial.begin(38400);
+
+  COM.addMemoryForWrite(comBuffer, sizeof(comBuffer));
   
   //receiver
   //PWM
@@ -328,14 +430,11 @@ void setup() {
     if (success){
       COM.println();
       COM.println("#4|1");
-    }
-    else
-    {
-      while(true){
-        COM.println();
-        COM.println("#4|0");
-        delay(500);
-      }
+    }else{
+      COM.println();
+      COM.println("#4|0");
+      //SCB_AIRCR = 0x05FA0004;
+      while(true);
     }
 
     while(!myGNSS.begin()){
@@ -356,6 +455,13 @@ void setup() {
     ps.enableDefault();
 
     COM.println("#6|1");
+
+    for(int i=0; i < waypointsNumber; i++){
+      waypoints[i][0] = EEPROM.readInt(i*4+1);
+      waypoints[i][1] = EEPROM.readInt(i*4+3);
+    }
+    leftColumnLon = EEPROM.readLong(114);
+    leftColumnLat = EEPROM.readLong(118);
     
   }else{
     //emergency
@@ -367,7 +473,6 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("messages");
   checkForMessage();
 
   if(emergency && millis() - emergencyTimer > 1000){
@@ -377,7 +482,8 @@ void loop() {
   }
   
   if(millis() - receiverTimer > receiverInterval){
-    Serial.println("receiver");
+    Serial.print("receiver ");
+    Serial.println(millis());
     readReceiver();
 
     if(!emergency && armed){
@@ -406,7 +512,8 @@ void loop() {
   }
   
   if(millis() - heartbeatTimer > heartbeatInterval){
-    Serial.println("heartbeat");
+    Serial.print("heartbeat ");
+    Serial.println(millis());
     int val = (int)(sin(heartbeatValue)*255);
     if(val < 0){
       val = 0;
@@ -420,7 +527,8 @@ void loop() {
   }
 
   if(!emergency && sendingData && millis() - sendDataTimer > sendDataInterval){
-    Serial.println("sending");
+    Serial.print("sending ");
+    Serial.print(millis());
     COM.print("$");
     COM.print(inp1);
     COM.print(",");
@@ -456,12 +564,14 @@ void loop() {
     COM.print(",");
     COM.print(vPitot);
     COM.println();
-    
+    Serial.print("-");
+    Serial.println(millis());
     sendDataTimer = millis();
   }
 
   if(!emergency){
-    Serial.println("icm");
+    Serial.print("icm ");
+    Serial.println(millis());
     icm_20948_DMP_data_t data;
     myICM.readDMPdataFromFIFO(&data);
   
@@ -489,7 +599,8 @@ void loop() {
   }
   
   if(!emergency && millis() - gpsTimer > gpsInterval){
-    Serial.println("gps");
+    Serial.print("gps ");
+    Serial.println(millis());
     if (myGNSS.getPVT() && (myGNSS.getInvalidLlh() == false)){
       latitude = myGNSS.getLatitude();
       longitude = myGNSS.getLongitude();
@@ -497,17 +608,56 @@ void loop() {
       SIV = myGNSS.getSIV();
       gspeed = myGNSS.getGroundSpeed();
       heading = heading = (float)((float)myGNSS.getHeading())/100000.0;
-      gpsTimer = millis();
+
+      planeX = globalToLocalX(longitude, latitude);
+      planeY = globalToLocalY(longitude, latitude);
+
+      int currentSide = 0;
+      if(lineA*planeX + lineB*planeY + lineC > 0){
+        currentSide = 1;
+      }
+      
+      if(previousSide != currentSide){
+        currentWaypoint++;
+        int previousWaypoint = currentWaypoint-1;
+        if(previousWaypoint < 0){
+          previousWaypoint = waypointsNumber - 1;
+        }
+        int nextWaypoint = currentWaypoint++;
+        if(nextWaypoint >= waypointsNumber){
+          nextWaypoint = 0;
+        }
+        //A - prev, B - next, C - current, D - tmp
+        float AcBcRatio = distance(waypoints[previousWaypoint][0], waypoints[previousWaypoint][1], waypoints[currentWaypoint][0], waypoints[currentWaypoint][1])/distance(waypoints[nextWaypoint][0], waypoints[nextWaypoint][1], waypoints[currentWaypoint][0], waypoints[currentWaypoint][1]);
+        int ADx = (waypoints[nextWaypoint][0] - waypoints[previousWaypoint][0]) * AcBcRatio;
+        int ADy = (waypoints[nextWaypoint][1] - waypoints[previousWaypoint][1]) * AcBcRatio;
+
+        int Dx = waypoints[previousWaypoint][0] + ADx;
+        int Dy = waypoints[previousWaypoint][1] + ADy;
+
+        lineA = (waypoints[currentWaypoint][1] - Dy)/(waypoints[currentWaypoint][0] - Dx);
+        lineB = 1;
+        lineC = Dy - lineA*Dx;
+
+        previousSide = 0;
+        if(lineA*planeX + lineB*planeY + lineC > 0){
+          previousSide = 1;
+       }
+      }
+
+      
+      gpsTimer = millis();      
     }
   }
 
   if(!emergency && millis() - sensorTimer > sensorInterval){
-    Serial.println("pressure");
+    Serial.print("pressure ");
+    Serial.println(millis());
     float pressure = ps.readPressureMillibars();
     altiPress = ps.pressureToAltitudeMeters(pressure);
-    Serial.println("pitot");
+    Serial.print("pitot ");
+    Serial.println(millis());
     vPitot = getPitot();
-    
     sensorTimer = millis();
   }
 }

@@ -140,13 +140,21 @@
     <div class="page" id="pageConfig" data-title="Config" data-default="BL">
         <button class="ui inverted button" id="armButton">Arm</button>
         <button class="ui inverted button" id="savingButton">Start saving data</button>
-        <br />
+        <br /><br />
         Horizontal scale:
         <input type="range" min="0" max="100" value="67" id="scaleHslider">
         <br />
         Vertical scale:
         <input type="range" min="0" max="100" value="42" id="scaleVslider">
-        
+        <br />
+        <br />
+        Set current position as:<br />
+        <button class="ui inverted button" id="updateLeftColumnBtn">Left column</button>
+        <button class="ui inverted button" id="updateRightColumnBtn">Right column</button><br />
+        <button class="ui inverted button" id="calibrateCoordinateBtn">Calibrate local coordinate systems</button><br />
+
+        <br />
+        <button class="ui inverted button" id="updateWaypointsBtn">Update waypoints</button>
     </div>
 
     <div class="page" id="pageAI" data-title="AI" data-default="BR">

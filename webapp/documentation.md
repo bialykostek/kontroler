@@ -6,11 +6,15 @@ Information request [?]:
 0 - is alive?
 1 - is armed?
 2 - show waypoints
+3 - current left column
+4 - current right column
 
 Change value [!]:
 0 - sending data (0 - false, 1 true)
-1 - change waypoints sending index
-2 - change waypoint value
+1 - change waypoints sending index (int)
+2 - change waypoint value (int)
+3 - set current position as left column
+4 - set current position as right column
 
 Responses [#]:
 0 - heartbeat (1 - ok)
@@ -42,3 +46,9 @@ Server settings actions (type 6):
 Server settings responses (type 7):
 0 - server on/off
 1 - log list
+
+Controler EEPROM adresses:
+0 - arm info
+113 - waypoints
+114-117 - left column long
+118-121 - left column lat
