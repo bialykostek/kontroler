@@ -405,7 +405,8 @@ void setup() {
     COM.println("#1|0");
 
     WIRE_PORT.begin();
-
+    WIRE_PORT.setClock(400000);
+    
     while(true){
       myICM.begin(WIRE_PORT, AD0_VAL);
       if (myICM.status != ICM_20948_Stat_Ok){
@@ -421,12 +422,13 @@ void setup() {
     
     bool success = true;
     success &= (myICM.initializeDMP() == ICM_20948_Stat_Ok);
-    success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
+    /*success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
     success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 0) == ICM_20948_Stat_Ok);
     success &= (myICM.enableFIFO() == ICM_20948_Stat_Ok);
     success &= (myICM.enableDMP() == ICM_20948_Stat_Ok);
     success &= (myICM.resetDMP() == ICM_20948_Stat_Ok);
     success &= (myICM.resetFIFO() == ICM_20948_Stat_Ok);
+    */
     if (success){
       COM.println();
       COM.println("#4|1");
