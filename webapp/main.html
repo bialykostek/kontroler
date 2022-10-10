@@ -138,6 +138,10 @@
     </div>
 
     <div class="page" id="pageConfig" data-title="Config" data-default="BL">
+        <button class="ui inverted button" id="stopSendingBtn">Stop sending interval</button><br />
+        <button class="ui inverted button" id="sendingOnBtn">Turn on sending data</button>
+        <button class="ui inverted button" id="sendingOffBtn">Turn off sending data</button>
+        <br />
         <button class="ui inverted button" id="armButton">Arm</button>
         <button class="ui inverted button" id="savingButton">Start saving data</button>
         <br /><br />
@@ -262,6 +266,42 @@
                 <tr>
                     <td class="dataName">Air Speed</td>
                     <td id="liveData16"></td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="liveTable">
+            <tbody>
+                <tr>
+                    <td class="dataName">Line A</td>
+                    <td id="liveData17"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Line B</td>
+                    <td id="liveData18"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Line C</td>
+                    <td id="liveData19"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">plane X</td>
+                    <td id="liveData20"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Plane Y</td>
+                    <td id="liveData21"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Current waypoint</td>
+                    <td id="liveData22"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Altitude Pressure</td>
+                    <td id="liveData23"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Air Speed</td>
+                    <td id="liveData24"></td>
                 </tr>
             </tbody>
         </table>

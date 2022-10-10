@@ -43,6 +43,8 @@ function disconnectFromServer(){
 function confirmChangeValue(){
     if(changeValueCallback != null){
         window[changeValueCallback]();
+    }else{
+        clog("Value updated", "positive");
     }
 }
 

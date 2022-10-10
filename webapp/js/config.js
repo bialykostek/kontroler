@@ -14,7 +14,6 @@ function toogleSaving(response){
 function startInfo(response){
     if(response == "0"){
         planeLog("System started normally", "positive");
-        downloadConfig();
     }
     if(response == "1"){
         planeLog("Emergency mode start", "negative");
@@ -146,9 +145,15 @@ function sendWaypoints(){
         tmpFunc();
     }
     if(sendingWaypointsStatus == 2){
+        changeValueCallback = null;
         clog("Updating waypoints data complete!", "positive");
         sendingWaypointsStatus = -1;
     }
+}
+
+function stopSending(){
+    clearInterval(changingValueInterval);
+    planeLog("Sending data stopped");
 }
 
 function initConfig(){
@@ -193,6 +198,24 @@ function initConfig(){
     $('#calibrateCoordinateBtn').click(_ => {
         calibrateCoordinateSystems();
     });
+
+    $('#sendingOnBtn').click(_ => {
+        planeChangeValue(0, 1);
+    });
+
+    $('#stopSendingBtn').click(_ => {
+        clearInterval(changingValueInterval);
+    });
+
+    $('#sendingOffBtn').click(_ => {
+        var tmpFunc = _ => {
+            planeChangeValue(0, 0, callback = "stopSending");
+        };
+        changingValueInterval = setInterval(tmpFunc, 20);
+        tmpFunc();
+    });
+
+    
 
     sendObject({
         type: 6,

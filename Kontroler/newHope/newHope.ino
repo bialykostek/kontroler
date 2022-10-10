@@ -14,7 +14,7 @@ SFE_UBLOX_GNSS myGNSS;
 ICM_20948_I2C myICM;
 LPS ps;
 
-void* comBuffer[100];
+void* comBuffer[200];
 
 bool sendingData = false;
 
@@ -54,7 +54,7 @@ long sensorTimer = 0;
 
 long emergencyTimer = 0;
 int emergencyCounter = 0;
-int emergencySafety = 200;
+int emergencySafety = 50;
 
 PWM ch1(2);
 PWM ch2(3);
@@ -234,7 +234,6 @@ void executeOrder(int order){
 void checkForMessage(){
   if(COM.available()){
     int in = COM.read();
-    
     if(in == 46){
       requestComma = true;
     }
@@ -325,11 +324,7 @@ float getPitot() {
   byte Temp_L;
   byte Temp_H;
   address = 0x28;
-  Serial.print("x ");
-  Serial.println(millis());
   Wire.requestFrom((int) address, (int) 4);
-  Serial.print("d ");
-  Serial.println(millis());
   long millis_start = millis();
   bool ok = true;
   while (Wire.available() < 4) {
@@ -422,13 +417,13 @@ void setup() {
     
     bool success = true;
     success &= (myICM.initializeDMP() == ICM_20948_Stat_Ok);
-    /*success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
+    success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
     success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 0) == ICM_20948_Stat_Ok);
     success &= (myICM.enableFIFO() == ICM_20948_Stat_Ok);
     success &= (myICM.enableDMP() == ICM_20948_Stat_Ok);
     success &= (myICM.resetDMP() == ICM_20948_Stat_Ok);
     success &= (myICM.resetFIFO() == ICM_20948_Stat_Ok);
-    */
+    
     if (success){
       COM.println();
       COM.println("#4|1");
@@ -484,8 +479,6 @@ void loop() {
   }
   
   if(millis() - receiverTimer > receiverInterval){
-    Serial.print("receiver ");
-    Serial.println(millis());
     readReceiver();
 
     if(!emergency && armed){
@@ -514,8 +507,6 @@ void loop() {
   }
   
   if(millis() - heartbeatTimer > heartbeatInterval){
-    Serial.print("heartbeat ");
-    Serial.println(millis());
     int val = (int)(sin(heartbeatValue)*255);
     if(val < 0){
       val = 0;
@@ -529,8 +520,6 @@ void loop() {
   }
 
   if(!emergency && sendingData && millis() - sendDataTimer > sendDataInterval){
-    Serial.print("sending ");
-    Serial.print(millis());
     COM.print("$");
     COM.print(inp1);
     COM.print(",");
@@ -565,15 +554,23 @@ void loop() {
     COM.print(altiPress);
     COM.print(",");
     COM.print(vPitot);
+    COM.print(",");
+    COM.print(lineA);
+    COM.print(",");
+    COM.print(lineB);
+    COM.print(",");
+    COM.print(lineC);
+    COM.print(",");
+    COM.print(planeX);
+    COM.print(",");
+    COM.print(planeY);
+    COM.print(",");
+    COM.print(currentWaypoint);
     COM.println();
-    Serial.print("-");
-    Serial.println(millis());
     sendDataTimer = millis();
   }
 
   if(!emergency){
-    Serial.print("icm ");
-    Serial.println(millis());
     icm_20948_DMP_data_t data;
     myICM.readDMPdataFromFIFO(&data);
   
@@ -601,8 +598,6 @@ void loop() {
   }
   
   if(!emergency && millis() - gpsTimer > gpsInterval){
-    Serial.print("gps ");
-    Serial.println(millis());
     if (myGNSS.getPVT() && (myGNSS.getInvalidLlh() == false)){
       latitude = myGNSS.getLatitude();
       longitude = myGNSS.getLongitude();
@@ -645,20 +640,14 @@ void loop() {
         if(lineA*planeX + lineB*planeY + lineC > 0){
           previousSide = 1;
        }
-      }
-
-      
+      }    
       gpsTimer = millis();      
     }
   }
 
   if(!emergency && millis() - sensorTimer > sensorInterval){
-    Serial.print("pressure ");
-    Serial.println(millis());
     float pressure = ps.readPressureMillibars();
     altiPress = ps.pressureToAltitudeMeters(pressure);
-    Serial.print("pitot ");
-    Serial.println(millis());
     vPitot = getPitot();
     sensorTimer = millis();
   }
