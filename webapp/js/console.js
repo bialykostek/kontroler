@@ -2,6 +2,8 @@ var consoleAutoscroll = true;
 var inputHistory = [];
 var historyIndex = 0;
 
+var maxRows = 500;
+
 function clog(text, style){
     addConsoleOutput("now", "~", text, style);
 }
@@ -36,6 +38,9 @@ function addConsoleOutput(time, direction, text, style=""){
         historyIndex = inputHistory.length + 1;
         inputHistory.push(text);
     }
+    if($('#consoleOutput tbody tr').length > maxRows){
+        $($('#consoleOutput tbody tr')[0]).remove();
+    }
 }
 
 function consoleInit(){
@@ -59,7 +64,12 @@ function consoleInit(){
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if(keycode == '13' && $('#consoleInputText').val() != ''){
             consoleAutoscroll = true;
-            sendToPlane($('#consoleInputText').val());
+            if($('#consoleInputText').val() != "clear"){
+                sendToPlane($('#consoleInputText').val());
+                
+            }else{
+                $('#consoleOutput tbody tr').remove();
+            }
             $('#consoleInputText').val('');
         }
     });

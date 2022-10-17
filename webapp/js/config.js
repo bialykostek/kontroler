@@ -103,6 +103,65 @@ function updateLeftColumnLon(){
     tmpFunc();
 }
 
+function updateScaleNS(){
+    var tmpFunc = _ => {
+        planeChangeValue(5, scaleNS, callback = "updateScaleEW");
+    };
+    changingValueInterval = setInterval(tmpFunc, 200);
+    tmpFunc();
+}
+
+function updateScaleEW(){
+    clearInterval(changingValueInterval);
+    var tmpFunc = _ => {
+        planeChangeValue(6, scaleEW, callback = "updateAngle");
+    };
+    changingValueInterval = setInterval(tmpFunc, 200);
+    tmpFunc();
+}
+
+function updateAngle(){
+    clearInterval(changingValueInterval);
+    var tmpFunc = _ => {
+        planeChangeValue(7, angle, callback = "updateLocalParamsDone");
+    };
+    changingValueInterval = setInterval(tmpFunc, 200);
+    tmpFunc();
+}
+
+function updateLocalParamsDone(){
+    planeLog("Update of local coordinate params complete", "positive");
+    clearInterval(changingValueInterval);
+    changeValueCallback = null;
+}
+
+function getLeftColumn(data){
+    planeQuery(3);
+}
+
+function getRightColumn(data){
+    planeQuery(4);
+}
+
+function gotLeftColumn(data){
+    clog("Plane left column: " + data);
+    data = data.split(";");
+    leftColumn[0] = parseInt(data[0])/10000000;
+    leftColumn[1] = parseInt(data[1])/10000000;
+}
+
+function gotRightColumn(data){
+    clog("Plane right column: " + data);
+    data = data.split(";");
+    rightColumn[0] = parseInt(data[0])/10000000;
+    rightColumn[1] = parseInt(data[1])/10000000;
+}
+
+function calibrateCoordinateSystems(){
+    calibration();
+    updateScaleNS();
+}
+
 function sendWaypointsConfirm(){
     if(sendingWaypointsStatus == -1){
         sendingWaypointsStatus = 0;
@@ -153,7 +212,7 @@ function sendWaypoints(){
 
 function stopSending(){
     clearInterval(changingValueInterval);
-    planeLog("Sending data stopped");
+    planeLog("Sending data from plane stopped");
 }
 
 function initConfig(){
@@ -204,18 +263,33 @@ function initConfig(){
     });
 
     $('#stopSendingBtn').click(_ => {
+        clog("Stop sending value change request");
         clearInterval(changingValueInterval);
+    });
+
+    $('#getOneFrameBtn').click(_ => {
+        planeExecute(2);
+    });
+
+    $('#getLeftColumnBtn').click(_ => {
+        getLeftColumn();
+    });
+
+    $('#getRightColumnBtn').click(_ => {
+        getRightColumn();
+    });
+
+    $('#calibrateYawBtn').click(_ => {
+        planeChangeValue(9, 0);
     });
 
     $('#sendingOffBtn').click(_ => {
         var tmpFunc = _ => {
             planeChangeValue(0, 0, callback = "stopSending");
         };
-        changingValueInterval = setInterval(tmpFunc, 20);
+        changingValueInterval = setInterval(tmpFunc, 200);
         tmpFunc();
-    });
-
-    
+    });    
 
     sendObject({
         type: 6,

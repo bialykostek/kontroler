@@ -21,9 +21,9 @@ bool sendingData = false;
 
 int receiverInterval = 20;
 int heartbeatInterval = 7;
-int sendDataInterval = 1000;
+int sendDataInterval = 50;
 int gpsInterval = 500;
-int sensorInterval = 100;
+int sensorInterval = 50;
 
 float heartbeatValue = 0;
 
@@ -60,8 +60,6 @@ long receiverTimer = 0;
 long sendDataTimer = 0;
 long gpsTimer = 0;
 long sensorTimer = 0;
-
-long debugTimer = 0;
 
 long emergencyTimer = 0;
 int emergencyCounter = 0;
@@ -114,6 +112,7 @@ float scaleNS = 1;
 float angle = 0;
 
 int visualizationScale = 10;
+
 
 int globalToLocal(long lon, long lat, int ind){
   double point[2];
@@ -348,22 +347,8 @@ void checkForMessage(){
   }
 }
 
-float getAngleVectors(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y){
-  float vec1x = p1x-p2x;
-  float vec1y = p1y-p2y;
-
-  float vec2x = p3x-p2x;
-  float vec2y = p3y-p2y;
-
-  float result = acos((vec1x*vec2x+vec1y*vec2y)/sqrt(vec1x*vec1x+vec1y*vec1y)/sqrt(vec2x*vec2x+vec2y*vec2y));
-  if(vec1x*vec2y - vec1y*vec2x < 0){
-    result *= -1;
-  }
-  return result;
-}
-
 float getAngle(int p1, int p2, int p3){
-  return getAngleVectors(waypoints[p1][0], waypoints[p1][1], waypoints[p2][0], waypoints[p2][1], waypoints[p3][0], waypoints[p3][1]);
+  return getAnglePoints(waypoints[p1][0], waypoints[p1][1], waypoints[p2][0], waypoints[p2][1], waypoints[p3][0], waypoints[p3][1]);
 }
 
 float getAnglePoints(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y){
@@ -373,9 +358,10 @@ float getAnglePoints(float p1x, float p1y, float p2x, float p2y, float p3x, floa
 
   float angleOut = acos((a*a + b*b - c*c)/(2*a*b));
   
+
   angleOut = pi - angleOut;
 
-  if((p2x - p1x)*(p3y - p2y) - (p2y - p2y)*(p3x - p2x) > 0){
+  if((p2x - p1x)*(p3y - p2y) - (p2y - p2y)*(p3x - p2x) < 0){
     angleOut *= -1;
   }
   
@@ -442,7 +428,7 @@ void calculateLine(){
     if(p3 >= waypointsNumber){
       p3 = 0;
     }
-    angles[i] = -pi + getAngle(p1, p2, p3);
+    angles[i] = getAngle(p1, p2, p3);
     p1++;
     p2++;
     p3++;
@@ -498,370 +484,108 @@ void readReceiver(){
   inp6 = map(ch6.getValue(), 1100, 1900, 0, 180);
 }
 
-void setup() {
-  //heart
+void setup(){
+
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
   
-     
-  
-  //communication
   Serial.begin(115200);
   COM.begin(38400);
+  delay(100);
 
-  //start mode
-  mode = EEPROM.read(0);
-  if(mode == 0){
-    //normal start
-   COM.println("#1|0");
+  while (Serial.available()){
+    Serial.read();
+  }
 
-    WIRE_PORT.begin();
-    WIRE_PORT.setClock(400000);
-    
-    delay(2000);
+  while (COM.available()){
+    COM.read();
+  }
 
-    bool initialized = false;
-  while (!initialized)
-  {
+  WIRE_PORT.begin();
+  WIRE_PORT.setClock(400000);
+
+mode = EEPROM.read(0);
+if(mode == 0){
+  //COM.println();
+    //COM.println("#1|0");
+
+  bool initialized = false;
+  while (!initialized){
     myICM.begin(WIRE_PORT, AD0_VAL);
-
-    if (myICM.status != ICM_20948_Stat_Ok)
-    {
+    if (myICM.status != ICM_20948_Stat_Ok){
       delay(500);
-    }
-    else
-    {
-      
+    }else{
+      //COM.println();
+      //COM.println("#3|1");
       initialized = true;
     }
   }
-  
 
-    
-    bool success = true;
-    success &= (myICM.initializeDMP() == ICM_20948_Stat_Ok);
-    success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
-    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Accel, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Gyro, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Gyro_Calibr, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Cpass, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Cpass_Calibr, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-    success &= (myICM.enableFIFO() == ICM_20948_Stat_Ok);
-    
-    success &= (myICM.enableDMP() == ICM_20948_Stat_Ok);
-    success &= (myICM.resetDMP() == ICM_20948_Stat_Ok);
-    
-    success &= (myICM.resetFIFO() == ICM_20948_Stat_Ok);
-    
-    if (success){
-      COM.println();
-      COM.println("#3|1");
-      COM.println("#4|1");
-    }else{
-      COM.println();
-      COM.println("#4|0");
-      delay(100);
-      SCB_AIRCR = 0x05FA0004;
-      while(true);
-    }
-    delay(1000);
+  bool success = true;
+  success &= (myICM.initializeDMP() == ICM_20948_Stat_Ok);
+  success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
+  success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_RAW_GYROSCOPE) == ICM_20948_Stat_Ok);
+  success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_RAW_ACCELEROMETER) == ICM_20948_Stat_Ok);
+  success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_MAGNETIC_FIELD_UNCALIBRATED) == ICM_20948_Stat_Ok);
+  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 0) == ICM_20948_Stat_Ok);
+  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Accel, 0) == ICM_20948_Stat_Ok);
+  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Gyro, 0) == ICM_20948_Stat_Ok);
+  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Gyro_Calibr, 0) == ICM_20948_Stat_Ok);
+  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Cpass, 0) == ICM_20948_Stat_Ok);
+  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Cpass_Calibr, 0) == ICM_20948_Stat_Ok);
+  success &= (myICM.enableFIFO() == ICM_20948_Stat_Ok);
+  success &= (myICM.enableDMP() == ICM_20948_Stat_Ok);
+  success &= (myICM.resetDMP() == ICM_20948_Stat_Ok);
+  success &= (myICM.resetFIFO() == ICM_20948_Stat_Ok);
 
-    COM.addMemoryForWrite(comBuffer, sizeof(comBuffer));
-    
-    while(!myGNSS.begin()){
-      COM.println();
-      COM.println("#5|0");
-      delay(500);
-    }
-
-    myGNSS.setI2COutput(COM_TYPE_UBX);
-    myGNSS.setNavigationFrequency(2);
-    myGNSS.setAutoPVT(true);
-
-    COM.println("#5|1");
-    
-    while(!ps.init()) {
-      COM.println("#6|0");
-      delay(500);
-    }
-    ps.enableDefault();
-    COM.println("#6|1");
-
-    for(int i=0; i < waypointsNumber; i++){
-      waypoints[i][0] = EEPROM.readInt(i*4+1);
-      waypoints[i][1] = EEPROM.readInt(i*4+3);
-    }
-    leftColumnLon = EEPROM.readLong(114);
-    leftColumnLat = EEPROM.readLong(118);
-    rightColumnLon = EEPROM.readLong(122);
-    rightColumnLat = EEPROM.readLong(126);
-    scaleNS = EEPROM.readFloat(130);
-    scaleEW = EEPROM.readFloat(134);
-    angle = EEPROM.readFloat(138);
-
-    
-     
-  }else{
-    //emergency
-    armed = true;
-    emergency = true;
-    COM.println();
-    COM.println("#1|1");
-    
+  if (success){
+    Serial.println(F("DMP enabled!"));
   }
-
-  
-    //receiver
-  //PWM
-  ch1.begin(true);
-  ch2.begin(true);
-  ch3.begin(true);
-  ch4.begin(true);
-  ch5.begin(true);
-  ch6.begin(true);
-
-  //SERVO
-  servo1.attach(23);
-  servo2.attach(22);
-  servo3.attach(11);
-  servo4.attach(10);
-  esc.attach(9, 1000, 2000);
-
-  COM.println("#14|1");
+  else{
+    Serial.println(F("Enable DMP failed!"));
+    Serial.println(F("Please check that you have uncommented line 29 (#define ICM_20948_USE_DMP) in ICM_20948_C.h..."));
+    while (1);
+  }
+}
 }
 
+void loop()
+{
+  icm_20948_DMP_data_t data;
+  myICM.readDMPdataFromFIFO(&data);
 
-
-void loop(){
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
-  checkForMessage();
-
-
-  if(emergency && millis() - emergencyTimer > 1000){
-    COM.println();
-    COM.println("#7|1");
-    emergencyTimer = millis();
-  }
-  
-  if(millis() - receiverTimer > receiverInterval){
-    readReceiver();
-
-    if(!emergency && armed){
-      if(millis() - emergencyTimer > emergencySafety){
-        emergencyCounter++;
-        if(emergencyCounter >= 3){
-          emergency = true;         
-        }
-      }else{
-        emergencyCounter = 0;
-      }
-      emergencyTimer = millis();
-    }
-    
-    servo1.write(inp1);
-    servo2.write(inp2);
-    servo3.write(inp3);
-    servo4.write(inp4);
-    if(armed){
-      esc.write(inp5);
-    }else{
-      esc.write(0);  
-    }
-    
-    receiverTimer = millis();
-  }
-
-  
-  
-  if(millis() - heartbeatTimer > heartbeatInterval){
-
-    int val = (int)(sin(heartbeatValue)*255);
-    if(val < 0){
-      val = 0;
-    }
-    analogWrite(13, val);
-    if(heartbeatValue >= 3.14){
-      heartbeatValue = 0;
-    }
-    heartbeatValue += 0.03;
-    heartbeatTimer = millis();
-
-  }
-  
-  if(!emergency && ((sendingData && millis() - sendDataTimer > sendDataInterval) || sendOne)){
-
-    COM.print("$");
-    COM.print(inp1);
-    COM.print(",");
-    COM.print(inp2);
-    COM.print(",");
-    COM.print(inp3);
-    COM.print(",");
-    COM.print(inp4);
-    COM.print(",");
-    COM.print(inp5);
-    COM.print(",");
-    COM.print(inp6);
-    COM.print(",");
-    COM.print(roll);
-    COM.print(",");
-    COM.print(pitch);
-    COM.print(",");
-    COM.print(yaw);
-    
-    COM.print(",");
-    COM.print(latitude);
-    COM.print(",");
-    COM.print(longitude);
-    COM.print(",");
-    COM.print(GPSaltitude);
-    COM.print(",");
-    COM.print(SIV);
-    COM.print(",");
-    COM.print(gspeed);
-    COM.print(",");
-    COM.print(heading);
-    
-    COM.print(",");
-    COM.print(altiPress);
-    COM.print(",");
-    COM.print(vPitot);
-    COM.print(",");
-    COM.print(lineA);
-    COM.print(",");
-    COM.print(lineB);
-    COM.print(",");
-    COM.print(lineC);
-    COM.print(",");
-    COM.print(planeX);
-    COM.print(",");
-    COM.print(planeY);
-    COM.print(",");
-    COM.print(currentWaypoint);
-    COM.print(",");
-    COM.print(angles[0]);
-    COM.print(",");
-    COM.print(angles[1]);
-    COM.print(",");
-    COM.print(angles[2]);
-    COM.print(",");
-    COM.print(angles[3]);
-    COM.print(",");
-    COM.print(angles[4]);
-    COM.print(",");
-    COM.print(angles[5]);
-    COM.print(",");
-    COM.print(angles[6]);
-    COM.print(",");
-    COM.print(distanceToCurrent);
-    
-    COM.println();
-    
-    sendDataTimer = millis();
-    
-    sendOne = false;
-
-  }
-  
-
-  if(!emergency){
-    icm_20948_DMP_data_t data;
-    myICM.readDMPdataFromFIFO(&data);
-  
-    if ((myICM.status == ICM_20948_Stat_Ok) || (myICM.status == ICM_20948_Stat_FIFOMoreDataAvail)){
-      if ((data.header & DMP_header_bitmap_Quat6) > 0){
-        double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
-        double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
-        double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
-        double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
-        double q2sqr = q2 * q2;
-        double t0 = +2.0 * (q0 * q1 + q2 * q3);
-        double t1 = +1.0 - 2.0 * (q1 * q1 + q2sqr);
-        roll = atan2(t0, t1) * 180.0 / PI;
-        double t2 = +2.0 * (q0 * q2 - q3 * q1);
-        t2 = t2 > 1.0 ? 1.0 : t2;
-        t2 = t2 < -1.0 ? -1.0 : t2;
-        pitch = asin(t2) * 180.0 / PI;
-        double t3 = +2.0 * (q0 * q3 + q1 * q2);
-        double t4 = +1.0 - 2.0 * (q2sqr + q3 * q3);
-        yaw = atan2(t3, t4);
-        yaw += pi;
-        yaw -= angle;
-        
-        if(yaw < 0){
-          yaw += 2*pi;
-        }
-
-        yaw -= yawOffset;
-        
-        if(yaw < 0){
-          yaw += 2*pi;
-        }
-         float tmpPointX;
-      if(yaw < pi/2 || yaw > pi*3/2){
-        tmpPointX = planeX + 100;
-      }else{
-        tmpPointX = planeX - 100;
-      }
-        float tmpPointY = tmpPointX*tan(yaw) + planeY - tan(yaw)*planeX;
-      int nextWaypoint = currentWaypoint + 1;
-      if(nextWaypoint > waypointsNumber){
-        nextWaypoint = 0;
-      }
-        angles[0] = getAngleVectors(tmpPointX, tmpPointY, planeX, planeY, waypoints[currentWaypoint][0], waypoints[currentWaypoint][1]);
-     
-      }
-    }
-  }
- 
-  if(!emergency && millis() - gpsTimer > gpsInterval){
+  if ((myICM.status == ICM_20948_Stat_Ok) || (myICM.status == ICM_20948_Stat_FIFOMoreDataAvail)){
+    if ((data.header & DMP_header_bitmap_Quat6) > 0){
+      double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+      double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+      double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
       
-    if (myGNSS.getPVT() && (myGNSS.getInvalidLlh() == false)){
-      latitude = myGNSS.getLatitude();
-      longitude = myGNSS.getLongitude();
-      GPSaltitude = myGNSS.getAltitude();
-      SIV = myGNSS.getSIV();
-      gspeed = myGNSS.getGroundSpeed();
-      heading = heading = (float)((float)myGNSS.getHeading())/100000.0;
+      double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
 
-      planeX = globalToLocal(longitude, latitude, 0);
-      planeY = globalToLocal(longitude, latitude, 1);
+      double q2sqr = q2 * q2;
+      double t0 = +2.0 * (q0 * q1 + q2 * q3);
+      double t1 = +1.0 - 2.0 * (q1 * q1 + q2sqr);
+      double roll = atan2(t0, t1) * 180.0 / PI;
+      double t2 = +2.0 * (q0 * q2 - q3 * q1);
+      t2 = t2 > 1.0 ? 1.0 : t2;
+      t2 = t2 < -1.0 ? -1.0 : t2;
+      double pitch = asin(t2) * 180.0 / PI;
 
-     
+      double t3 = +2.0 * (q0 * q3 + q1 * q2);
+      double t4 = +1.0 - 2.0 * (q2sqr + q3 * q3);
+      double yaw = atan2(t3, t4) * 180.0 / PI;
 
-     int nextWaypoint = currentWaypoint + 1;
-      if(nextWaypoint > waypointsNumber){
-        nextWaypoint = 0;
-      }
-      
-      angles[1] = -pi + getAngleVectors(planeX, planeY, waypoints[currentWaypoint][0], waypoints[currentWaypoint][1], waypoints[nextWaypoint][0], waypoints[nextWaypoint][1]);
-      distanceToCurrent = distance(planeX, planeY, waypoints[currentWaypoint][0], waypoints[currentWaypoint][1]);
-      
-      int currentSide = 0;
-      if(lineA*planeX +lineB*planeY + lineC > 0){
-        currentSide = 1;
-      }
-      
-      if(previousSide != currentSide){
-        currentWaypoint++;
-        if(currentWaypoint >= waypointsNumber){
-          currentWaypoint = 0;
-        }
-        calculateLine();
-      }
-      gpsTimer = millis();      
+      Serial.print(F("Roll:"));
+      Serial.print(roll, 1);
+      Serial.print(F(" Pitch:"));
+      Serial.print(pitch, 1);
+      Serial.print(F(" Yaw:"));
+      Serial.println(yaw, 1);
+
     }
   }
 
-  if(!emergency && millis() - sensorTimer > sensorInterval){
-    //float pressure = ps.readPressureMillibars();
-    //if(pressure != 0){
-    //  altiPress = ps.pressureToAltitudeMeters(pressure);
-    //}
-    vPitot = getPitot();
-    sensorTimer = millis();
+  if (myICM.status != ICM_20948_Stat_FIFOMoreDataAvail){
+    delay(10);
   }
- 
 }

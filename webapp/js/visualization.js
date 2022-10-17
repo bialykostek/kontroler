@@ -1,5 +1,5 @@
-var leftColumn = [19.8747786801465, 50.05427240641037];
-var rightColumn = [19.87556705467462, 50.05478046358079];
+var leftColumn = [19.91028806728955, 50.067505657154115];
+var rightColumn = [19.909393061596532, 50.0674134791677 ];
 
 var angle = 0;
 var visualizationScale = 10;
@@ -16,12 +16,17 @@ var scaleV = 9;
 var canvas;
 var ctx; 
 
-var testWp = 0;
+var lineA = 1;
+var lineB = 1;
+var lineC = 1;
 
-setInterval(_ => {
-    testWp++;
-    visualizationFrame();
-}, 1000);
+var currentWaypoint = 0;
+
+var nextPathAngles = [0, 0, 0, 0, 0, 0, 0];
+
+var betweenWaypoints = 90;
+
+var distanceToCurrent = 0;
 
 var waypoints = [
     [0, 0],
@@ -60,6 +65,8 @@ var waypointsGlobal = [];
 var planeVis = {
     x: 500,
     y: 500,
+    long: 0,
+    lat: 0,
     angle: 30,
     img: null,
     size: 70
@@ -137,6 +144,40 @@ function updatePlanePosition(position){
     markersToMap();
 }
 
+function calibration(){
+    angle = Math.atan(distance(leftColumn[0], rightColumn[1], rightColumn[0], rightColumn[1])/distance(leftColumn[0], leftColumn[1], leftColumn[0], rightColumn[1]));
+    if(rightColumn[0] < leftColumn[0]){
+        if(rightColumn[1] < leftColumn[1]){
+            //III
+            angle = Math.PI*3/2 - angle;
+        }else{
+            //II
+            angle = Math.PI/2 + angle;
+        }
+    }else{
+        if(rightColumn[1] < leftColumn[1]){
+            //IV
+            angle = Math.PI*3/2 + angle;
+        }else{
+            //I
+            angle = Math.PI/2 - angle;
+        }
+    }
+
+    scaleEW = distance(leftColumn[0], leftColumn[1], leftColumn[0] + 0.003, leftColumn[1])/0.003;
+    scaleNS = distance(leftColumn[0], leftColumn[1], leftColumn[0], leftColumn[1] + 0.002)/0.002;
+    waypointsTransformed = [];
+    waypoints.forEach((wp) => {
+        waypointsTransformed.push(centerWp(scaleWp(wp)));
+    });
+    waypointsGlobal = [];
+    waypointsTransformed.forEach((wp) => {
+       waypointsGlobal.push(localToGlobal(wp));
+    });
+
+    markersToMap();
+}
+
 function visualizationFrame(){
 
     //background
@@ -156,7 +197,7 @@ function visualizationFrame(){
         ctx.beginPath();
         ctx.arc(wp[0], wp[1], 10, 0, 2 * Math.PI, false);
         ctx.fillStyle = '#94004a';
-        if(ind < testWp){
+        if(ind < currentWaypoint){
             ctx.fillStyle = "#1b4b7d";
         }
         ctx.fill();
@@ -173,6 +214,44 @@ function visualizationFrame(){
     ctx.arc(visRightColumn[0], visRightColumn[1], 30, 0, 2 * Math.PI, false);
     ctx.fillStyle = '#00add4';
     ctx.fill();
+
+    //next waypoint line
+    ctx.beginPath();
+    ctx.moveTo(0, -lineC/lineB);
+    ctx.lineTo(canvas.width, -lineA/lineB*canvas.width - lineC/lineB);
+    ctx.strokeStyle = "#000000";
+    ctx.stroke();
+    
+    //next path trace
+    ctx.beginPath();
+    ctx.save();
+    
+    ctx.translate(planeVis.x, planeVis.y);
+    ctx.rotate(planeVis.angle);
+    ctx.moveTo(0, 0);
+    nextPathAngles.forEach((val, ind) => {
+        ctx.rotate(val);
+        if(ind == 0){
+            ctx.translate(distanceToCurrent, 0);
+        }else{
+            ctx.translate(betweenWaypoints, 0);
+        }
+        ctx.lineTo(0, 0);       
+    });
+    ctx.restore();
+    ctx.strokeStyle = "#eb34a5";
+    ctx.stroke();
+
+    //yaw line
+    ctx.beginPath();
+    ctx.moveTo(planeVis.x, planeVis.y);
+    if(planeVis.angle < Math.PI/2 || planeVis.angle > Math.PI*3/2){
+        ctx.lineTo(canvas.width, canvas.width*Math.tan(planeVis.angle) + planeVis.y - Math.tan(planeVis.angle)*planeVis.x);
+   }else{
+        ctx.lineTo(0, planeVis.y - Math.tan(planeVis.angle)*planeVis.x);
+    }
+    ctx.strokeStyle = "#5feb34";
+    ctx.stroke();
 
     //plane
     ctx.save();
@@ -247,35 +326,7 @@ function visualizationInit(){
         visualizationFrame();
     });
     
-    angle = Math.atan(distance(leftColumn[0], rightColumn[1], rightColumn[0], rightColumn[1])/distance(leftColumn[0], leftColumn[1], leftColumn[0], rightColumn[1]));
-    if(rightColumn[1] < leftColumn[1]){
-        angle += Math.PI/2;
-        if(rightColumn[0] < leftColumn[0]){
-            angle += Math.PI/2;
-        }
-    }else{
-        if(rightColumn[0] < leftColumn[0]){
-            angle += Math.PI/2*3;
-        }
-    }
-
-    scaleEW = distance(leftColumn[0], leftColumn[1], leftColumn[0] + 0.003, leftColumn[1])/0.003;
-    scaleNS = distance(leftColumn[0], leftColumn[1], leftColumn[0], leftColumn[1] + 0.002)/0.002;
-
-    var tempPlane = [19.875438578825595,  50.05479358675747];
-
-    waypointsTransformed = [];
-    waypoints.forEach((wp) => {
-        waypointsTransformed.push(centerWp(scaleWp(wp)));
-    });
-    waypointsGlobal = [];
-    waypointsTransformed.forEach((wp) => {
-       waypointsGlobal.push(localToGlobal(wp));
-    });
-
-    markersToMap();
-
-    updatePlanePosition(tempPlane);
+    calibration();
 
     clog("Visualization ready", "info");
 }

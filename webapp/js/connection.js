@@ -44,7 +44,7 @@ function confirmChangeValue(){
     if(changeValueCallback != null){
         window[changeValueCallback]();
     }else{
-        clog("Value updated", "positive");
+        planeLog("Value updated", "positive");
     }
 }
 
@@ -103,6 +103,15 @@ function connectToServer(){
                     case 8:
                         confirmChangeValue(response);
                         break;
+                    case 9:
+                        gotLeftColumn(response);
+                        break;
+                    case 10:
+                        gotRightColumn(response);
+                        break;
+                    case 14:
+                        planeLog("Plane ready to flight!", "positive");
+                        break;    
                     default:
                       clog("Unknow message type " + messageType + ": " + response, "negative");
                   }  

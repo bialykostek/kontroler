@@ -138,9 +138,14 @@
     </div>
 
     <div class="page" id="pageConfig" data-title="Config" data-default="BL">
+        <button class="ui inverted button" id="getOneFrameBtn">Get one information frame</button><br />
         <button class="ui inverted button" id="stopSendingBtn">Stop sending interval</button><br />
         <button class="ui inverted button" id="sendingOnBtn">Turn on sending data</button>
         <button class="ui inverted button" id="sendingOffBtn">Turn off sending data</button>
+        <br />
+        For compass calibration, remember to point plane to the est
+        <br />
+        <button class="ui inverted button" id="calibrateYawBtn">Calibrate compass</button>
         <br />
         <button class="ui inverted button" id="armButton">Arm</button>
         <button class="ui inverted button" id="savingButton">Start saving data</button>
@@ -152,6 +157,11 @@
         <input type="range" min="0" max="100" value="42" id="scaleVslider">
         <br />
         <br />
+        Download:<br />
+        <button class="ui inverted button" id="getLeftColumnBtn">Left column</button>
+        <button class="ui inverted button" id="getRightColumnBtn">Right column</button><br /><br />
+
+
         Set current position as:<br />
         <button class="ui inverted button" id="updateLeftColumnBtn">Left column</button>
         <button class="ui inverted button" id="updateRightColumnBtn">Right column</button><br />
@@ -159,6 +169,8 @@
 
         <br />
         <button class="ui inverted button" id="updateWaypointsBtn">Update waypoints</button>
+        <br />
+        For reset, send command @3; then @4;.
     </div>
 
     <div class="page" id="pageAI" data-title="AI" data-default="BR">
@@ -296,16 +308,51 @@
                     <td id="liveData22"></td>
                 </tr>
                 <tr>
-                    <td class="dataName">Altitude Pressure</td>
+                    <td class="dataName">Angle 0</td>
                     <td id="liveData23"></td>
                 </tr>
                 <tr>
-                    <td class="dataName">Air Speed</td>
+                    <td class="dataName">Angle 1</td>
                     <td id="liveData24"></td>
                 </tr>
             </tbody>
         </table>
-
+        <table class="liveTable">
+            <tbody>
+                <tr>
+                    <td class="dataName">Angle 2</td>
+                    <td id="liveData25"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Angle 3</td>
+                    <td id="liveData26"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Angle 4</td>
+                    <td id="liveData27"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Angle 5</td>
+                    <td id="liveData28"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Angle 6</td>
+                    <td id="liveData29"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">Distance to current</td>
+                    <td id="liveData30"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">-</td>
+                    <td id="liveData31"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">-</td>
+                    <td id="liveData32"></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     
     <div class="page" id="pageLogs" data-title="Logs" data-default="TR">
@@ -337,7 +384,7 @@
             chartInit();
             
             //setActive('pageSettings');
-            setActive('pageChart');
+            setActive('pageConfig');
 
             window.dispatchEvent(new Event('resize'));
           
