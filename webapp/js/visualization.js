@@ -69,7 +69,8 @@ var planeVis = {
     lat: 0,
     angle: 30,
     img: null,
-    size: 70
+    size: 70,
+    heading: 0
 }
 
 var playing = false;
@@ -251,6 +252,17 @@ function visualizationFrame(){
         ctx.lineTo(0, planeVis.y - Math.tan(planeVis.angle)*planeVis.x);
     }
     ctx.strokeStyle = "#5feb34";
+    ctx.stroke();
+
+    //heading line
+    ctx.beginPath();
+    ctx.moveTo(planeVis.x, planeVis.y);
+    if(planeVis.heading < Math.PI/2 || planeVis.heading > Math.PI*3/2){
+        ctx.lineTo(canvas.width, canvas.width*Math.tan(planeVis.heading) + planeVis.y - Math.tan(planeVis.heading)*planeVis.x);
+   }else{
+        ctx.lineTo(0, planeVis.y - Math.tan(planeVis.heading)*planeVis.x);
+    }
+    ctx.strokeStyle = "#0008ff";
     ctx.stroke();
 
     //plane

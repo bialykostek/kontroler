@@ -15,22 +15,27 @@ SFE_UBLOX_GNSS myGNSS;
 ICM_20948_I2C myICM;
 LPS ps;
 
-void* comBuffer[200];
+void* comBufferTX[200];
+void* comBufferRX[200];
 
 bool sendingData = false;
 
 int receiverInterval = 20;
 int heartbeatInterval = 7;
-int sendDataInterval = 1000;
+int sendDataInterval = 50;
 int gpsInterval = 500;
-int sensorInterval = 100;
-
+int sensorInterval = 50;
+int packageInterval = 10;
 float heartbeatValue = 0;
+
+int readSensorNumber = 0;
+
+int packageNumber = 0;
 
 bool sendOne = false;
 double yaw, pitch, roll;
-
-float angles[7];
+long frameNumber = 0;
+float angles[8];
 float distanceToCurrent;
 
 int planeX, planeY = 0;
@@ -39,7 +44,15 @@ int previousSide = 0;
 int mode = 0;
 bool armed = false;
 
+
+
 bool emergency = false;
+
+const int historicLength = 5;
+
+float historicvPitot[historicLength] = {0, 0, 0, 0, 0};
+float historicAltiPress[historicLength] = {0, 0, 0, 0, 0};
+
 
 float altiPress;
 
@@ -60,12 +73,12 @@ long receiverTimer = 0;
 long sendDataTimer = 0;
 long gpsTimer = 0;
 long sensorTimer = 0;
-
-long debugTimer = 0;
+long packageTimer = 0;
 
 long emergencyTimer = 0;
 int emergencyCounter = 0;
 int emergencySafety = 50;
+
 
 PWM ch1(2);
 PWM ch2(3);
@@ -249,7 +262,7 @@ void changeValue(int target, float value){
       COM.print("Value to change ");
       COM.print(target);
       COM.println(" is not defined.");
-    COM.clear();
+      COM.clear();
   }
   if(okMessage){
     COM.println();
@@ -432,7 +445,7 @@ void calculateLine(){
   if(p3 >= waypointsNumber){
     p3 -= waypointsNumber;
   }
-  for(int i=2; i<7; i++){
+  for(int i=3; i<8; i++){
     if(p1 >= waypointsNumber){
       p1 = 0;
     }
@@ -490,10 +503,10 @@ float getPitot() {
 
 
 void readReceiver(){
-  inp1 = map(ch4.getValue(), 1100, 1900, 0, 180);
-  inp2 = map(ch2.getValue(), 1100, 1900, 0, 180);
-  inp3 = map(ch5.getValue(), 1100, 1900, 0, 180);
-  inp4 = map(ch3.getValue(), 1100, 1900, 0, 180);
+  inp1 = map(ch4.getValue(), 1100, 1900, 30, 150);
+  inp2 = map(ch2.getValue(), 1100, 1900, 40, 160);
+  inp3 = map(ch5.getValue(), 1100, 1900, 30, 150);
+  inp4 = map(ch3.getValue(), 1100, 1900, 40, 140);
   inp5 = map(ch1.getValue(), 1100, 1900, 0, 180);
   inp6 = map(ch6.getValue(), 1100, 1900, 0, 180);
 }
@@ -503,11 +516,34 @@ void setup() {
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
   
-     
-  
   //communication
   Serial.begin(115200);
   COM.begin(38400);
+
+  //receiver
+  //PWM
+  
+  ch1.begin(true);
+  ch2.begin(true);
+  ch3.begin(true);
+  ch4.begin(true);
+  ch5.begin(true);
+  ch6.begin(true);
+
+  //SERVO
+  servo1.attach(23);
+  servo2.attach(22);
+  servo3.attach(11);
+  servo4.attach(10);
+  esc.attach(9, 1000, 2000);
+
+  servo1.write(90);
+  servo2.write(90);
+  servo3.write(90);
+  servo4.write(90);
+  esc.write(0);
+
+
 
   //start mode
   mode = EEPROM.read(0);
@@ -567,7 +603,8 @@ void setup() {
     }
     delay(1000);
 
-    COM.addMemoryForWrite(comBuffer, sizeof(comBuffer));
+    COM.addMemoryForWrite(comBufferTX, sizeof(comBufferTX));
+    COM.addMemoryForRead(comBufferRX, sizeof(comBufferRX));
     
     while(!myGNSS.begin()){
       COM.println();
@@ -576,7 +613,7 @@ void setup() {
     }
 
     myGNSS.setI2COutput(COM_TYPE_UBX);
-    myGNSS.setNavigationFrequency(2);
+    myGNSS.setNavigationFrequency(10);
     myGNSS.setAutoPVT(true);
 
     COM.println("#5|1");
@@ -612,21 +649,7 @@ void setup() {
   }
 
   
-    //receiver
-  //PWM
-  ch1.begin(true);
-  ch2.begin(true);
-  ch3.begin(true);
-  ch4.begin(true);
-  ch5.begin(true);
-  ch6.begin(true);
-
-  //SERVO
-  servo1.attach(23);
-  servo2.attach(22);
-  servo3.attach(11);
-  servo4.attach(10);
-  esc.attach(9, 1000, 2000);
+  
 
   COM.println("#14|1");
 }
@@ -634,16 +657,20 @@ void setup() {
 
 
 void loop(){
+  long debugTimer = millis();
+  checkForMessage();
+  Serial.print("m ");
   Serial.println(millis() - debugTimer);
   debugTimer = millis();
-  checkForMessage();
-
 
   if(emergency && millis() - emergencyTimer > 1000){
     COM.println();
     COM.println("#7|1");
     emergencyTimer = millis();
   }
+  Serial.print("e ");
+  Serial.println(millis() - debugTimer);
+  debugTimer = millis();
   
   if(millis() - receiverTimer > receiverInterval){
     readReceiver();
@@ -673,6 +700,10 @@ void loop(){
     receiverTimer = millis();
   }
 
+  Serial.print("s ");
+  Serial.println(millis() - debugTimer);
+  debugTimer = millis();
+
   
   
   if(millis() - heartbeatTimer > heartbeatInterval){
@@ -689,82 +720,97 @@ void loop(){
     heartbeatTimer = millis();
 
   }
-  
-  if(!emergency && ((sendingData && millis() - sendDataTimer > sendDataInterval) || sendOne)){
 
-    COM.print("$");
-    COM.print(inp1);
-    COM.print(",");
-    COM.print(inp2);
-    COM.print(",");
-    COM.print(inp3);
-    COM.print(",");
-    COM.print(inp4);
-    COM.print(",");
-    COM.print(inp5);
-    COM.print(",");
-    COM.print(inp6);
-    COM.print(",");
-    COM.print(roll);
-    COM.print(",");
-    COM.print(pitch);
-    COM.print(",");
-    COM.print(yaw);
+  Serial.print("h ");
+  Serial.println(millis() - debugTimer);
+  debugTimer = millis();
+  
+  if(!emergency && (inp6 < 15 || inp6 > 30) && ((sendingData && millis() - sendDataTimer > sendDataInterval) || sendOne)){
     
-    COM.print(",");
-    COM.print(latitude);
-    COM.print(",");
-    COM.print(longitude);
-    COM.print(",");
-    COM.print(GPSaltitude);
-    COM.print(",");
-    COM.print(SIV);
-    COM.print(",");
-    COM.print(gspeed);
-    COM.print(",");
-    COM.print(heading);
     
-    COM.print(",");
-    COM.print(altiPress);
-    COM.print(",");
-    COM.print(vPitot);
-    COM.print(",");
-    COM.print(lineA);
-    COM.print(",");
-    COM.print(lineB);
-    COM.print(",");
-    COM.print(lineC);
-    COM.print(",");
-    COM.print(planeX);
-    COM.print(",");
-    COM.print(planeY);
-    COM.print(",");
-    COM.print(currentWaypoint);
-    COM.print(",");
-    COM.print(angles[0]);
-    COM.print(",");
-    COM.print(angles[1]);
-    COM.print(",");
-    COM.print(angles[2]);
-    COM.print(",");
-    COM.print(angles[3]);
-    COM.print(",");
-    COM.print(angles[4]);
-    COM.print(",");
-    COM.print(angles[5]);
-    COM.print(",");
-    COM.print(angles[6]);
-    COM.print(",");
-    COM.print(distanceToCurrent);
+          COM.print("$");
+          COM.print(inp1);
+          COM.print(",");
+          COM.print(inp2);
+          COM.print(",");
+          COM.print(inp3);
+          COM.print(",");
+          COM.print(inp4);
+          COM.print(",");
+          COM.print(inp5);
+          COM.print(",");
+          COM.print(inp6);
+          COM.print(",");
+          COM.print(roll);
+          COM.print(",");
+          COM.print(pitch);
+          COM.print(",");
+          COM.print(yaw);
+          COM.print(",");
+ 
+         COM.print(latitude);
+          COM.print(",");
+          COM.print(longitude);
+          COM.print(",");
+          COM.print(GPSaltitude);
+
+          COM.print(",");
+          COM.print(SIV);
+          COM.print(",");
+          COM.print(gspeed);
+          COM.print(",");
+          COM.print(heading);
+          COM.print(",");
+          COM.print(altiPress);
+          COM.print(",");
+          COM.print(vPitot);
+         
+          COM.print(",");
+          COM.print(lineA);
+          COM.print(",");
+          COM.print(lineB);
+          COM.print(",");
+          COM.print(lineC);
+          COM.print(",");
+          COM.print(planeX);
+          COM.print(",");
+          COM.print(planeY);
+          COM.print(",");
+          COM.print(currentWaypoint);
+          COM.print(",");
+         
+         COM.print(angles[0]);
+          COM.print(",");
+          COM.print(angles[1]);
+          COM.print(",");
+          COM.print(angles[2]);
+          COM.print(",");
+          COM.print(angles[3]);
+          COM.print(",");
+          COM.print(angles[4]);
+          COM.print(",");
+          COM.print(angles[5]);
+          COM.print(",");
+          COM.print(angles[6]);
+          COM.print(",");
+          COM.print(angles[7]);
+          COM.print(",");
+          COM.print(distanceToCurrent);
+          COM.print(",");
+          COM.print(frameNumber);
+          
+          COM.println();
+          sendDataTimer = millis();
+          frameNumber++;
+          sendOne = false;
+     
+   
     
-    COM.println();
-    
-    sendDataTimer = millis();
-    
-    sendOne = false;
 
   }
-  
+  Serial.print("w ");
+  Serial.println(millis() - debugTimer);
+  debugTimer = millis();
 
   if(!emergency){
     icm_20948_DMP_data_t data;
@@ -811,11 +857,25 @@ void loop(){
         nextWaypoint = 0;
       }
         angles[0] = getAngleVectors(tmpPointX, tmpPointY, planeX, planeY, waypoints[currentWaypoint][0], waypoints[currentWaypoint][1]);
-     
+        
+        if(yaw > heading){
+          angles[2] = yaw - heading;
+          if(angles[2] > pi){
+            angles[2] = 2*pi - angles[2];
+          }
+        }else{
+          angles[2] = heading - yaw;
+          if(angles[2] > pi){
+            angles[2] = 2*pi - angles[2];
+          }
+          angles[2] *= -1;
+        }
       }
     }
   }
- 
+ Serial.print("i ");
+  Serial.println(millis() - debugTimer);
+  debugTimer = millis();
   if(!emergency && millis() - gpsTimer > gpsInterval){
       
     if (myGNSS.getPVT() && (myGNSS.getInvalidLlh() == false)){
@@ -825,6 +885,18 @@ void loop(){
       SIV = myGNSS.getSIV();
       gspeed = myGNSS.getGroundSpeed();
       heading = heading = (float)((float)myGNSS.getHeading())/100000.0;
+
+      heading = 360 - heading;
+      heading = heading*pi/180;
+
+      heading -= angle;
+      if(heading < 0){
+        heading += 2*pi;
+      }
+      heading -= 3*pi/2;
+      if(heading < 0){
+        heading += 2*pi;
+      }
 
       planeX = globalToLocal(longitude, latitude, 0);
       planeY = globalToLocal(longitude, latitude, 1);
@@ -855,13 +927,54 @@ void loop(){
     }
   }
 
-  if(!emergency && millis() - sensorTimer > sensorInterval){
-    //float pressure = ps.readPressureMillibars();
-    //if(pressure != 0){
-    //  altiPress = ps.pressureToAltitudeMeters(pressure);
-    //}
-    vPitot = getPitot();
-    sensorTimer = millis();
+  Serial.print("g ");
+  Serial.println(millis() - debugTimer);
+  debugTimer = millis();
+
+  if(!emergency && millis() - sensorTimer > sensorInterval ){
+    if(readSensorNumber == 0){
+      
+      float pressure = ps.readPressureMillibars();
+      if(pressure != 0){
+        for(int i=1; i < historicLength; i++){
+          historicAltiPress[i-1] = historicAltiPress[i];
+        }
+        altiPress = ps.pressureToAltitudeMeters(pressure);
+        historicAltiPress[historicLength-1] = altiPress;
+
+        float tmpSum = 0;
+        for(int i=0; i < historicLength; i++){
+          tmpSum += historicAltiPress[i];
+        }
+        altiPress = tmpSum/historicLength;
+        
+      }
+      
+      readSensorNumber++;
+    }else if(readSensorNumber == 1){
+      vPitot = getPitot();
+
+
+      for(int i=1; i < historicLength; i++){
+          historicvPitot[i-1] = historicvPitot[i];
+        }
+       vPitot = getPitot();
+        historicvPitot[historicLength-1] = vPitot;
+
+        float tmpSum = 0;
+        for(int i=0; i < historicLength; i++){
+          tmpSum += historicvPitot[i];
+        }
+        vPitot = tmpSum/historicLength;
+        
+      
+      sensorTimer = millis();
+      readSensorNumber = 0;  
+    }
+    
   }
+  Serial.print("c ");
+  Serial.println(millis() - debugTimer);
+  debugTimer = millis();
  
 }

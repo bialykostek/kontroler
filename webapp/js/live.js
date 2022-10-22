@@ -25,6 +25,8 @@ function updateLiveData(data){
 
     distanceToCurrent = parseFloat(data[30]);
     currentWaypoint = parseInt(data[22]);
+
+    planeVis.heading = parseFloat(data[14]);
     
     visualizationFrame();
     var lonLat = new OpenLayers.LonLat(planeVis.long, planeVis.lat).transform(new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject());

@@ -44,6 +44,11 @@ Responses [#]:
 13 - current angle
 14 - system ready
 
+Setting chanel value:
+0-50 - manual
+15-30 - stop sending messages
+
+
 Websocket message type:
 0 - Web App -> Ground Station
 1 - Ground Station -> Web App
