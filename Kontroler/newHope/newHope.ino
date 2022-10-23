@@ -862,11 +862,13 @@ void loop(){
           angles[2] = yaw - heading;
           if(angles[2] > pi){
             angles[2] = 2*pi - angles[2];
+            angles[2] *= -1;
           }
         }else{
           angles[2] = heading - yaw;
           if(angles[2] > pi){
             angles[2] = 2*pi - angles[2];
+            angles[2] *= -1;
           }
           angles[2] *= -1;
         }

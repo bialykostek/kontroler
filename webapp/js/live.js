@@ -15,15 +15,15 @@ function updateLiveData(data){
     lineB = parseFloat(data[18]);
     lineC = parseFloat(data[19]);
 
-    nextPathAngles[0] = parseFloat(data[23]);
-    nextPathAngles[1] = parseFloat(data[24]);
-    nextPathAngles[2] = parseFloat(data[25]);
-    nextPathAngles[3] = parseFloat(data[26]);
-    nextPathAngles[4] = parseFloat(data[27]);
-    nextPathAngles[5] = parseFloat(data[28]);
-    nextPathAngles[6] = parseFloat(data[29]);
+    nextPathAngles[0] = parseFloat(data[24]);
+    nextPathAngles[1] = parseFloat(data[25]);
+    nextPathAngles[2] = parseFloat(data[26]);
+    nextPathAngles[3] = parseFloat(data[27]);
+    nextPathAngles[4] = parseFloat(data[28]);
+    nextPathAngles[5] = parseFloat(data[29]);
+    nextPathAngles[6] = parseFloat(data[30]);
 
-    distanceToCurrent = parseFloat(data[30]);
+    distanceToCurrent = parseFloat(data[31]);
     currentWaypoint = parseInt(data[22]);
 
     planeVis.heading = parseFloat(data[14]);
@@ -32,6 +32,7 @@ function updateLiveData(data){
     var lonLat = new OpenLayers.LonLat(planeVis.long, planeVis.lat).transform(new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject());
     markers.markers[6].moveTo(lonLat);
     map.setCenter(lonLat);
+
 }
 
 function initLiveData(){

@@ -73,9 +73,6 @@ var planeVis = {
     heading: 0
 }
 
-var playing = false;
-var playingSpeed = 1;
-
 function rotate(point, angle){
     point = math.matrix([[point[0]], [point[1]]]);
     var rot = math.matrix([[Math.cos(angle), -Math.sin(angle)], [Math.sin(angle), Math.cos(angle)]]);
@@ -286,39 +283,6 @@ function visualizationInit(){
         visualizationFrame();
     }
     planeVis.img = planeImg;
-    
-    $('#playingSpeedSlider').on('input', _ => {
-        playingSpeed = $('#playingSpeedSlider').val();
-        if(playingSpeed <= 50){
-            playingSpeed = playingSpeed * 0.018367 + 0.081633;
-        }else{
-            playingSpeed = playingSpeed * playingSpeed * 0.0036 - playingSpeed * 0.36 + 10
-        }
-        var text = 'x' + Math.round(playingSpeed*10)/10;
-        if(text == 'x10'){
-            text = 'x9.9'
-        }
-        if(text.length == 2){
-            text += '.0';
-        }
-        $('#playerSpeedValue').html(text);
-    });
-
-    $('#resetPlayingSpeed').click(_ => {
-        playingSpeed = 50;
-        $('#playingSpeedSlider').val(playingSpeed);
-        $('#playerSpeedValue').html('x1.0');
-    });
-
-    $('#playPauseButton').click(_ => {
-        if(playing){
-            playing = false;
-            $('#playPauseButton img').attr('src', 'static/play.png');
-        }else{
-            playing = true;
-            $('#playPauseButton img').attr('src', 'static/pause.png');
-        }
-    });
 
     $('#scaleHslider').on('input', _ => {
         waypointsTransformed = [];

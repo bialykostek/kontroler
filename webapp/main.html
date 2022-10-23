@@ -26,6 +26,7 @@
     <script src="js/chart.js"></script>
     <script src="js/live.js"></script>
     <script src="js/logs.js"></script>
+    <script src="js/player.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/console.css">
     <link rel="stylesheet" type="text/css" href="css/logs.css">
@@ -78,11 +79,17 @@
     <!--PAGES-->
     <div class="page" id="pagePlayer" data-title="Player" data-default="BL">
         <div id="player">
+            <div class="panelRow">
+                <div class="ui toggle checkbox" id="tooglePlayer">
+                    <input type="checkbox" name="public">
+                </div>
+                Log player
+            </div>
             <div class="panelRow" id="nowPlaying">
                 Now playing: #223, 12.04.22 13:57:34, 34s
             </div>
             <div class="panelRow">
-                <div class="panelButton">
+                <div class="panelButton" id="prevFrameBtn">
                     <img src="static/backwards.png" class="panelButtonImg" />
                 </div> 
                 <div class="panelButtonSeparator"></div>
@@ -90,7 +97,7 @@
                     <img src="static/play.png" class="panelButtonImg" />
                 </div> 
                 <div class="panelButtonSeparator"></div>
-                <div class="panelButton">
+                <div class="panelButton" id="nextFrameBtn">
                     <img src="static/forward.png" class="panelButtonImg" />
                 </div>
             </div>
@@ -102,7 +109,7 @@
                 <button class="ui mini inverted button" id="resetPlayingSpeed">Reset</button>
             </div>
             <div class="panelRow">
-                Frame 123 of 1736, 30%, 12:45:23
+                <span id="playerInfoSpan"></span>
             </div>
             <div class="panelRow">
                 <input type="range" min="1" max="100" value="1" id="playingTimeline">
@@ -340,15 +347,15 @@
                     <td id="liveData29"></td>
                 </tr>
                 <tr>
-                    <td class="dataName">Distance to current</td>
+                    <td class="dataName">Angle 7</td>
                     <td id="liveData30"></td>
                 </tr>
                 <tr>
-                    <td class="dataName">-</td>
+                    <td class="dataName">Distance to current</td>
                     <td id="liveData31"></td>
                 </tr>
                 <tr>
-                    <td class="dataName">-</td>
+                    <td class="dataName">Frame number</td>
                     <td id="liveData32"></td>
                 </tr>
             </tbody>
@@ -382,29 +389,18 @@
             initConfig();
             initLiveData();
             chartInit();
+            playerInit();
             
             //setActive('pageSettings');
-            setActive('pageConfig');
 
             window.dispatchEvent(new Event('resize'));
           
 
             //---------------notes----------------------------
             /*
-            wizualizacja
-            ustawienia programu
-            konfiguracja kontrolera
-            lista zapisanych przelotow
             wykresy
             panel odtwarzania
-            busola/live wskazniki
-            mapa
             AI learing
-
-
-            DOTO
-            not connected console/ogolnie niepodlaczone
-            Rzeczy na konsoli: wszytsko, tylko konfigi, itp
             */
            //----------------------------------------------------
 
