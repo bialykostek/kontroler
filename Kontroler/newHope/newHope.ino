@@ -32,6 +32,8 @@ int readSensorNumber = 0;
 
 int packageNumber = 0;
 
+float altiPressOffset = 0;
+
 bool sendOne = false;
 double yaw, pitch, roll;
 long frameNumber = 0;
@@ -44,7 +46,7 @@ int previousSide = 0;
 int mode = 0;
 bool armed = false;
 
-
+bool sendingModeNormal = true;
 
 bool emergency = false;
 
@@ -61,6 +63,10 @@ bool resetFirstStep = false;
 float vPitot;
 
 float yawOffset = 0;
+
+int NNinpLen = 27;
+
+float NNlearnOut[5] = {0, 0, 0, 0, 0};
 
 const int waypointsNumber = 28;
 int waypoints[waypointsNumber][2];
@@ -114,6 +120,8 @@ int requestCommaPlace = 0;
 
 long leftColumnLon = 0;
 long leftColumnLat = 0;
+
+float NNinputs[29];
 
 long rightColumnLon = 0;
 long rightColumnLat = 0;
@@ -257,6 +265,15 @@ void changeValue(int target, float value){
       yawOffset = yaw;
       COM.println("Compass calibrated");
       break;
+    case 10:
+      if((int)value == 0){
+        sendingModeNormal = true;
+      }
+      if((int)value == 1){
+        sendingModeNormal = false;
+      }
+      COM.println("Sending data mode changed");
+      break;
     default:
       okMessage = false;
       COM.print("Value to change ");
@@ -275,6 +292,7 @@ void executeOrder(int order){
     case 0:
       //arm
       armed = true;
+      altiPressOffset = altiPress;
       EEPROM.write(0, 1);
       break;
     case 1:
@@ -637,7 +655,9 @@ void setup() {
     scaleEW = EEPROM.readFloat(134);
     angle = EEPROM.readFloat(138);
 
-    
+    for(int i=0; i<NNinpLen; i++){
+      NNinputs[i] = 0;
+    }
      
   }else{
     //emergency
@@ -726,7 +746,7 @@ void loop(){
   debugTimer = millis();
   
   if(!emergency && (inp6 < 15 || inp6 > 30) && ((sendingData && millis() - sendDataTimer > sendDataInterval) || sendOne)){
-    
+    if(sendingModeNormal == true){
     
           COM.print("$");
           COM.print(inp1);
@@ -799,13 +819,73 @@ void loop(){
           COM.print(",");
           COM.print(frameNumber);
           
+          
+     
+    }else{
+      //previous
+      NNinputs[2] = NNinputs[0]; //roll
+      NNinputs[3] = NNinputs[1]; //pitch
+
+      NNinputs[7] = NNinputs[4]; //ground speed
+      NNinputs[8] = NNinputs[5]; //alti press
+      NNinputs[9] = NNinputs[6]; //vpitot
+
+      NNinputs[13] = NNinputs[10]; //angles 0
+      NNinputs[14] = NNinputs[11]; //angles 1
+      NNinputs[15] = NNinputs[12]; //angles 2
+
+      NNinputs[22] = NNlearnOut[0]; //pwm
+      NNinputs[23] = NNlearnOut[1];
+      NNinputs[24] = NNlearnOut[2];
+      NNinputs[25] = NNlearnOut[3];
+      NNinputs[26] = NNlearnOut[4];
+
+      NNinputs[0] = (roll+180)/360;
+      NNinputs[1] = (pitch+180)/360;
+      
+      NNinputs[4] = gspeed/20000;
+      NNinputs[5] = (altiPress-altiPressOffset+10)/20;
+      NNinputs[6] = vPitot/20;
+      
+      NNinputs[10] = angles[0];
+      NNinputs[11] = angles[1];
+      NNinputs[12] = angles[2];
+      NNinputs[16] = angles[3];
+      NNinputs[17] = angles[4];
+      NNinputs[18] = angles[5];
+      NNinputs[19] = angles[6];
+      NNinputs[20] = angles[7];
+
+      NNinputs[21] = distanceToCurrent/150;
+
+      NNlearnOut[0] = inp1/180;
+      NNlearnOut[1] = inp2/180;
+      NNlearnOut[2] = inp3/180;
+      NNlearnOut[3] = inp4/180;
+      NNlearnOut[4] = inp5/180;
+
+      COM.print("$");
+      for(int i=0; i<NNinpLen; i++){
+        COM.print(NNinputs[i]);
+        COM.print(",");
+      }
+
+      COM.print(NNlearnOut[0]);
+      COM.print(",");
+      COM.print(NNlearnOut[1]);
+      COM.print(",");
+      COM.print(NNlearnOut[2]);
+      COM.print(",");
+      COM.print(NNlearnOut[3]);
+      COM.print(",");
+      COM.print(NNlearnOut[4]);
+ 
+          
+    }
           COM.println();
           sendDataTimer = millis();
           frameNumber++;
           sendOne = false;
-     
-   
-    
 
   }
   Serial.print("w ");

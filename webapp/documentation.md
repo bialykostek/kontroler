@@ -26,6 +26,7 @@ Change value [!]:
 7 - set angle
 8 - set current waypoint
 9 - calibrate compas
+10 - change sending data mode (0 - normal, 1 - AI style)
 
 Responses [#]:
 0 - heartbeat (1 - ok)
@@ -78,4 +79,33 @@ Controler EEPROM adresses:
 126-129 - right column lat
 130-133 - scale NS
 134-137 - scale EW
-138-141 - angle
+138-141 - angle 
+
+Neural Network inputs:
+0-roll
+1-pitch
+2-roll previous
+3-pitch previous
+4-ground speed
+5-altitute
+6-vPitot
+7-ground speed previous
+8-altitute previous
+9-vPitot previous
+10-angles[0]
+11-angles[1]
+12-angles[2]
+13-angles[0] previous
+14-angles[1] previous
+15-angles[2] previous
+16-angles[3]
+17-angles[4]
+18-angles[5]
+19-angles[6]
+20-angles[7]
+21-distance to current
+22-input1 previous
+23-input2 previous
+24-input3 previous
+25-input4 previous
+26-input5 previous
