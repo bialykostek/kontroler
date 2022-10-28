@@ -14,25 +14,46 @@
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 #include <Wire.h>
 #include <LPS.h>
+#include <TensorFlowLite.h>
 
 #define COM Serial3
 #define WIRE_PORT Wire
 #define AD0_VAL 1
 #define pi 3.14159265
 
+#include "second_model.h"
+#include "tensorflow/lite/experimental/micro/kernels/all_ops_resolver.h"
+#include "tensorflow/lite/experimental/micro/micro_error_reporter.h"
+#include "tensorflow/lite/experimental/micro/micro_interpreter.h"
+#include "tensorflow/lite/schema/schema_generated.h"
+#include "tensorflow/lite/version.h"
+#include "tensorflow/lite/c/c_api_internal.h"
+#include "tensorflow/lite/experimental/micro/micro_error_reporter.h"
+
+
 SFE_UBLOX_GNSS myGNSS;
 ICM_20948_I2C myICM;
 LPS ps;
 
-void* comBufferTX[200];
-void* comBufferRX[200];
+namespace {
+  tflite::ErrorReporter* error_reporter = nullptr;
+  const tflite::Model* model = nullptr;
+  tflite::MicroInterpreter* interpreter = nullptr;
+  TfLiteTensor* input = nullptr;
+  TfLiteTensor* output = nullptr;
+  int inference_count = 0;
+  constexpr int kTensorArenaSize = 10 * 1024;
+  uint8_t tensor_arena[kTensorArenaSize];
+}
+
+void* comBufferTX[700];
+void* comBufferRX[700];
 
 bool sendingData = false;
 
 int receiverInterval = 20;
 int heartbeatInterval = 7;
 int sendDataInterval = 50;
-int gpsInterval = 500;
 int sensorInterval = 50;
 int packageInterval = 10;
 float heartbeatValue = 0;
@@ -89,6 +110,7 @@ long sendDataTimer = 0;
 long gpsTimer = 0;
 long sensorTimer = 0;
 long packageTimer = 0;
+long NNtimer = 0;
 
 long emergencyTimer = 0;
 int emergencyCounter = 0;
@@ -283,6 +305,9 @@ void changeValue(int target, float value){
       }
       COM.println("Sending data mode changed");
       break;
+    case 11:
+      myGNSS.setNavigationFrequency((int)value);
+      break;
     default:
       okMessage = false;
       COM.print("Value to change ");
@@ -301,7 +326,7 @@ void executeOrder(int order){
     case 0:
       //arm
       armed = true;
-      altiPressOffset = altiPress;
+      altiPressOffset = (float)GPSaltitude/1000;
       EEPROM.write(0, 1);
       break;
     case 1:
@@ -576,6 +601,7 @@ void setup() {
   mode = EEPROM.read(0);
   if(mode == 0){
     //normal start
+  
    COM.println("#1|0");
 
     WIRE_PORT.begin();
@@ -594,7 +620,6 @@ void setup() {
     }
     else
     {
-      
       initialized = true;
     }
   }
@@ -640,7 +665,7 @@ void setup() {
     }
 
     myGNSS.setI2COutput(COM_TYPE_UBX);
-    myGNSS.setNavigationFrequency(10);
+    myGNSS.setNavigationFrequency(12);
     myGNSS.setAutoPVT(true);
 
     COM.println("#5|1");
@@ -667,6 +692,29 @@ void setup() {
     for(int i=0; i<NNinpLen; i++){
       NNinputs[i] = 0;
     }
+
+    static tflite::MicroErrorReporter micro_error_reporter;
+  error_reporter = &micro_error_reporter;
+  
+  model = tflite::GetModel(g_second_model_data);
+  if (model->version() != TFLITE_SCHEMA_VERSION) {
+    Serial.println("Model version error");
+    return;
+  }
+  
+  static tflite::ops::micro::AllOpsResolver resolver;
+  static tflite::MicroInterpreter static_interpreter(model, resolver, tensor_arena, kTensorArenaSize, error_reporter);
+  interpreter = &static_interpreter;
+
+  TfLiteStatus allocate_status = interpreter->AllocateTensors();
+  if (allocate_status != kTfLiteOk) {
+    Serial.println("Allocation tensors error");
+    return;
+  }
+
+  input = interpreter->input(0);
+  output = interpreter->output(0);
+  
      
   }else{
     //emergency
@@ -688,21 +736,16 @@ void setup() {
 void loop(){
   long debugTimer = millis();
   checkForMessage();
-  Serial.print("m ");
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
 
   if(emergency && millis() - emergencyTimer > 1000){
     COM.println();
     COM.println("#7|1");
     emergencyTimer = millis();
   }
-  Serial.print("e ");
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
   
   if(millis() - receiverTimer > receiverInterval){
-    readReceiver();
+    readReceiver();      
+    
 
     if(!emergency && armed){
       if(millis() - emergencyTimer > emergencySafety){
@@ -715,24 +758,62 @@ void loop(){
       }
       emergencyTimer = millis();
     }
-    
-    servo1.write(inp1);
-    servo2.write(inp2);
-    servo3.write(inp3);
-    servo4.write(inp4);
-    if(armed){
-      esc.write(inp5);
-    }else{
-      esc.write(0);  
+    if(inp6 < 75 || inp6 > 105){
+      servo1.write(inp1);
+      servo2.write(inp2);
+      servo3.write(inp3);
+      servo4.write(inp4);
+      if(armed){
+        esc.write(inp5);
+      }else{
+        esc.write(0);  
+      }
     }
-    
     receiverTimer = millis();
   }
 
-  Serial.print("s ");
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
+  if(inp6 > 75 && inp6 < 105 && millis()-NNtimer > 50){
 
+      
+      
+
+for(int i=0; i <27; i++)
+  input->data.f[i] = NNinputs[i];
+
+  TfLiteStatus invoke_status = interpreter->Invoke();
+  if (invoke_status != kTfLiteOk) {
+    Serial.println("Model invoke error");
+    return;
+  }
+  
+  NNlearnOut[0] = output->data.f[0];
+  NNlearnOut[1] = output->data.f[1];
+  NNlearnOut[2] = output->data.f[2];
+  NNlearnOut[3] = output->data.f[3];
+  NNlearnOut[4] = output->data.f[4];
+  
+  Serial.print(NNlearnOut[0]);
+  Serial.print(" ");
+  Serial.print(NNlearnOut[1]);
+  Serial.print(" ");
+  Serial.print(NNlearnOut[2]);
+  Serial.print(" ");
+  Serial.print(NNlearnOut[3]);
+  Serial.print(" ");
+  Serial.println(NNlearnOut[4]);
+
+servo1.write(NNlearnOut[1]*60+60);
+      servo2.write(NNlearnOut[2]*60+60);
+      servo3.write(NNlearnOut[3]*60+60);
+      servo4.write(NNlearnOut[4]*60+60);
+      if(armed){
+        esc.write(NNlearnOut[5]*180);
+      }else{
+        esc.write(0);  
+      }
+    
+    NNtimer = millis();
+  }
   
   
   if(millis() - heartbeatTimer > heartbeatInterval){
@@ -750,13 +831,52 @@ void loop(){
 
   }
 
-  Serial.print("h ");
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
+  
   
   if(!emergency && (inp6 < 15 || inp6 > 30) && ((sendingData && millis() - sendDataTimer > sendDataInterval) || sendOne)){
-    if(sendingModeNormal == true){
-    
+   // if(sendingModeNormal == true){
+
+NNinputs[2] = NNinputs[0]; //roll
+      NNinputs[3] = NNinputs[1]; //pitch
+
+      NNinputs[7] = NNinputs[4]; //ground speed
+      NNinputs[8] = NNinputs[5]; //alti press
+      NNinputs[9] = NNinputs[6]; //vpitot
+
+      NNinputs[13] = NNinputs[10]; //angles 0
+      NNinputs[14] = NNinputs[11]; //angles 1
+      NNinputs[15] = NNinputs[12]; //angles 2
+
+      NNinputs[22] = NNlearnOut[0]; //pwm
+      NNinputs[23] = NNlearnOut[1];
+      NNinputs[24] = NNlearnOut[2];
+      NNinputs[25] = NNlearnOut[3];
+      NNinputs[26] = NNlearnOut[4];
+
+      NNinputs[0] = (roll+180)/360;
+      NNinputs[1] = (pitch+180)/360;
+      
+      NNinputs[4] = (float)gspeed/25000;
+      NNinputs[5] = ((float)GPSaltitude/1000-altiPressOffset)/40;
+      NNinputs[6] = vPitot/20;
+      
+      NNinputs[10] = (angles[0]+pi)/2/pi;
+      NNinputs[11] = (angles[1]+pi)/2/pi;
+      NNinputs[12] = (angles[2]+pi)/2/pi;
+      NNinputs[16] = (angles[3]+pi)/2/pi;
+      NNinputs[17] = (angles[4]+pi)/2/pi;
+      NNinputs[18] = (angles[5]+pi)/2/pi;
+      NNinputs[19] = (angles[6]+pi)/2/pi;
+      NNinputs[20] = (angles[7]+pi)/2/pi;
+
+      NNinputs[21] = distanceToCurrent/500;
+if(inp6 < 75 || inp6 > 105){
+      NNlearnOut[0] = ((float)inp1-60)/60;
+      NNlearnOut[1] = ((float)inp2-60)/60;
+      NNlearnOut[2] = ((float)inp3-60)/60;
+      NNlearnOut[3] = ((float)inp4-60)/60;
+      NNlearnOut[4] = (float)inp5/180;
+}
           COM.print("$");
           COM.print(inp1);
           COM.print(",");
@@ -781,7 +901,7 @@ void loop(){
           COM.print(",");
           COM.print(longitude);
           COM.print(",");
-          COM.print(GPSaltitude);
+          COM.print((float)GPSaltitude/1000-altiPressOffset);
 
           COM.print(",");
           COM.print(SIV);
@@ -830,76 +950,34 @@ void loop(){
           
           
      
-    }else{
+    //}else{
       //previous
-      NNinputs[2] = NNinputs[0]; //roll
-      NNinputs[3] = NNinputs[1]; //pitch
-
-      NNinputs[7] = NNinputs[4]; //ground speed
-      NNinputs[8] = NNinputs[5]; //alti press
-      NNinputs[9] = NNinputs[6]; //vpitot
-
-      NNinputs[13] = NNinputs[10]; //angles 0
-      NNinputs[14] = NNinputs[11]; //angles 1
-      NNinputs[15] = NNinputs[12]; //angles 2
-
-      NNinputs[22] = NNlearnOut[0]; //pwm
-      NNinputs[23] = NNlearnOut[1];
-      NNinputs[24] = NNlearnOut[2];
-      NNinputs[25] = NNlearnOut[3];
-      NNinputs[26] = NNlearnOut[4];
-
-      NNinputs[0] = (roll+180)/360;
-      NNinputs[1] = (pitch+180)/360;
       
-      NNinputs[4] = gspeed/20000;
-      NNinputs[5] = (altiPress-altiPressOffset+10)/20;
-      NNinputs[6] = vPitot/20;
-      
-      NNinputs[10] = angles[0];
-      NNinputs[11] = angles[1];
-      NNinputs[12] = angles[2];
-      NNinputs[16] = angles[3];
-      NNinputs[17] = angles[4];
-      NNinputs[18] = angles[5];
-      NNinputs[19] = angles[6];
-      NNinputs[20] = angles[7];
-
-      NNinputs[21] = distanceToCurrent/150;
-
-      NNlearnOut[0] = inp1/180;
-      NNlearnOut[1] = inp2/180;
-      NNlearnOut[2] = inp3/180;
-      NNlearnOut[3] = inp4/180;
-      NNlearnOut[4] = inp5/180;
-
-      COM.print("$");
+COM.print(",");
+      //COM.print("$");
       for(int i=0; i<NNinpLen; i++){
         COM.print(NNinputs[i]);
-        COM.print(",");
+        COM.print(">");
       }
 
       COM.print(NNlearnOut[0]);
-      COM.print(",");
+      COM.print(">");
       COM.print(NNlearnOut[1]);
-      COM.print(",");
+      COM.print(">");
       COM.print(NNlearnOut[2]);
-      COM.print(",");
+      COM.print(">");
       COM.print(NNlearnOut[3]);
-      COM.print(",");
+      COM.print(">");
       COM.print(NNlearnOut[4]);
  
           
-    }
+   // }
           COM.println();
           sendDataTimer = millis();
           frameNumber++;
           sendOne = false;
 
   }
-  Serial.print("w ");
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
 
   if(!emergency){
     icm_20948_DMP_data_t data;
@@ -964,18 +1042,14 @@ void loop(){
       }
     }
   }
- Serial.print("i ");
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
-  if(!emergency && millis() - gpsTimer > gpsInterval){
-      
-    if (myGNSS.getPVT() && (myGNSS.getInvalidLlh() == false)){
-      latitude = myGNSS.getLatitude();
-      longitude = myGNSS.getLongitude();
-      GPSaltitude = myGNSS.getAltitude();
-      SIV = myGNSS.getSIV();
-      gspeed = myGNSS.getGroundSpeed();
-      heading = heading = (float)((float)myGNSS.getHeading())/100000.0;
+ debugTimer = millis();
+    if (millis()-gpsTimer>100 && myGNSS.getPVT(5)){
+      latitude = myGNSS.getLatitude(5);
+      longitude = myGNSS.getLongitude(5);
+      GPSaltitude = myGNSS.getAltitude(5);
+      SIV = myGNSS.getSIV(5);
+      gspeed = myGNSS.getGroundSpeed(5);
+      heading = heading = (float)((float)myGNSS.getHeading(5))/100000.0;
 
       heading = 360 - heading;
       heading = heading*pi/180;
@@ -992,16 +1066,6 @@ void loop(){
       planeX = globalToLocal(longitude, latitude, 0);
       planeY = globalToLocal(longitude, latitude, 1);
 
-     
-
-     int nextWaypoint = currentWaypoint + 1;
-      if(nextWaypoint > waypointsNumber){
-        nextWaypoint = 0;
-      }
-      
-      angles[1] = -pi + getAngleVectors(planeX, planeY, waypoints[currentWaypoint][0], waypoints[currentWaypoint][1], waypoints[nextWaypoint][0], waypoints[nextWaypoint][1]);
-      distanceToCurrent = distance(planeX, planeY, waypoints[currentWaypoint][0], waypoints[currentWaypoint][1]);
-      
       int currentSide = 0;
       if(lineA*planeX +lineB*planeY + lineC > 0){
         currentSide = 1;
@@ -1014,13 +1078,18 @@ void loop(){
         }
         calculateLine();
       }
+     
+
+     int nextWaypoint = currentWaypoint + 1;
+      if(nextWaypoint > waypointsNumber){
+        nextWaypoint = 0;
+      }
+      
+      angles[1] = -pi + getAngleVectors(planeX, planeY, waypoints[currentWaypoint][0], waypoints[currentWaypoint][1], waypoints[nextWaypoint][0], waypoints[nextWaypoint][1]);
+      distanceToCurrent = distance(planeX, planeY, waypoints[currentWaypoint][0], waypoints[currentWaypoint][1]);
+      
       gpsTimer = millis();      
     }
-  }
-
-  Serial.print("g ");
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
 
   if(!emergency && millis() - sensorTimer > sensorInterval ){
     if(readSensorNumber == 0){
@@ -1061,11 +1130,11 @@ void loop(){
       
       sensorTimer = millis();
       readSensorNumber = 0;  
+
+
+      
     }
     
   }
-  Serial.print("c ");
-  Serial.println(millis() - debugTimer);
-  debugTimer = millis();
  
 }

@@ -77,16 +77,54 @@
 
 
     <!--PAGES-->
+
+    <div class="page" id="pageConfig" data-title="Config" data-default="BL">
+        <button class="ui inverted button" id="getOneFrameBtn">Get one information frame</button><br />
+        <button class="ui inverted button" id="stopSendingBtn">Stop sending interval</button><br />
+        <button class="ui inverted button" id="sendingOnBtn">Turn on sending data</button>
+        <button class="ui inverted button" id="sendingOffBtn">Turn off sending data</button>
+        <br />
+        For compass calibration, remember to point plane to the est
+        <br />
+        <button class="ui inverted button" id="calibrateYawBtn">Calibrate compass</button>
+        <br />
+        <button class="ui inverted button" id="armButton">Arm</button>
+        <button class="ui inverted button" id="savingButton">Start saving data</button>
+        <br /><br />
+        Horizontal scale:
+        <input type="range" min="0" max="100" value="67" id="scaleHslider">
+        <br />
+        Vertical scale:
+        <input type="range" min="0" max="100" value="42" id="scaleVslider">
+        <br />
+        <br />
+        Download:<br />
+        <button class="ui inverted button" id="getLeftColumnBtn">Left column</button>
+        <button class="ui inverted button" id="getRightColumnBtn">Right column</button><br /><br />
+
+
+        Set current position as:<br />
+        <button class="ui inverted button" id="updateLeftColumnBtn">Left column</button>
+        <button class="ui inverted button" id="updateRightColumnBtn">Right column</button><br />
+        <button class="ui inverted button" id="calibrateCoordinateBtn">Calibrate local coordinate systems</button><br />
+
+        <br />
+        <button class="ui inverted button" id="updateWaypointsBtn">Update waypoints</button>
+        <br />
+        For reset, send command @3; then @4;.
+    </div>
+    
     <div class="page" id="pagePlayer" data-title="Player" data-default="BL">
         <div id="player">
             <div class="panelRow">
+                
                 <div class="ui toggle checkbox" id="tooglePlayer">
                     <input type="checkbox" name="public">
                 </div>
-                Log player
+                Log player (Unblock CORS!)
             </div>
             <div class="panelRow" id="nowPlaying">
-                Now playing: #223, 12.04.22 13:57:34, 34s
+                Now playing:  <span id="fileNameSpan"></span>
             </div>
             <div class="panelRow">
                 <div class="panelButton" id="prevFrameBtn">
@@ -144,41 +182,7 @@
         </div>
     </div>
 
-    <div class="page" id="pageConfig" data-title="Config" data-default="BL">
-        <button class="ui inverted button" id="getOneFrameBtn">Get one information frame</button><br />
-        <button class="ui inverted button" id="stopSendingBtn">Stop sending interval</button><br />
-        <button class="ui inverted button" id="sendingOnBtn">Turn on sending data</button>
-        <button class="ui inverted button" id="sendingOffBtn">Turn off sending data</button>
-        <br />
-        For compass calibration, remember to point plane to the est
-        <br />
-        <button class="ui inverted button" id="calibrateYawBtn">Calibrate compass</button>
-        <br />
-        <button class="ui inverted button" id="armButton">Arm</button>
-        <button class="ui inverted button" id="savingButton">Start saving data</button>
-        <br /><br />
-        Horizontal scale:
-        <input type="range" min="0" max="100" value="67" id="scaleHslider">
-        <br />
-        Vertical scale:
-        <input type="range" min="0" max="100" value="42" id="scaleVslider">
-        <br />
-        <br />
-        Download:<br />
-        <button class="ui inverted button" id="getLeftColumnBtn">Left column</button>
-        <button class="ui inverted button" id="getRightColumnBtn">Right column</button><br /><br />
-
-
-        Set current position as:<br />
-        <button class="ui inverted button" id="updateLeftColumnBtn">Left column</button>
-        <button class="ui inverted button" id="updateRightColumnBtn">Right column</button><br />
-        <button class="ui inverted button" id="calibrateCoordinateBtn">Calibrate local coordinate systems</button><br />
-
-        <br />
-        <button class="ui inverted button" id="updateWaypointsBtn">Update waypoints</button>
-        <br />
-        For reset, send command @3; then @4;.
-    </div>
+    
 
     <div class="page" id="pageAI" data-title="AI" data-default="BR">
         <button class="ui inverted button">Check status</button>
@@ -322,6 +326,7 @@
                     <td class="dataName">Angle 1</td>
                     <td id="liveData24"></td>
                 </tr>
+            
             </tbody>
         </table>
         <table class="liveTable">
@@ -357,6 +362,10 @@
                 <tr>
                     <td class="dataName">Frame number</td>
                     <td id="liveData32"></td>
+                </tr>
+                <tr>
+                    <td class="dataName">NN data</td>
+                    <td id="liveData33"></td>
                 </tr>
             </tbody>
         </table>

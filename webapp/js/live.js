@@ -15,8 +15,8 @@ function updateLiveData(data){
     lineB = parseFloat(data[18]);
     lineC = parseFloat(data[19]);
 
-    nextPathAngles[0] = parseFloat(data[24]);
-    nextPathAngles[1] = parseFloat(data[25]);
+    nextPathAngles[0] = parseFloat(data[23]);
+    nextPathAngles[1] = parseFloat(data[24]);
     nextPathAngles[2] = parseFloat(data[26]);
     nextPathAngles[3] = parseFloat(data[27]);
     nextPathAngles[4] = parseFloat(data[28]);

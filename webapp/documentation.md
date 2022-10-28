@@ -27,6 +27,7 @@ Change value [!]:
 8 - set current waypoint
 9 - calibrate compas
 10 - change sending data mode (0 - normal, 1 - AI style)
+11 - GPS frequency
 
 Responses [#]:
 0 - heartbeat (1 - ok)
@@ -48,7 +49,7 @@ Responses [#]:
 Setting chanel value:
 0-50 - manual
 15-30 - stop sending messages
-
+75-105 - auto mode
 
 Websocket message type:
 0 - Web App -> Ground Station

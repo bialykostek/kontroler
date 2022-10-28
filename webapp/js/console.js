@@ -69,6 +69,7 @@ function consoleInit(){
                 
             }else{
                 $('#consoleOutput tbody tr').remove();
+                clog("Console cleared", "info");
             }
             $('#consoleInputText').val('');
         }

@@ -1,7 +1,7 @@
-var leftColumn = [19.91028806728955, 50.067505657154115];
-var rightColumn = [19.909393061596532, 50.0674134791677 ];
+var leftColumn = [19.888026, 50.0252842];
+var rightColumn = [19.8889826, 50.0250206];
 
-var angle = 0;
+var angle = 5.878002559431705;
 var visualizationScale = 10;
 
 var visLeftColumn = [550, 700];

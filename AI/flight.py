@@ -6,7 +6,7 @@
 import os
 os.add_dll_directory(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin")
 os.add_dll_directory(r"D:\INSTALATORY\cudnn-10.1-windows10-x64-v8.0.4.30\cuda\bin")
-
+import sys
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,32 +14,42 @@ import math
 import random
 from tensorflow.keras import layers
 
-nsamples = 1000
+file = open('log_27_10_15_55_27.txt', 'r')
+
+inputdata = []
+inputres = []
+while True:
+    line = file.readline()
+    
+    if not line:
+        break
+  
+    try:
+
+      line = line.split(",")
+      line = line[33]
+
+      line = line.split("|")[0]
+      line = line.split(">")
+      
+      tmp = []
+      for i in range(27):
+        tmp.append(float(line[i]))
+      inputdata.append(tmp)
+      inputres.append([float(line[27]), float(line[28]), float(line[29]), float(line[30]), float(line[31])])
+    except:
+      pass
+
+nsamples = len(inputres)
 val_ratio = 0.2
-test_ratio = 0.2
+test_ratio = 0
 tflite_model_name = "second_model"
 c_model_name = "second_model"
 
-np.random.seed(1234)
-
-x1_values = np.random.uniform(low=0, high=(2 * math.pi), size=nsamples)
-x2_values = np.random.uniform(low=0, high=(2 * math.pi), size=nsamples)
-
-x_values = []
-y_values = []
-
-for i in range(nsamples):
-  x1 = random.random() * 2 * 3.14
-  x2 = random.random() * 2 * 3.14
-  y1 = math.sin(x1) + (random.random() - 0.5) * 0.1
-  y2 = math.cos(x2) + (random.random() - 0.5) * 0.1
-  x_values.append([x1, x2])
-  y_values.append([y1, y2])
-
 val_split = int(val_ratio * nsamples)
 test_split = int(val_split + (test_ratio * nsamples))
-x_val, x_test, x_train = np.split(x_values, [val_split, test_split])
-y_val, y_test, y_train = np.split(y_values, [val_split, test_split])
+x_val, x_test, x_train = np.split(inputdata, [val_split, test_split])
+y_val, y_test, y_train = np.split(inputres, [val_split, test_split])
 
 model = tf.keras.Sequential()
 model.add(layers.Dense(16, activation='sigmoid', input_shape=(27,)))
@@ -110,6 +120,3 @@ with open(c_model_name + '.h', 'w') as file:
   file.write(hex_to_c_array(tflite_model, c_model_name))
 
 print("Training finished!")
-
-print(model.predict([[0, 0]])) 
-#print(model.predict(np.array([3.14, 3.14]).T))

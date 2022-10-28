@@ -65,8 +65,8 @@ function playerInit(){
     $('#tooglePlayer').checkbox({
         onChecked: function(){
             liveData = false;
-            currentLogData = []
-            $.get("http://jkostecki.ddns.net:8080/log_21_10_00_05_16.txt?xdxd", (data) => {
+            currentLogData = [];
+            $.get("http://jkostecki.ddns.net:8080/"+currentLogFile, (data) => {
                 currentLogData = data.split('\n');
                 for(var i=0; i < currentLogData.length; i++){
                     currentLogData[i] = [currentLogData[i].split('|')[0], parseInt(currentLogData[i].split('|')[1])];
