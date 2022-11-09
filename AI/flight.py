@@ -14,7 +14,7 @@ import math
 import random
 from tensorflow.keras import layers
 
-file = open('log_27_10_15_55_27.txt', 'r')
+file = open('training_data.txt', 'r')
 
 inputdata = []
 inputres = []
@@ -42,7 +42,7 @@ while True:
 
 nsamples = len(inputres)
 val_ratio = 0.2
-test_ratio = 0
+test_ratio = 0.1
 tflite_model_name = "second_model"
 c_model_name = "second_model"
 
@@ -51,18 +51,20 @@ test_split = int(val_split + (test_ratio * nsamples))
 x_val, x_test, x_train = np.split(inputdata, [val_split, test_split])
 y_val, y_test, y_train = np.split(inputres, [val_split, test_split])
 
+print(x_val)
+print("--------------------------------------------------------")
+print(y_val)
+
 model = tf.keras.Sequential()
-model.add(layers.Dense(16, activation='sigmoid', input_shape=(27,)))
-model.add(layers.Dense(20, activation='sigmoid'))
-model.add(layers.Dense(10, activation='sigmoid'))
+model.add(layers.Dense(27, activation='sigmoid', input_shape=(27,)))
 model.add(layers.Dense(5))
 
-model.compile(optimizer='rmsprop', loss='mae', metrics=['mae'])
+model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['mse'])
 
 history = model.fit(x_train,
                     y_train,
-                    epochs=100,
-                    batch_size=100,
+                    epochs=30,
+                    batch_size=1000,
                     validation_data=(x_val, y_val))
 
 loss = history.history['loss']
@@ -120,3 +122,29 @@ with open(c_model_name + '.h', 'w') as file:
   file.write(hex_to_c_array(tflite_model, c_model_name))
 
 print("Training finished!")
+print(x_test[0])
+print(x_test[1])
+print(model.predict(x_test[:2]))
+
+
+
+'''
+forplotinp = []
+forplotout = []
+for i in range(100):
+  print(np.array2string(model.predict([inputdata[i]])), inputres[i]) 
+  forplotinp.append(inputres[i][2])
+  forplotout.append(model.predict([inputdata[i]])[0][2])
+
+plt.plot(forplotinp, 'r', forplotout, 'b')
+plt.show()
+print("Evaluate on test data")
+results = model.evaluate(x_test, y_test, batch_size=128)
+print("test loss, test acc:", results)
+
+# Generate predictions (probabilities -- the output of the last layer)
+# on new data using `predict`
+print("Generate predictions for 3 samples")
+predictions = model.predict(x_test[:3])
+print("predictions shape:", predictions.shape)
+'''

@@ -2,6 +2,7 @@ var liveData = true;
 var currentLogFile = "";
 var currentLogData = [];
 var playerFrameNumber = 0;
+var NNdata = [];
 
 var playing = false;
 var playingSpeed = 1;
@@ -28,6 +29,7 @@ function updateInfoSpan(){
     var h = date.getHours();
     var m = date.getMinutes();
     var s = date.getSeconds();
+    var ms = date.getMilliseconds();
     if(h < 10){
         h = '0' + h;
     }
@@ -37,7 +39,13 @@ function updateInfoSpan(){
     if(s < 10){
         s = '0' + s;
     }
-    $('#playerInfoSpan').html("Frame " + playerFrameNumber + " of " + currentLogData.length + ", " + parseInt(playerFrameNumber/currentLogData.length*100) + "%, " + h + ":" + m + ":" + s);
+    if(ms < 100){
+        ms = '0' + ms;
+    }
+    if(ms < 10){
+        ms = '0' + ms;
+    }
+    $('#playerInfoSpan').html("Frame " + playerFrameNumber + " of " + currentLogData.length + ", " + parseInt(playerFrameNumber/currentLogData.length*100) + "%, " + h + ":" + m + ":" + s + ":" + ms);
 }
 
 function playerInit(){
@@ -72,6 +80,22 @@ function playerInit(){
                     currentLogData[i] = [currentLogData[i].split('|')[0], parseInt(currentLogData[i].split('|')[1])];
                 }
                 clog("Log file downloaded", "info");
+
+                NNdata = [];
+                currentLogData.forEach(el=>{
+                    try{
+                        var tmp = el[0].split(",")[33];
+                        tmp = tmp.split(">");
+                        var tmp1 = [];
+                        tmp.forEach(el1 => {
+                            tmp1.push(parseFloat(el1));
+                        });
+                        if(tmp1.length == 32){
+                            NNdata.push(tmp1);
+                        }
+                    }catch(e){}
+                });
+
             });
 
         },
@@ -123,6 +147,15 @@ function playerInit(){
                 nextFrame();
             }
         }
+    });
+
+    $('#chartDataLoad').click(_ => {
+        var tmpdata = [];
+        var ind = parseInt($('#chartDataIndex').val());
+        NNdata.forEach(el => {
+            tmpdata.push(el[ind]);
+        });
+        showChart(tmpdata);
     });
 
     clog("Player initialized", "info");

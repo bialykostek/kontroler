@@ -14,36 +14,19 @@
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 #include <Wire.h>
 #include <LPS.h>
-#include <TensorFlowLite.h>
+#include "nn.h"
 
 #define COM Serial3
 #define WIRE_PORT Wire
 #define AD0_VAL 1
 #define pi 3.14159265
 
-#include "second_model.h"
-#include "tensorflow/lite/experimental/micro/kernels/all_ops_resolver.h"
-#include "tensorflow/lite/experimental/micro/micro_error_reporter.h"
-#include "tensorflow/lite/experimental/micro/micro_interpreter.h"
-#include "tensorflow/lite/schema/schema_generated.h"
-#include "tensorflow/lite/version.h"
-#include "tensorflow/lite/c/c_api_internal.h"
-#include "tensorflow/lite/experimental/micro/micro_error_reporter.h"
 
 
 SFE_UBLOX_GNSS myGNSS;
 ICM_20948_I2C myICM;
 LPS ps;
 
-namespace {
-  tflite::ErrorReporter* error_reporter = nullptr;
-  const tflite::Model* model = nullptr;
-  tflite::MicroInterpreter* interpreter = nullptr;
-  TfLiteTensor* input = nullptr;
-  TfLiteTensor* output = nullptr;
-  constexpr int kTensorArenaSize = 20 * 1024;
-  uint8_t tensor_arena[kTensorArenaSize];
-}
 
 void* comBufferTX[700];
 void* comBufferRX[700];
@@ -84,7 +67,6 @@ const int historicLength = 5;
 float historicvPitot[historicLength] = {0, 0, 0, 0, 0};
 float historicAltiPress[historicLength] = {0, 0, 0, 0, 0};
 
-
 float altiPress;
 
 bool resetFirstStep = false;
@@ -93,7 +75,7 @@ float vPitot;
 
 float yawOffset = 0;
 
-int NNinpLen = 27;
+const int NNinpLen = 27;
 
 float NNlearnOut[5] = {0, 0, 0, 0, 0};
 
@@ -110,6 +92,7 @@ long gpsTimer = 0;
 long sensorTimer = 0;
 long packageTimer = 0;
 long NNtimer = 0;
+long NNdataTimer = 0;
 
 long emergencyTimer = 0;
 int emergencyCounter = 0;
@@ -150,8 +133,6 @@ int requestCommaPlace = 0;
 
 long leftColumnLon = 0;
 long leftColumnLat = 0;
-
-float NNinputs[29];
 
 long rightColumnLon = 0;
 long rightColumnLat = 0;
@@ -562,6 +543,66 @@ void readReceiver(){
   inp6 = map(ch6.getValue(), 1100, 1900, 0, 180);
 }
 
+
+float tansig(float x){
+    return 2/(1+exp(-2*x))-1;
+}
+
+void NNrun(){
+    
+    float l0[NNil];
+    for(int i=0; i < NNil; i++){
+        l0[i] = NNinput[i];
+    }
+
+    
+    for(int i=0; i < NNil; i++){
+        l0[i] -= x1_step1_xoffset[i];
+    }
+
+    
+    for(int i=0; i < NNil; i++){
+        l0[i] *= x1_step1_gain[i];
+    }
+    
+    for(int i=0; i < NNil; i++){
+        l0[i] += x1_step1_ymin;
+    }
+    
+
+    float l1[NNl1l];
+    
+    for(int i=0; i < NNl1l; i++){
+        l1[i] = 0;
+        for(int k = 0; k < NNil; k++){
+            l1[i] += l0[k] * IW1_1[i][k];
+        }
+        l1[i] += b1[i];
+        l1[i] = tansig(l1[i]);
+    }
+    
+    for(int i=0; i < NNol; i++){
+        NNoutput[i] = 0;
+        for(int k = 0; k < NNl1l; k++){
+            NNoutput[i] += l1[k] * LW2_1[i][k];
+        }
+        NNoutput[i] += b2[i];
+    }
+    
+    for(int i=0; i < NNil; i++){
+        NNoutput[i] -= y1_step1_ymin;
+    }
+    
+    for(int i=0; i < NNil; i++){
+        NNoutput[i] /= y1_step1_gain[i];
+    }
+    
+    for(int i=0; i < NNil; i++){
+        NNoutput[i] += y1_step1_xoffset[i];
+    }
+    
+}
+
 void setup() {
   //heart
   pinMode(13, OUTPUT);
@@ -594,31 +635,7 @@ void setup() {
   servo4.write(90);
   esc.write(0);
 
-   for(int i=0; i<NNinpLen; i++){
-      NNinputs[i] = 0;
-    }
-
-    static tflite::MicroErrorReporter micro_error_reporter;
-  error_reporter = &micro_error_reporter;
-  
-  model = tflite::GetModel(g_second_model_data);
-  if (model->version() != TFLITE_SCHEMA_VERSION) {
-    Serial.println("Model version error");
-    return;
-  }
-  
-  static tflite::ops::micro::AllOpsResolver resolver;
-  static tflite::MicroInterpreter static_interpreter(model, resolver, tensor_arena, kTensorArenaSize, error_reporter);
-  interpreter = &static_interpreter;
-
-  TfLiteStatus allocate_status = interpreter->AllocateTensors();
-  if (allocate_status != kTfLiteOk) {
-    Serial.println("Allocation tensors error");
-    return;
-  }
-
-  input = interpreter->input(0);
-  output = interpreter->output(0);
+   
 
   //start mode
   mode = EEPROM.read(0);
@@ -713,7 +730,13 @@ void setup() {
     angle = EEPROM.readFloat(138);
 
  
-  
+  for(int i=0; i<NNinpLen; i++){
+      NNinput[i] = 0;
+    }
+
+    for(int i=0; i<5; i++){
+      NNoutput[i] = 0;
+    }
      
   }else{
     //emergency
@@ -734,7 +757,9 @@ void setup() {
 
 
 void loop(){
+  
   long debugTimer = millis();
+  
   checkForMessage();
 
   if(emergency && millis() - emergencyTimer > 1000){
@@ -766,74 +791,11 @@ void loop(){
       if(armed){
         esc.write(inp5);
       }else{
-        esc.write(0);  
+        esc.write(0);
       }
     }
     receiverTimer = millis();
-  }
-
-  if(inp6 > 75 && inp6 < 105 && millis()-NNtimer > 50){
-
-      float test1[27] = {0.58, 0.51, 0.57, 0.51, 0.59, 0.48, 0.23, 0.59, 0.48, 0.22, 0.18 -0.3, 0.53, 0.18 -0.31, 0.53, 0.43, 0.43, 0.37, 0.43, 0.43, 0.33, 0.44, 0.42, 0.64, 0.49, 0.48};  
-    for(int l=0; l <27; l++){
-      NNinputs[l] = test1[l];
-    }
-  
-  Serial.print(sizeof(input->data.f));
-  Serial.print(" ");
-  Serial.print(input->params.scale);
-  Serial.print(" ");
-  Serial.println(input->params.zero_point);
-
-  
-  
-  for(int i=0; i <27; i++){
-    input->data.f[i] = NNinputs[i];
-  }
-
-  for(int l=0; l <27; l++){
-      Serial.print(input->data.f[l]);
-      Serial.print(" ");
-    }
-    Serial.println();
-  
-  TfLiteStatus invoke_status = interpreter->Invoke();
-  if (invoke_status != kTfLiteOk) {
-    Serial.println("Model invoke error");
-    return;
-  }
-  
-  NNlearnOut[0] = output->data.f[0];
-  NNlearnOut[1] = output->data.f[1];
-  NNlearnOut[2] = output->data.f[2];
-  NNlearnOut[3] = output->data.f[3];
-  NNlearnOut[4] = output->data.f[4];
-  
-
-/*
-    servo1.write(NNlearnOut[0]*60+60);
-      servo2.write(NNlearnOut[1]*60+60);
-      servo3.write(NNlearnOut[2]*60+60);
-      servo4.write(NNlearnOut[3]*60+60);
-      if(armed){
-        esc.write(NNlearnOut[4]*180);
-      }else{
-        esc.write(0);  
-      }
-
-    */
-    Serial.print(NNlearnOut[0]);
-    Serial.print(", ");
-    Serial.print(NNlearnOut[1]);
-    Serial.print(", ");
-    Serial.print(NNlearnOut[2]);
-    Serial.print(", ");
-    Serial.print(NNlearnOut[3]);
-    Serial.print(", ");
-    Serial.println(NNlearnOut[4]);
-    NNtimer = millis();
-  }
-  
+  }  
   
   
   if(millis() - heartbeatTimer > heartbeatInterval){
@@ -851,34 +813,23 @@ void loop(){
 
   }
 
-  
-  
-  if(!emergency && (inp6 < 15 || inp6 > 30) && ((sendingData && millis() - sendDataTimer > sendDataInterval) || sendOne)){
-   // if(sendingModeNormal == true){
+  if(millis()-NNdataTimer > 50){
+    
+      NNinput[2] = NNinput[0]; //roll
+      NNinput[3] = NNinput[1]; //pitch
 
-NNinputs[2] = NNinputs[0]; //roll
-      NNinputs[3] = NNinputs[1]; //pitch
+      NNinput[16] = NNlearnOut[0]; //pwm
+      NNinput[17] = NNlearnOut[1];
+      NNinput[18] = NNlearnOut[2];
+      NNinput[19] = NNlearnOut[3];
+      NNinput[20] = NNlearnOut[4];
 
-      NNinputs[7] = NNinputs[4]; //ground speed
-      NNinputs[8] = NNinputs[5]; //alti press
-      NNinputs[9] = NNinputs[6]; //vpitot
-
-      NNinputs[13] = NNinputs[10]; //angles 0
-      NNinputs[14] = NNinputs[11]; //angles 1
-      NNinputs[15] = NNinputs[12]; //angles 2
-
-      NNinputs[22] = NNlearnOut[0]; //pwm
-      NNinputs[23] = NNlearnOut[1];
-      NNinputs[24] = NNlearnOut[2];
-      NNinputs[25] = NNlearnOut[3];
-      NNinputs[26] = NNlearnOut[4];
-
-      NNinputs[0] = (roll+180)/360;
-      NNinputs[1] = (pitch+180)/360;
+      NNinput[0] = (roll+180)/360;
+      NNinput[1] = (pitch+180)/360;
       
-      NNinputs[4] = (float)gspeed/25000;
-      NNinputs[5] = ((float)GPSaltitude/1000-altiPressOffset)/40;
-      NNinputs[6] = vPitot/20;
+      NNinput[4] = (float)gspeed/25000;
+      NNinput[5] = ((float)GPSaltitude/1000-altiPressOffset)/40;
+      NNinput[6] = vPitot/20;
 
       float tmp = angles[0];
       tmp *= -1;
@@ -886,7 +837,8 @@ NNinputs[2] = NNinputs[0]; //roll
       if(tmp > 2*pi){
         tmp -= 2*pi;
       }
-      NNinputs[10] = tmp;
+      tmp /= 2*pi;
+      NNinput[7] = tmp;
 
       tmp = angles[1];
       tmp *= -1;
@@ -894,7 +846,8 @@ NNinputs[2] = NNinputs[0]; //roll
       if(tmp > 2*pi){
         tmp -= 2*pi;
       }
-      NNinputs[11] = tmp;
+      tmp /= 2*pi;
+      NNinput[8] = tmp;
 
       tmp = angles[3];
       tmp *= -1;
@@ -902,7 +855,8 @@ NNinputs[2] = NNinputs[0]; //roll
       if(tmp > 2*pi){
         tmp -= 2*pi;
       }
-      NNinputs[16] = tmp;
+      tmp /= 2*pi;
+      NNinput[10] = tmp;
 
       tmp = angles[4];
       tmp *= -1;
@@ -910,7 +864,8 @@ NNinputs[2] = NNinputs[0]; //roll
       if(tmp > 2*pi){
         tmp -= 2*pi;
       }
-      NNinputs[17] = tmp;
+      tmp /= 2*pi;
+      NNinput[11] = tmp;
 
       tmp = angles[5];
       tmp *= -1;
@@ -918,7 +873,8 @@ NNinputs[2] = NNinputs[0]; //roll
       if(tmp > 2*pi){
         tmp -= 2*pi;
       }
-      NNinputs[18] = tmp;
+      tmp /= 2*pi;
+      NNinput[12] = tmp;
 
       tmp = angles[6];
       tmp *= -1;
@@ -926,7 +882,8 @@ NNinputs[2] = NNinputs[0]; //roll
       if(tmp > 2*pi){
         tmp -= 2*pi;
       }
-      NNinputs[19] = tmp;
+      tmp /= 2*pi;
+      NNinput[13] = tmp;
     
       tmp = angles[7];
       tmp *= -1;
@@ -934,19 +891,68 @@ NNinputs[2] = NNinputs[0]; //roll
       if(tmp > 2*pi){
         tmp -= 2*pi;
       }
-      NNinputs[20] = tmp;
+      tmp /= 2*pi;
+      NNinput[14] = tmp;
 
-      NNinputs[12] = (angles[2]+pi)/2/pi;
+      NNinput[9] = (angles[2]+pi)/2/pi;
       
-      NNinputs[21] = distanceToCurrent/500;
+      NNinput[15] = distanceToCurrent/500;
 
-      if(inp6 < 75 || inp6 > 105){
-        NNlearnOut[0] = ((float)inp1-60)/60;
-        NNlearnOut[1] = ((float)inp2-60)/60;
-        NNlearnOut[2] = ((float)inp3-60)/60;
-        NNlearnOut[3] = ((float)inp4-60)/60;
-        NNlearnOut[4] = (float)inp5/180;
+if(inp6 > 75 && inp6 < 105){
+      NNlearnOut[0] = NNoutput[0];
+      NNlearnOut[1] = NNoutput[1];
+      NNlearnOut[2] = NNoutput[2];
+      NNlearnOut[3] = NNoutput[3];
+      NNlearnOut[4] = NNoutput[4];  
+
+      servo1.write(NNoutput[0]*60+60);
+      servo2.write(NNoutput[1]*60+60);
+      servo3.write(NNoutput[2]*60+60);
+      servo4.write(NNoutput[3]*60+60);
+      if(armed){
+        esc.write(NNoutput[4]*180);
+      }else{
+        esc.write(0);
       }
+
+      
+}else{
+
+      NNlearnOut[0] = ((float)inp1-60)/60;
+      NNlearnOut[1] = ((float)inp2-60)/60;
+      NNlearnOut[2] = ((float)inp3-60)/60;
+      NNlearnOut[3] = ((float)inp4-60)/60;
+      NNlearnOut[4] = (float)inp5/180;
+}
+    NNrun();
+    if(inp6 > 75 && inp6 < 105){
+      
+      
+      for(int i=0; i<NNil; i++){
+        Serial.print(NNinput[i]);
+        Serial.print(",");
+      }
+      Serial.println();
+      
+      Serial.print(NNoutput[0]);
+      Serial.print(",");
+      Serial.print(NNoutput[1]);
+      Serial.print(",");
+      Serial.print(NNoutput[2]);
+      Serial.print(",");
+      Serial.print(NNoutput[3]);
+      Serial.print(",");
+      Serial.print(NNoutput[4]);
+      Serial.print(",");
+      Serial.println();
+    }
+      
+      NNdataTimer = millis();
+  }
+  
+  if(!emergency && (inp6 < 15 || inp6 > 30) && ((sendingData && millis() - sendDataTimer > sendDataInterval) || sendOne)){
+
+    if(sendingModeNormal){
           COM.print("$");
           COM.print(inp1);
           COM.print(",");
@@ -967,7 +973,7 @@ NNinputs[2] = NNinputs[0]; //roll
           COM.print(yaw);
           COM.print(",");
  
-         COM.print(latitude);
+          COM.print(latitude);
           COM.print(",");
           COM.print(longitude);
           COM.print(",");
@@ -1017,13 +1023,36 @@ NNinputs[2] = NNinputs[0]; //roll
           COM.print(distanceToCurrent);
           COM.print(",");
           COM.print(frameNumber);
+          COM.print(",");
           
-          
-     
+          COM.print(NNoutput[0]*60+60);
+          COM.print(">");
+          COM.print(NNoutput[1]*60+60);
+          COM.print(">");
+          COM.print(NNoutput[2]*60+60);
+          COM.print(">");
+          COM.print(NNoutput[3]*60+60);
+          COM.print(">");
+          COM.print(NNoutput[4]*60+60);
   
-COM.print(",");
+          
+    }else{
+      COM.print("$");
+      COM.print("-1");
+      COM.print(",");
+      COM.print(planeX);
+      COM.print(",");
+      COM.print(planeY);
+      COM.print(",");
+      COM.print(yaw);
+      COM.print(",");
+      COM.print(currentWaypoint);
+      COM.print(",");
+      COM.print(frameNumber);
+      COM.print(",");
+      
       for(int i=0; i<NNinpLen; i++){
-        COM.print(NNinputs[i]);
+        COM.print(NNinput[i]);
         COM.print(">");
       }
 
@@ -1036,14 +1065,16 @@ COM.print(",");
       COM.print(NNlearnOut[3]);
       COM.print(">");
       COM.print(NNlearnOut[4]);
- 
-      
+    }
+
+    
           COM.println();
           sendDataTimer = millis();
           frameNumber++;
           sendOne = false;
 
   }
+  
 
   if(!emergency){
     icm_20948_DMP_data_t data;
@@ -1101,15 +1132,20 @@ COM.print(",");
       }
     }
   }
+  
  debugTimer = millis();
-    if (millis()-gpsTimer>100 && myGNSS.getPVT(5)){
-      latitude = myGNSS.getLatitude(5);
-      longitude = myGNSS.getLongitude(5);
-      GPSaltitude = myGNSS.getAltitude(5);
-      SIV = myGNSS.getSIV(5);
-      gspeed = myGNSS.getGroundSpeed(5);
-      heading = heading = (float)((float)myGNSS.getHeading(5))/100000.0;
+    if (millis()-gpsTimer>100 && myGNSS.getPVT()){
+      latitude = myGNSS.getLatitude();
+      longitude = myGNSS.getLongitude();
+      GPSaltitude = myGNSS.getAltitude();
+      SIV = myGNSS.getSIV();
+      gspeed = myGNSS.getGroundSpeed();
+      heading = heading = (float)((float)myGNSS.getHeading())/100000.0;
 
+
+if(inp6 > 75 && inp6 < 105){
+GPSaltitude -= 20000;
+}
       heading = 360 - heading;
       heading = heading*pi/180;
 

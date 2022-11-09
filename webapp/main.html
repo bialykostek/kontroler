@@ -152,6 +152,12 @@
             <div class="panelRow">
                 <input type="range" min="1" max="100" value="1" id="playingTimeline">
             </div>
+            <div class="panelRow">
+                <div class="ui inverted input">
+                    <input type="number" value="0" id="chartDataIndex">
+                </div>
+                <button class="ui mini inverted button" id="chartDataLoad">Display on chart</button>
+            </div>
         </div>
     </div>
 
@@ -186,6 +192,7 @@
 
     <div class="page" id="pageAI" data-title="AI" data-default="BR">
         <button class="ui inverted button">Check status</button>
+        <textarea id="aiout"></textarea>
     </div>
 
     <div class="page" id="pageSettings" data-title="Settings" data-default="BR">

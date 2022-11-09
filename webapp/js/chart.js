@@ -16,6 +16,17 @@ function updateChart(val){
     chart.render();
 }
 
+function showChart(data){
+    chartData.length = 0;
+    data.forEach((el, val) => {
+        chartData.push({
+            x: val,
+            y: el
+        });
+    });
+    chart.render();
+}
+
 function chartInit(){
     
     chart = new CanvasJS.Chart("chartDiv", {

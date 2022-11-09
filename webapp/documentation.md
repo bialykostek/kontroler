@@ -83,30 +83,29 @@ Controler EEPROM adresses:
 138-141 - angle 
 
 Neural Network inputs:
-0-roll
-1-pitch
-2-roll previous
-3-pitch previous
-4-ground speed
-5-altitute
-6-vPitot
-7-ground speed previous
-8-altitute previous
-9-vPitot previous
-10-angles[0]
-11-angles[1]
-12-angles[2]
-13-angles[0] previous
-14-angles[1] previous
-15-angles[2] previous
-16-angles[3]
-17-angles[4]
-18-angles[5]
-19-angles[6]
-20-angles[7]
-21-distance to current
-22-input1 previous
-23-input2 previous
-24-input3 previous
-25-input4 previous
-26-input5 previous
+0 - roll
+1 - pitch
+2 - roll previous
+3 - pitch previous
+4 - ground speed
+5 - altitute
+6 - vPitot
+7 - angles[0]
+8 - angles[1]
+9 - angles[2]
+10 - angles[3]
+11 - angles[4]
+12 - angles[5]
+13 - angles[6]
+14 - angles[7]
+15 - distance to current
+16 - input1 previous
+17 - input2 previous
+18 - input3 previous
+19 - input4 previous
+20 - input5 previous
+21 - output1
+22 - output2
+23 - output3
+24 - output4
+25 - output5

@@ -245,6 +245,7 @@ function visualizationFrame(){
     ctx.moveTo(planeVis.x, planeVis.y);
     if(planeVis.angle < Math.PI/2 || planeVis.angle > Math.PI*3/2){
         ctx.lineTo(canvas.width, canvas.width*Math.tan(planeVis.angle) + planeVis.y - Math.tan(planeVis.angle)*planeVis.x);
+        
    }else{
         ctx.lineTo(0, planeVis.y - Math.tan(planeVis.angle)*planeVis.x);
     }
@@ -269,6 +270,7 @@ function visualizationFrame(){
     ctx.translate(-planeVis.size/2, -planeVis.size/2);
     ctx.drawImage(planeVis.img, 0, 0, planeVis.size, planeVis.size);
     ctx.restore();
+    
 }
 
 function visualizationInit(){

@@ -3,7 +3,7 @@ function updateLiveData(data){
     data.forEach((val, ind) => {
         $('#liveData' + ind).html(val);
     });
-    updateChart(parseFloat(data[3]));
+    //updateChart(parseFloat(data[3]));
 
     planeVis.x = parseInt(data[20]);
     planeVis.y = parseInt(data[21]);
