@@ -1,14 +1,14 @@
-var start = 350;
-var end = 5500;
+var start = 292;
+var end = 12715;
 
-$.get("http://jkostecki.ddns.net:8080/log_08_11_14_21_05.txt", (inp) => {
+$.get("http://jkostecki.ddns.net:8080/log_15_11_14_24_27.txt", (inp) => {
 
     inp1 = inp.split('\n')
     output = []
     for(var i=start; i < end; i++){
         try{
         inp1[i] = inp1[i].split(",");
-        if(inp1[i].length == 33){
+        if(inp1[i].length == 34){
             output.push([]);
             for(var k = 0; k <= 32; k++){
                  output[output.length-1].push(parseFloat(inp1[i][k]));

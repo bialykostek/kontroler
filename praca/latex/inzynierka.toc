@@ -1,0 +1,26 @@
+\babel@toc {polish}{}\relax 
+\contentsline {section}{\numberline {1}Wprowadzenie}{3}{}%
+\contentsline {subsection}{\numberline {1.1}Cel i zakres pracy}{3}{}%
+\contentsline {subsection}{\numberline {1.2}Motywacja}{3}{}%
+\contentsline {section}{\numberline {2}Wstęp teoretyczny}{3}{}%
+\contentsline {subsection}{\numberline {2.1}Moduły dostępne na rynku}{3}{}%
+\contentsline {subsection}{\numberline {2.2}Technika lotu samolotem}{4}{}%
+\contentsline {subsection}{\numberline {2.3}Sztuczne sieci neuronowe}{4}{}%
+\contentsline {subsection}{\numberline {2.4}Budowa samolotów kompozytowych}{4}{}%
+\contentsline {subsection}{\numberline {2.5}Laminowanie ogniw fotowoltaicznych}{4}{}%
+\contentsline {subsection}{\numberline {2.6}State of the art}{4}{}%
+\contentsline {section}{\numberline {3}Implementacja rozwiązania}{5}{}%
+\contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{5}{}%
+\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{12}{}%
+\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{15}{}%
+\contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{20}{}%
+\contentsline {paragraph}{Algorytm estymacji trajektorii}{24}{}%
+\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{26}{}%
+\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{27}{}%
+\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{28}{}%
+\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{30}{}%
+\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{30}{}%
+\contentsline {subsection}{\numberline {4.1}Podsumowanie wyników doświadczeń}{30}{}%
+\contentsline {subsection}{\numberline {4.2}Problemy}{30}{}%
+\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{30}{}%
+\contentsline {subsection}{\numberline {4.4}Wnioski}{30}{}%

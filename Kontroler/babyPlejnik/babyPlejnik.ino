@@ -21,8 +21,6 @@
 #define AD0_VAL 1
 #define pi 3.14159265
 
-
-
 SFE_UBLOX_GNSS myGNSS;
 ICM_20948_I2C myICM;
 LPS ps;
@@ -554,12 +552,10 @@ void NNrun(){
     for(int i=0; i < NNil; i++){
         l0[i] = NNinput[i];
     }
-
     
     for(int i=0; i < NNil; i++){
         l0[i] -= x1_step1_xoffset[i];
     }
-
     
     for(int i=0; i < NNil; i++){
         l0[i] *= x1_step1_gain[i];
@@ -569,7 +565,6 @@ void NNrun(){
         l0[i] += x1_step1_ymin;
     }
     
-
     float l1[NNl1l];
     
     for(int i=0; i < NNl1l; i++){
@@ -1142,10 +1137,11 @@ if(inp6 > 75 && inp6 < 105){
       gspeed = myGNSS.getGroundSpeed();
       heading = heading = (float)((float)myGNSS.getHeading())/100000.0;
 
-
+/*
 if(inp6 > 75 && inp6 < 105){
 GPSaltitude -= 20000;
 }
+*/
       heading = 360 - heading;
       heading = heading*pi/180;
 

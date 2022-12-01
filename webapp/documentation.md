@@ -73,7 +73,7 @@ Server settings responses (type 7):
 
 Controler EEPROM adresses:
 0 - arm info
-113 - waypoints
+1 - 113 - waypoints
 114-117 - left column long
 118-121 - left column lat
 122-125 - right column long
