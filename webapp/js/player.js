@@ -155,6 +155,7 @@ function playerInit(){
         NNdata.forEach(el => {
             tmpdata.push(el[ind]);
         });
+        console.log(tmpdata);
         showChart(tmpdata);
     });
 

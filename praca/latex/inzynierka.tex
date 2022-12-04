@@ -38,6 +38,8 @@
 \subsection{Motywacja}
 
 \section{Wstęp teoretyczny}
+Uwaga: określenie "środowisko" zawarte w poniższym rozdziale odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej.
+
 \subsection{Moduły dostępne na rynku}
 Na rynku dostępne są urządzenia spełniające definicję kontrolera do autonomicznego statku powietrznego - urządzenia te nadają się do wykorzystania zarówno w modelach samolotów jak i w wielowirnikowcach. Jednym z najpopularniejszych tego typu rozwiązań jest rodzina urządzeń Pixhawk. Jest to rozwiązaniem sprawdzone i często wykorzystywane w nawet zaawansowanych komercyjnych projektach. Kontroler lotu jest modułem zbierającym dane z różnych czujników, przede wszystkim IMU (czujnika orientacji), GPS/GNNS (czujnika położenia), rurki pitota (czujnika względnej prędkości wiatru). Do modułu podłączany jest także odbiornik z aparatury RC, natomiast jego wyjściem są sygnały PWM do ustawienia odpowiednich powierzchni sterowych lub prędkości silników. 
 Moduł kontrolera lotu może pracować w kilku trybach, z których najważniejszymi są:
@@ -187,7 +189,7 @@ Mimo krótkiego czasu wykonywania pomiarów, halogenowe lampy wytwarzają bardzo
 
 Ostatnim wykonanym badaniem była analiza ogniw przy pomocy specjalistycznej kamery termowizyjnej. Podanie napięcia na końce panelu skutkuje stopniowym ogrzewaniem się ogniw. Dzięki tej technice możliwe jest wykrycie uszkodzeń powstałych w procesie laminowania ogniw lub skrzydeł. Miejsca uszkodzone stawiają większy opór elektryczny, a co za tym idzie wytwarzają więcej ciepła przy przepływie energii elektrycznej. A badaniu podano wykorzystano napięcie i natężenie znamionowe ogniw, a różnice w temperaturach sięgały kilku stopni Celsujasza. Zaobserwowano znacznie większe uszkodzenia szeregu ogniw na prawym skrzydle, co możne tłumaczyć różnicę koło 10\% maksymalnej mocy.
 
- \clearpage
+\FloatBarrier
 \subsection{Moduł kontrolera lotu}
 Pierwszym krokiem podczas pracy nad projektem  było przygotowanie listy parametrów, które są brane pod uwagę przez pilota podczas zdalnego terowania modelem. Są to: wysokość, rotacja, prędkość względem ziemi, prędkość względem wiatru, położenie samolotu, kierunek dalszej planowanej trasy. Wszystkie te wymienione elementy muszą w analogiczny sposób być brane pod uwagę przez autonomiczną jednostkę sterującą, a zbierane muszą być przy pomocy sensorów i czujników umieszczonych na pokładzie samolotu. Jednym z kluczowych założeń takiego modułu jest jego nieprzerwane, niezatrzymane i nieopóźnione działanie w podczas pracy. Utrata kontroli nad samolotem oznacza niemal pewne uderzenie w ziemię w ciągu zaledwie kilku sekund. Dlatego jako główny komputer pokładowy został wybrany mikrokontroler Teensy 4.0. Dysponuje on mikroprocesorem ARM Cortex-M7, taktowanym w trybie standardowym z częstotliwością 600 MHz. Jego innymi istotnymi zaletami jest możliwość generowania sygnału PWM przez większość wyjść cyfrowych, duża pojemność pamięci Flash (1984K) oraz RAM (1024 KB), 7 portów szeregowych UART, a także możliwość programowania w środowisku Arduino IDE (z rozszerzeniem Teensyduino). Ta ostatnia cecha jest o tyle ważna, że pozwala na użycie bibliotek do sensorów, które są najczęściej przygotowane właśnie pod tą platformę. Ich migracja na inne technologie mogła by być problematyczna. Warto zauważyć, że teoretycznie jeszcze lepszymi parametrami cechują się moduły komputerów jednopłytkowych (ang. single-board computer) jak na przykład Raspberry Pi Zero W, na którym można uruchomić system Raspbian z rodziny UNIX. Uruchomienie programu kontrolera na takim mikrokomputerze byłoby prawdopodobnie software’owo stabilniejsze i pozwalało na łatwiejsze zarządzanie wyjątkami i błędami, jednakże w przypadku zawieszenia się systemu operacyjnego lub jakiegokolwiek innego czynnika mogącego przerwać płynność działania programu bardzo prawdopodobne jest utracenie kontroli nad samolotem. Dodatkowo, system operacyjny uruchamia się w najlepszym czasie około kilkunastu sekund, co w przypadku nieplanowanego restartu w powietrzu wywołanego na przykład chwilowym spadkiem napięcia na przetwornicy oznacza pewne rozbicie modelu. Teensy uruchamia się w czasie bliskim sekundy, dodatkowo przed inicjalizacją czujników (mogącą trwać 2-3 sekundy) program sprawdza w pamięci EEPROM czy samolot nie został uprzednio uzbrojony. Jeżeli tak, czujniki pozostają wyłączone, natomiast samolot przechodzi w awaryjny tryb manualny. To rozwiązanie zapewnia samolotowi najwyższe bezpieczeństwo.
 Pierwszy prototyp projektu wykorzystywał następujące moduły:
@@ -232,7 +234,7 @@ Warto zauważyć, że widoczna na zdjęciu płytka miała charakter prototypowy,
 
 W skład elektorniki podkładowej samolotu wchodzą także serwomechanizmy do poruszania powierzchniami sterowymi samolotu. Z uwagi na rozmiar powierzchni sterowych, wybrane zostały serwomechanizmy GO-17 MG firmy Pelikan. Posiadają one moment obrotowy od 2,2$\frac{kg}{cm}$ przy napięciu zasilającym 4,8V do nawet 2,5$\frac{kg}{cm}$ przy napięciu 6V (w samolocie napięcie zasilające za przetwornicą wynosi znamionowo 5V, w praktyce ta wartość waha się w zakresie 5V-5.5V). Silnik napędzający samolot umieszczony jest w przedniej części kadłuba, razem z elektronicznym regulatorem prędkości ESC. Wybranym modelem został Dualsky Ecko V2 2814 970kV. Jego chwilowa moc maksymalna wynosi nawet do 400W, przy obciążeniu prądowym 33A. Zgodnie z zaleceniem producenta, dobrane do niego zostały śmigła  11x7. 
 
-\FloatBarrier
+ \clearpage
 \subsection{Oprogramowanie kontrolera lotu}
 Ciągłość pracy kontrolera jest jednym z najważniejszych założeń projektowych – jak już zostało podkreślone, jakikolwiek przestój w pracy może się wiązać z utraceniem modelu. Całe oprogramowanie znajduje się na mikrokontrolerze Teensy 4.0. Po uruchomieniu, pierwszą czynnością jest inicjalizacja:
 1.	Portów szeregowych do komunikacji
@@ -245,14 +247,10 @@ Oprogramowanie ma pozwolić na dwa tryby lotu – manualny oraz autonomiczny. W 
  
     \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\textwidth]{diagram_blokowy}
+    \includegraphics[width=1\textwidth]{diagramy}
     \caption{A nice plot.}
 \end{figure}
-   \begin{figure}[ht]
-    \centering
-    \includegraphics[width=1\textwidth]{diagram_emergency}
-    \caption{A nice plot.}
-\end{figure}
+
 Poszczególne elementy programu wykonywane są z różna częstotliwością, zależną najczęściej od szybkości działania czujnika:
 
 \begin{center}
@@ -263,7 +261,7 @@ Element programu & Częstotliwość działania \\
 \hline
 Odczyt danych z odbiornika & 50 Hz \\
 Sterowanie – tryb manualny & 50 Hz \\
-Sterowanie - tryb autonomiczny & 20 Hz \\
+Sterowanie – tryb autonomiczny & 20 Hz \\
 Odczyt danych z sensora IMU & $\sim$100 Hz \\
 Odczyt danych z rurki Pitota & 20 Hz \\
 Odczyt danych z modułu GPS & 10 Hz \\
@@ -352,6 +350,8 @@ Programem obsługującym dwustronną komunikację ze stacją odbiorczą jest prz
     \caption{Dodać podpis :)}
 \end{figure}
 
+Warto wspomnieć, że komunikacja odbywa się przez moduły HC-12, które są tansceiverami (połączeniem transmittera oraz receivera), czyli umożliwia komunikację dwustronną. Moduł ten ma pewne ograniczenia, widoczne przede wszystkim przy próbie równoczesnego nadawania oraz odbierania danych. Po uruchomieniu transmisji, samolot nadaje dane w trybie praktycznie ciągłym, dlatego wysłanie do niego ramki danych jest bardzo utrudnione i mało prawdopodobne. Dlatego na aparaturze jeden z przełączników działa jako blokada transmisji danych (od strony oprogramowania kontrolera), która umożliwia na bezproblemową komunikację.
+
 \FloatBarrier
 \subsection{Protokół komunikacji}
 Komunikacja między poszczególnymi elementami systemu wymagała opracowania dedykowanego protokołu komunikacyjnego tak, aby każda wiadomość trafiła w odpowiednie miejsce i została prawidłowo odczytana. 
@@ -373,52 +373,188 @@ Przykładowa odpowiedź:
 \#5;1; - potwierdzenie prawidłowej inicjalizacji modułu GNSS
 \FloatBarrier
 \subsection{Oprogramowanie naziemne}
-Podczas testów samolotu bardzo szybko okazało się, że do przygotowania modułu kontrolera konieczne będzie przygotowanie środowiska, które pozwoli na podgląd i wizualizację danych oraz konfigurację parametrów i systemu. Początkowy projekt założył prosty program do wyświetlania zapisanych w pliku danych zebranych podczas przelotu w postaci wykresów.
+Podczas testów samolotu bardzo szybko okazało się, że do efektywnej pracy nad modułem kontrolera konieczne będzie przygotowanie środowiska, które pozwoli na podgląd i wizualizację danych oraz konfigurację parametrów systemu. Początkowy projekt założył prosty program do wyświetlania zapisanych w pliku danych zebranych podczas przelotu w postaci wykresów.
 
-(Screen starego programu)
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{starysystem}
+    \caption{Dodać podpis :)}
+\end{figure}
 
-Program został przygotowany w formie strony internetowej tak, aby możliwy był do niego dostęp z poziomu przeglądarki. Niestety, szybko okazało się, że jest to rozwiązanie tylko tymczasowe - brak możliwości podglądu danych w czasie rzeczywistym znacząco utrudniał pracę nad samym kontrolerem - największym zarzutem był brak możliwości sprawdzenia poprawności działania algorytmów przetwarzające dane lokalizacyjne i śledzenia trasy. Podczas testów w warunkach polowych bardzo uciążliwa była konieczność ponownej kompilacji całego programu i ponownego wgrywania do mikrokontrolera przy każdej zmianie parametrów. 
+Program został przygotowany w formie strony internetowej tak, aby możliwy był do niego dostęp z poziomu przeglądarki. Niestety, szybko okazało się, że jest to rozwiązanie tylko tymczasowe - brak możliwości podglądu danych w czasie rzeczywistym znacząco utrudniał pracę nad samym kontrolerem - największym problemem był brak możliwości sprawdzenia poprawności działania algorytmów przetwarzające dane lokalizacyjne i estymacji trajektorii lotu. Podczas testów w warunkach polowych bardzo uciążliwa była konieczność ponownej kompilacji całego programu i ponownego wgrywania do mikrokontrolera przy każdej zmianie parametrów. 
 
-Podjęta została decyzja o całkowitym przepisaniu oprogramowania kontrolera i przygotowania go do komunikacji dwustronnej oraz stworzenie środowiska do pełnej kontroli z poziomu laptopa. 
+Pojawił się więc pomysł stworzenia aplikacji, która pozwoli na podgląd danych w czasie rzeczywistym, konfigurację samolotu a także zapis i analizę zebranych danych. Projektując system największy nacisk położony został na jego przejrzystość, łatwość obsługi i praktyczność, tak aby pozwolić zaoszczędzić każdą cenną sekundę podczas wykonywania lotów testowych. 
 
-(Screen programu)
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{weball}
+    \caption{Dodać podpis :)}
+\end{figure}
 
-Projektując system największy nacisk położony został na jego przejrzystość, łatwość obsługi i praktyczność, tak aby pozwolić zaoszczędzić każdą cenną sekundę podczas testów. 
 
-Layout cztero-panelowy
 
-Layout programu jest najistotniejszym elementem decydującym o jego przejrzystości. Pierwszym pytaniem podczas projektowania tego typu narzędzia jest zmaksymalizowanie ilości informacji, które użytkownik może równocześnie obserwować. Program jednak miał umożliwiać pracę nad różnymi aspektami samolotu, pracę z danymi w czasie rzeczywistym lub odtworzone z pliku, konfigurację trasy czy podgląd stanu połączenia całego środowiska. Podsumowując, potrzebna jest możliwość przygotowania wielu możliwych wyglądów aplikacji. Przygotowane rozwiązanie opiera się o wyświetlanie różnych stron na czterech panelach aplikacji. Każda strona odpowiada za wyświetlanie lub konfigurację innych parametrów samolotu. 
+\paragraph{Układ czteropanelowy}\mbox{}
 
-Co najważniejsze, rozmiar paneli nie jest stały, można go zmienić w intuicyjny sposób przy pomocy myszy. Strony także nie są związane z konkretnym panelem, po przeciągnięciu paska tytułowego na inny panel, strona zmienia swoją lokalizację. W obrębie panelu możliwa jest też zmiana kolejności na pasku tytułowym.
-Całość umożliwia (w zależności od potrzeby) wyświetlanie na ekranie zupełnie innych zestawów informacji. Przełączenie się między dowolną konfiguracją zajmuje czas liczony w sekundach. Kilka przykładów zostało pokazanych poniżej:
+Wygląd i układ programu są najistotniejszymi elementami decydującymi o jego przejrzystości. Pierwszym pytaniem podczas projektowania tego typu oprogramowania jest zmaksymalizowanie ilości informacji, które użytkownik może równocześnie obserwować. Zgodnie z założeniem, program  miał umożliwiać pracę nad różnymi aspektami samolotu: analizę danych (w czasie rzeczywistym lub odtworzonych z pliku), konfigurację trasy czy podgląd stanu połączenia całego środowiska. Podsumowując, jedno statyczne ułożenie elementów interfejsu byłoby niemożliwe, stąd koncepcja rozwoju dynamicznego układu czteropanelowego, która pozwala na wyświetlanie różnych stron aplikacji w oknach.
+
+Co najważniejsze, rozmiar paneli nie jest stały, można go dynamicznie modyfikować w intuicyjny sposób przy pomocy przeciągnięcia wskaźnikiem myszy. Ponadto, strony nie są przypisane do jednego panelu, można zmieniać ich lokalizację po przeciągnięciu paska tytułowego na inny obszar. Zmiana kolejności wyświetlanych stron w obrębie panelu także jest możliwa w analogiczny sposób. Całość umożliwia (w zależności od potrzeby) wyświetlanie na ekranie zupełnie innych zestawów informacji. Przełączenie się między dowolną konfiguracją zajmuje czas liczony w sekundach. Podczas kalibracji przed startem wygodniejszy będzie podgląd na mapę, sieć połączeń środowiska, ekran konfiguracji i konsolę, w trakcie lotu niezbędny jest ekran podglądu danych i wizualizacja, a podczas analizy zebranych danych panel odtwarzania czy lista plików.
+
+
 
 System został stworzony w formie strony internetowej przy pomocy technologii: HTML, JavaScript, jQuery, jQuery-UI, Semantic-UI oraz CSS i przygotowywany głównie pod przeglądarkę Google Chrome. Dostęp do niego nie wymaga żadnej instalacji i jest możliwy za pośrednictwem internetu. 
 
-Strony:
 
-Wizualizacja
-Strona "Wizualizacja" jest jedną z najistotniejszych zakładek pozwalających sprawdzić obecne położenie samolotu, wyznaczoną trasę, kolejne punkty na trasie. Miejsce to było kluczowe przede wszystkim podczas tworzenia algorytmów wewnątrz kontrolera, ponieważ ich wizualizacja umożliwiła sprawdzenie poprawności ich działania. Ponadto możliwe jest w czasie rzeczywistym obserwowanie pozycji samolotu co ułatwia późniejszą analizę danych. 
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{przedlotem}
+    \caption{Dodać podpis :)}
+\end{figure}
 
-Wizualizacja przedstawia samolot w lokalnym układzie współrzędnych. Z tego samego układu korzysta kontroler do wykonania obliczeń związanych ze śledzeniem trasy. Układ ten jest obliczany na podstawie określenia lokalizacji słupów wyznaczających trasę. Kalibracja układów odbywa się w stronie "Konfiguracja". 
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{podczaslotu}
+    \caption{Dodać podpis :)}
+\end{figure}
 
-Mapa
-W praktyce pomocne może być określenie położenia samolotu na mapie terenu. W tym celu wykorzystano działające na licencji open source Open Street Maps poprzez bibliotekę OpenLayers. Na mapie naniesiona jest lokalizacja samolotu a także słupy, trasa oraz obszar lotu.
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{polocie}
+    \caption{Dodać podpis :)}
+\end{figure}
 
-Konsola
-Strona konsoli została przygotowana z myślą o dwustronnej komunikacji z kontrolerem, wyświetlania komunikatów z samolotu jak i z programu. Tekst wpisany w okno konsoli zostaje wysłany bezpośrednio do samolotu. Poprzez użycie różnych styli wiadomości możliwe jest szybkie określenie wysyłanych komunikatów. Konsola przechowuje do 1000 wierszy.
+\FloatBarrier
+ 
+\paragraph{Strona: Wizualizacja}\mbox{}
 
-Konfiguracja
-Strona umożliwia konfigurację parametrów systemu, kalibrację urządzenia, wyznaczenie nowej trasy, zarządzenie wysyłaniem wiadomości i wiele innych.
+Strona wizualizacji jest jedną z najistotniejszych zakładek pozwalających sprawdzić obecne położenie samolotu, wyznaczoną trasę oraz które z nich zostały już zaliczone. Podczas tworzenia algorytmów transformacji do lokalnego układu współrzędnych oraz estymacji trajektorii podgląd taki okazał się niezbędny, zwłaszcza na etapie weryfikacji poprawności ich działania - dane liczbowe często mogły się wydawać poprawne, jednak dopiero ich wizualizowanie pozwoliło na bardzo dokładne sprawdzenie i wychwycenie błędów (na przykład niepoprawne skalowanie względem osi). W trakcie lotu testowego podgląd pozycji jest także wygodny jako wsparcie pilota, który nie zawsze jest w stanie poprawie określić odległość samolotu od siebie. Ponadto, możliwe jest sprawdzenie w czasie rzeczywistym kalibracji i poprawności danych. Do przygotowania modułu wizualizacji konieczna jest kalibracja lokalnego układu współrzędnych z samolotem. Bezpośrednio powiązaną stroną jest moduł wyświetlania danych w czasie rzeczywistym, które są aktualizowane na podstawie ramek przychodzących z samolotu.
 
-Ustawienia
-Strona umożliwia zarządzie samym programem. Diagram widoczny poniżej pokazuje zasięg połączenia, wywoływanego przy pomocy tak zwanego echo systemu. Umożliwia on szybkie zweryfikowanie podłączonych systemów. 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{wizualizacja}
+    \caption{Dodać podpis :)}
+\end{figure}
 
-Bajery
-Automatyczne przewijanie konsoli
-Dopracowane zachowanie stron przy przenoszeniu
+\paragraph{Strona: Mapa}\mbox{}
+
+Podczas przygotowań do lotu i przy wyznaczeniu obszaru lotu oraz jego trasy, pomocne może być określenie położenia samolotu na mapie terenu. W tym celu wykorzystano działające na licencji open source Open Street Maps poprzez bibliotekę OpenLayers. Na mapie naniesiona jest lokalizacja samolotu a także słupy, trasa oraz obszar lotu.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{mapa}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+
+\paragraph{Strona: Konsola}\mbox{}
+
+Konsola została przygotowana z myślą o bezpośredniej dwustronnej komunikacji z kontrolerem, a także wyświetlania komunikatów z samolotu jak i z programu. Tekst wpisany w okno konsoli zostaje wysłany bezpośrednio do kontrolera. Interakcja z konsolą odbywa się w sposób analogiczny jak w najczęściej używanych tego typu aplikacjach - pozwala na korzystanie ze strzałek do przewijania po poprzednio wysłanych komendach, automatycznie przewija do nowych wiadomości po ręcznym przewinięciu na sam dół, a okno wpisywania staje się aktywne po kliknięciu gdziekolwiek na obszarze panelu. Dodatkowo wyświetlany tekst może być odpowiednio stylizowany oraz pokazywane jest jego źródło poprzez odpowiedni symbol przed wiadomością. Konsola przechowuje do 1000 wierszy informacji.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{konsola}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+\paragraph{Strona: Konfiguracja}\mbox{}
+
+Strona ta jest kluczowa przy konfiguracji samolotu przed startem. Umożliwia zarządzenie wysyłaniem danych, zbrojeniem silnika, zapisem danych, kalibracją terenu czy zarządzaniem trasą. Dzięki użyciu protokołu komunikacyjnego możliwe jest automatyczne wysłanie danych, wraz z informacją zwrotną - przykładowo informacja o poprawnym odebraniu pozycji waypointa skutkuje uruchomieniu procedury wysłania kolejnego. W skład takiej procedury wchodzi wysłanie osobo obydwu współrzędnych.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{config}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+\paragraph{Strona: Ustawienia}\mbox{}
+
+Jeżeli występuje problem z podłączeniem do samolotu najszybszym sposobem do zlokalizowania newralgicznego miejsca jest zakładka Settings - za pomocą mapy połączeń w całym środowisku możliwe jest określenie błędu. Przykładowo, problem z siecią czasem może skutkować błędem aplikacji przekaźnikowej, z kolei serwer czasem automatycznie kończy działanie ze względu na brak aktywności.  Wywołanie funkcji Echo skutkuje wysłaniem prośby do kolejnych programów o odesłanie informacji o prawidłowym działaniu. Podczas pracy strona okazała się bardzo praktyczna i pozwoliła każdorazowo na oszczędzenie nawet kilku minut. Uwaga: z przyczyn praktycznych aplikacja do treningu sztucznej inteligencji nie została finalnie podłączona do środowiska.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{settings}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+
+\paragraph{Strona: Odtwarzacz}\mbox{}
+
+Strona odtwarzacza pozwala na podgląd zapisanych plików z danymi z przelotów (lista dostępnych plików znajduje się w zakładce Logs). Jest niezwykle istotna podczas analizy przelotów. Dostępne jest odtwarzanie i pauzowanie, przesuwanie pojedynczych klatek, dostosowanie prędkości odtwarzania (w zakresie od 0.1 do 10 razy) oraz przewijanie przy pomocy suwaka. Dodatkowo możliwe jest wyświetlanie wybranych danych na wykresie. Informacje z plików pokazywane są w formie wizualizacji oraz w zakładce z danymi w czasie rzeczywistym.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{player}
+    \caption{Dodać podpis :)}
+\end{figure}
 
 \FloatBarrier
 \subsection{Trening sieci neuronowej}
+Zebranie danych potrzebnych do treningu i działania sieci wymagało przygotowania wszystkich elementów wymienionych w poprzednich rozdziałach. Sprawdzenie poprawności i niezawodności poszczególnych systemów i informacji okazało się kluczowe, ponieważ pozwoliło na zebranie poprawnych danych. 
+
+W celu przygotowania algorytmów sztucznej inteligencji pierwszym krokiem było określenie wyboru algorytmu przetwarzania danych - wybór padł na rekurencyjną sieć neuronową, ze względu na sposób i możliwość jej nauczania, a także na możliwość brania pod uwagę poprzedniej chwili czasowej. Zgodnie z założeniem projektu, sterowanie samolotem ma się odbywać całkowicie w sposób sterowany przez sztuczną inteligencję - odpowiedź z sieci neuronowej jest kierowana prosto na serwomechanizmy i silnik. 
+
+Kolejnym z założeń projektu było wykorzystanie doświadczenia pilotów w sterowaniu modelami samolotów bezpośrednio do nauki algorytmu sterowania. Lot modelem samolotu jest niezwykle trudnym zadaniem, a wykonanie wielu powtarzalnych przelotów trasy (w tym przypadku "ósemki") wymaga bardzo dużej ilości praktyki. Głównym pilotem samolotu został więc Kacper Krempa, wicemistrz Polski w kategorii lotów modelami F3K oraz wicemistrz Europy w lotach modeli kosmicznych.
+
+Zadaniem sztucznej inteligencji jest więc zaobserwowanie stanu samolotu w powietrzu w locie manualnym oraz skorelowanie tego stanu z reakcją i zachowaniem pilota, poprzez odpowiednie wychyły drążków aparatury. Takie zachowanie powinno później zostać odtworzone podczas lotu autonomicznego. Aby określić stan samolotu, należy wziąć pod uwagę: wychylenie samolotu w osi roll oraz w osi pitch, te same wartości z poprzedniej chwili czasowej (różnica tych wartości może służyć stabilizacji), prędkość względem ziemi, wysokość względną od wysokości startu, prędkość względem powietrza, planowaną trajektorię lotu, a także rekurencyjną odpowiedź sieci z poprzedniej chwili czasowej. Warto zaznaczyć, że użyte serwomechanizmy są z rodziny serwomechanizmów analogowych, nie są one zatem w stanie wysłać informacji zwrotnej na temat rzeczywistego ustawienia. Przy małych różnicach w wychyleniu (rzędu kilkunastu stopni w ciągu sekundy) działania algorytmu możemy jednak uznać, że zadane ustawienie odpowiada rzeczywistemu.
+
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{kacperlata}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+Implementacja sieci i efektywny proces nauczania wymaga użycia biblioteki lub innego gotowego środowiska - przygotowanie i testowanie programów do treningu sieci przy pomocy algorytmów propagacji wstecznej jest bardzo czasochłonna i bezsensowna - istniejące rozwiązania okażą się prawdopodobnie bardziej sprawne i skuteczne. Dlatego po odrzuceniu początkowego pomysłu przygotowania własnego oprogramowania treningowego, zdecydowano się na użycie biblioteki TensorFlow w języku Python3. Umożliwia ona przygotowanie nawet bardzo złożonych algorytmów nauczania maszynowego, w tym także konwolucyjnych sieci neuronowych do przetwarzania obrazów, równocześnie korzystając z mocy obliczeniowej kart GPU. Poprawne zainstalowanie i konfiguracja jest dość uciążliwa, problematyczne jest zwłaszcza odpowiednia instalacja sterowników do karty graficznej, jednak po poprawnej instalacji dostępne jest bardzo wygodne środowisko do pracy ze sztuczną inteligencją. W systemie Windows do pracy z wirtualnym środowiskiem wykorzystano oprogramowanie Anakonda. Wykorzystana wersja Pythona to 3.7.9, natomiast wersja TensorFlow to 2.1. Użycie wyższych wersji Pythona nie jest możliwe ze względu na brak kompatybilności z drugą biblioteką.
+
+Problem sterowania samolotem jest dość liniowy, wychylenie powietrzni sterowych związane jest w dość liniowy sposób z pozycją samolotu na trasie i może być wspomagany przez (również w dużym stopniu liniowy) problem stabilizacji. Dlatego wybrana sieć neuronowa nie jest głęboka - posiada 21 wejść, 10 neuronów ukrytych (w jednej warstwie), oraz 5 wyjść (4 serwomechanizmy oraz silnik).
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{siec}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+W bibliotece TensorFlow sieć ta zdefiniowana jest jako model typu Sequential, dodatkowo przyjęto sigmoidalną funkcję aktywacji oraz definicję błędu pomiarowego jako średni błąd kwadratowy. Do procesu nauczania wykorzystano dane zebrane podczas przelotów treningowych.
+
+
+Trening został przeprowadzony na podstawie około 1500 chwil czasowych. Po około 35 epokach spadek błędu jest niewielki, dalsze działanie algorytmu może więc skutkować przeuczeniem sieci. Po przetestowaniu działania na przykładowych danych testowych otrzymany wynik predykcji sieci zdaje się być poprawny, zatem sieć można wstępnie uznać za wytrenowaną.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{tfloss}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+Jedną z wad biblioteki TensorFlow jest brak bezpośredniego dostępu do struktury wytrenowanej sieci neuronowej - macierzy wag połączeń oraz biasów. Sposobem na wygenerowanie modelu jest jego konwersja do pliku TFlite. Biblioteka TensorFlowLite jest biblioteką dedykowaną dla urządzeń mobilnych, która umożliwia na wykorzystanie modelu na docelowym urządzeniu, takim jak telefon, mikrokontroler czy w aplikacji komputerowej. Modele TFlite są lżejsze oraz zoptymalizowane do pracy z wykorzystaniem mniejszych zasobów obliczeniowych i pamięciowych.
+
+Wersja biblioteki TensorFlowLite dostępna na mikrokontrolery jest kompatybilna ze środowiskiem Arduino IDE. Nie wspiera jednak ona sprzętowo wszytskich mikroprocesorów, oficjalnie wspierane jest niewiele urządzeń takich jak Arduino Nano 33 BLE Sense, STM32F746 czy ESP-EYE. Mimo braku oficjalnego wsparcia, na wykorzystanym w projekcie Teensy 4 z (mikroprocesor ARM Cortex-M7) istnieje możliwość uruchomienia biblioteki. Plik z modelem sieci neuronowej TFlite musi zostać zapisany przemieniony na tablicę, która może zostać zinterpretowana przez język C/C++. W tym celu można wykorzystać dostępną w systemach UNIX komendę xdd lub użyć skryptu w Pythonie. Finalnie otrzymany plik można zapisać z rozszerzeniem .h i zaimportować przez kompilator AVR-GCC po stronie środowiska Arduino. Model można poddać dodatkowemu procesowi kwantyzacji, co pozwala jeszcze bardziej ograniczyć jego zapotrzebowanie na moc obliczeniową oraz pamięciową. Podczas treningu liczby zmiennoprzecinkowe zapisane są w formacie float64, kwantyzacja pozwala na implementację z wykorzystaniem na przykład postaci float32 czy float16.
+
+Niestety, przykładowych rozwiązań zastosowania modelu TensofFlow na mikrokontrolerach ze szczegółowym opisem ich implementacji jest w Internecie bardzo niewielka ilość, dokumentacja również jest skromna i nie zawiera opisu rozwiązań wielu problemów. To wszystko sprawiło, że praca z biblioteką okazała się bardzo uciążliwa. Po wielu próbach udało uruchomić wytrenowaną sieć, jednak problemem okazała się rozbieżność odpowiedzi sieci dla danych testowych w oryginalnej aplikacji uczącej i na mikrokontrolerze. Rozbieżność ta wynika najprawdopodobniej z konieczności skalowania danych wejściowych i wyjściowych (co jest częstą procedurą w implementacji tego typu sieci neuronowych), jednak próby naprawienia tego problemu nie powiodły się. 
+
+Drugim równocześnie testowym oprogramowaniem do uczenia maszynowego było narzędzie Neural Net Fitting App z Deep Learning Toolbox w środowisku Matlab. Jego zdecydowaną przewagą nad biblioteką TensorFlow jest możliwość wyeksportowania macierzy wag i biasów wytrenowanej sieci neuronowej. Dodatkowo istnieje opcja wygenerowania źródłowego kodu do obsługi sieci w języku MATLAB. Dzięki temu przygotowany został skrypt umożliwiający konwersję wytrenowanego modelu - jego struktury i wartości - do pliku .h w języku C++. Na ten sam język przetłumaczone zostały funkcje odpowiadające za propagację sygnału przez sieć. Kolejnymi krokami algorytmu propagacji sieci są:
+
+\begin{enumerate}
+    \item Wpisane danych do macierzy wejściowej.
+	\item Translacja wejścia o stały offset (odejmowanie).
+	\item Skalowanie wejścia o stałą wzmocnienia (mnożenie).
+	\item Translacja wejścia o wartość minimalną (dodawanie).
+	\item Propagacja do drugiej warstwy:
+	\begin{enumerate}
+		\item Mnożenie macierzy wejściowej przez macierz wag połączeń.
+		\item Translacja o bias.
+		\item Transformacja funkcją tangensa hiperbolicznego.
+	\end{enumerate}
+	\item Analogiczna propagacja do warstwy wyjściowej.
+	\item Translacja wyjścia o wartość minimalną (odejmowanie).
+	\item Skalowanie wyjścia o stałą wzmocnienia (dzielenie).
+	\item Translacja wyjścia o stały offset (dodawanie).
+\end{enumerate}
+
+Stałe skalowania i translacji są indywidualne dla każdego neuronu wejściowego i wyjściowego. Wykorzystany algorytm zwraca taką samą odpowiedź w środowisku treningowym (Matlab) jak i na mikrokontrolerze, osiągnięty zatem został cel implementacji zadanej sieci. 
+
+Uwaga: przygotowany algorytm umożliwia automatyczną zmianę ilości neuronów w każdej z warstw, dopiero modyfikacja struktury sieci (ilości warstw ukrytych) wymagałaby ręcznej interwencji w oprogramowanie i powielenia propagacji między warstwami odpowiednią ilość razy.
+
+\FloatBarrier
+
+\subsection{Wyniki}
 
 \section{Podsumowanie i wnioski}
 \subsection{Podsumowanie wyników doświadczeń}

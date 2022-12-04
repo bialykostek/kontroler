@@ -12,15 +12,23 @@
 \contentsline {section}{\numberline {3}Implementacja rozwiązania}{5}{}%
 \contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{5}{}%
 \contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{12}{}%
-\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{15}{}%
+\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{14}{}%
 \contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{20}{}%
-\contentsline {paragraph}{Algorytm estymacji trajektorii}{24}{}%
-\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{26}{}%
-\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{27}{}%
-\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{28}{}%
-\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{30}{}%
-\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{30}{}%
-\contentsline {subsection}{\numberline {4.1}Podsumowanie wyników doświadczeń}{30}{}%
-\contentsline {subsection}{\numberline {4.2}Problemy}{30}{}%
-\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{30}{}%
-\contentsline {subsection}{\numberline {4.4}Wnioski}{30}{}%
+\contentsline {paragraph}{Algorytm estymacji trajektorii}{22}{}%
+\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{25}{}%
+\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{26}{}%
+\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{27}{}%
+\contentsline {paragraph}{Układ czteropanelowy}{28}{}%
+\contentsline {paragraph}{Strona: Wizualizacja}{30}{}%
+\contentsline {paragraph}{Strona: Mapa}{31}{}%
+\contentsline {paragraph}{Strona: Konsola}{31}{}%
+\contentsline {paragraph}{Strona: Konfiguracja}{32}{}%
+\contentsline {paragraph}{Strona: Ustawienia}{32}{}%
+\contentsline {paragraph}{Strona: Odtwarzacz}{33}{}%
+\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{34}{}%
+\contentsline {subsection}{\numberline {3.9}Wyniki}{39}{}%
+\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{39}{}%
+\contentsline {subsection}{\numberline {4.1}Podsumowanie wyników doświadczeń}{39}{}%
+\contentsline {subsection}{\numberline {4.2}Problemy}{39}{}%
+\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{39}{}%
+\contentsline {subsection}{\numberline {4.4}Wnioski}{39}{}%

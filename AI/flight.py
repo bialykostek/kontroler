@@ -14,7 +14,7 @@ import math
 import random
 from tensorflow.keras import layers
 
-file = open('training_data.txt', 'r')
+file = open('log_27_10_14_40_41.txt', 'r')
 
 inputdata = []
 inputres = []
@@ -63,7 +63,7 @@ model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['mse'])
 
 history = model.fit(x_train,
                     y_train,
-                    epochs=30,
+                    epochs=45,
                     batch_size=1000,
                     validation_data=(x_val, y_val))
 
