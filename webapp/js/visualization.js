@@ -22,6 +22,9 @@ var lineC = 1;
 
 var currentWaypoint = 0;
 
+var drawLine = false;
+var trackHis = [];
+
 var nextPathAngles = [0, 0, 0, 0, 0, 0, 0];
 
 var betweenWaypoints = 90;
@@ -212,9 +215,10 @@ function visualizationFrame(){
     ctx.arc(visRightColumn[0], visRightColumn[1], 30, 0, 2 * Math.PI, false);
     ctx.fillStyle = '#00add4';
     ctx.fill();
-
+/*
     //next waypoint line
     ctx.beginPath();
+    ctx.lineWidth = 1;
     ctx.moveTo(0, -lineC/lineB);
     ctx.lineTo(canvas.width, -lineA/lineB*canvas.width - lineC/lineB);
     ctx.strokeStyle = "#000000";
@@ -222,8 +226,8 @@ function visualizationFrame(){
     
     //next path trace
     ctx.beginPath();
+    ctx.lineWidth = 3;
     ctx.save();
-    
     ctx.translate(planeVis.x, planeVis.y);
     ctx.rotate(planeVis.angle);
     ctx.moveTo(0, 0);
@@ -242,6 +246,7 @@ function visualizationFrame(){
 
     //yaw line
     ctx.beginPath();
+    ctx.lineWidth = 2;
     ctx.moveTo(planeVis.x, planeVis.y);
     if(planeVis.angle < Math.PI/2 || planeVis.angle > Math.PI*3/2){
         ctx.lineTo(canvas.width, canvas.width*Math.tan(planeVis.angle) + planeVis.y - Math.tan(planeVis.angle)*planeVis.x);
@@ -254,6 +259,7 @@ function visualizationFrame(){
 
     //heading line
     ctx.beginPath();
+    ctx.lineWidth = 2;
     ctx.moveTo(planeVis.x, planeVis.y);
     if(planeVis.heading < Math.PI/2 || planeVis.heading > Math.PI*3/2){
         ctx.lineTo(canvas.width, canvas.width*Math.tan(planeVis.heading) + planeVis.y - Math.tan(planeVis.heading)*planeVis.x);
@@ -269,8 +275,23 @@ function visualizationFrame(){
     ctx.rotate(planeVis.angle);
     ctx.translate(-planeVis.size/2, -planeVis.size/2);
     ctx.drawImage(planeVis.img, 0, 0, planeVis.size, planeVis.size);
+    if(drawLine && planeVis.x > 0 && planeVis.y > 0){
+      trackHis.push([planeVis.x, planeVis.y]);  
+    }
     ctx.restore();
     
+    //plane track
+    if(drawLine){
+        ctx.beginPath();
+        ctx.lineWidth = 3;
+        ctx.moveTo(trackHis[0], trackHis[1]);
+        trackHis.forEach((val) => {
+            ctx.lineTo(val[0], val[1]);
+        });
+        ctx.strokeStyle = "#FFFF00";
+        ctx.stroke();
+    }
+    */
 }
 
 function visualizationInit(){
@@ -302,6 +323,15 @@ function visualizationInit(){
         });
         scaleV = ($('#scaleVslider').val() * 1.9 + 10)/10;
         visualizationFrame();
+    });
+
+    $('#drawLineBtn').on('click', _ => {
+        if(drawLine){
+            drawLine = false;
+            trackHis = [];
+        }else{
+            drawLine = true;
+        }
     });
     
     calibration();

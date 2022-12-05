@@ -32,21 +32,67 @@
 \maketitle
 \newpage
 \tableofcontents
-	
+
+\clearpage
+
 \section{Wprowadzenie}
+\subsection{Koncepcja}
+
+Pomysł na stworzenie autorskiego kontrolera lotu powstał w Studenckim Kole Naukowym AGH Solar Plane podczas przygotowań do odbywających się co roku międzynarodowych zawodach autonomicznych bezzałogowych statków powietrznych TUBITAK w Turcji. Z uwagi na dodatkowe punkty w ocenie finałowej za autorskie rozwiązania systemów pokładowych, podjęte zostały pierwszy próby przygotowania koncepcji takiego modułu. Jedną z misji konkursowych było wykonanie przez autonomiczny statek powietrzny trasy "leniwej ósemki" pomiędzy dwoma kolumnami. Postawione zostało więc pytanie: w jaki sposób można by przelać doświadczenie pilotów modeli samolotów (którzy są w stanie bardzo szybko i optymalnie pokonać trasę sterując samolotem manualnie) na system kontroli lotu? Jednym z pomysłów było wykorzystanie w tym celu algorytmów nauczania maszynowego, konkretnie treningu sztucznej sieci neuronowej. Projekt ostatecznie nie został rozwinięty przed wspomnianymi zawodami, czas na jego realizację przyszedł w późniejszym terminie, jednak część celów i założeń została zapożyczona z regulaminu.
+
 \subsection{Cel i zakres pracy}
-\subsection{Motywacja}
+Podstawowym założeniem projektu jest przygotowanie kontrolera lotu, który za pomocą sieci neuronowej będzie w autonomiczny sposób sterować modelem samolotu w taki sposób, aby ten wykonał trasę ósemki pomiędzy dwoma kolumnami. Odległość między nimi wynosi 80 metrów. Dodatkowo samolot nie może przekroczyć wyznaczonego obszaru  wymiarach 120 metrów na 170 metrów.
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{osemka}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+Algorytm sterowania ma zostać wytrenowany na podstawie danych z przelotu pilota, który odpowiednią ilość razy wykona przelot treningowy. Zadaniem sztucznej inteligencji będzie skorelowanie zachowania pilota z sytuacją, w której znajduje się samolot. Następnie, w trybie autonomicznym, algorytm ma oszacować najbardziej prawdopodobne zachowanie pilota w danej chwili czasowej oraz bezpośrednio wykorzystać je do sterowania samolotem. 
+
+Przygotowanie opisanego algorytmu wiąże się z koniecznością przygotowania szeregu rozwiązań, którymi są:
+\begin{enumerate}
+	\item Neuronowy algorytm sterowania.
+	\item Środowiska uczącego.
+	\item Oprogramowanie kontrolera.
+	\item Elektroniczny moduł kontrolera.
+	\item Samolot służący jako platforma treningowa.
+	\item Stacja odbiorczej.
+	\item Naziemne oprogramowanie.
+	\item Pozostałych elementów pozwalające na współpracę wszystkich wyżej wymienionych.
+\end{enumerate}
+
+Poniższa praca zawiera przegląd wiedzy potrzebnej do zrozumienia opisu działań wykonywanych w części implementacyjnej, przeglądu aktualnego stanu wiedzy i istniejących rozwiązań, opis procesu wdrożenia wymienionych powyżej elementów, a także omówienie rezultatu i wyników podsumowanie oraz wnioski.
+
+Uwaga: określenie "środowisko" używane w poniższej pracy, w kontekście stworzonych programów, odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej. Warto również wspomnieć o wieloznaczności często używanego słowa "model". Model samolotu jest określeniem zdalnie sterowanego bezzałogowego statku powietrznego, którego wymiary nie przekraczają kilku metrów. Innym często padającym znaczeniem tego słowa jest model sztucznej inteligencji, który oznacza pewną konkretną instancję struktury danych wyniku nauczania maszynowego, w tym przypadku sieci neuronowej.
+
+\clearpage
 \section{Wstęp teoretyczny}
-Uwaga: określenie "środowisko" zawarte w poniższym rozdziale odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej.
 
-\subsection{Moduły dostępne na rynku}
-Na rynku dostępne są urządzenia spełniające definicję kontrolera do autonomicznego statku powietrznego - urządzenia te nadają się do wykorzystania zarówno w modelach samolotów jak i w wielowirnikowcach. Jednym z najpopularniejszych tego typu rozwiązań jest rodzina urządzeń Pixhawk. Jest to rozwiązaniem sprawdzone i często wykorzystywane w nawet zaawansowanych komercyjnych projektach. Kontroler lotu jest modułem zbierającym dane z różnych czujników, przede wszystkim IMU (czujnika orientacji), GPS/GNNS (czujnika położenia), rurki pitota (czujnika względnej prędkości wiatru). Do modułu podłączany jest także odbiornik z aparatury RC, natomiast jego wyjściem są sygnały PWM do ustawienia odpowiednich powierzchni sterowych lub prędkości silników. 
+\subsection{Rozwiązania dostępne na rynku}
+Na rynku dostępne są urządzenia spełniające definicję kontrolera do autonomicznego statku powietrznego - urządzenia te nadają się do wykorzystania zarówno w modelach samolotów jak i w wielowirnikowcach. Jednym z najpopularniejszych tego typu rozwiązań jest rodzina urządzeń Pixhawk. Jest to rozwiązaniem sprawdzone i często wykorzystywane w nawet zaawansowanych komercyjnych projektach. Kontroler lotu jest modułem zbierającym dane z różnych czujników, przede wszystkim IMU (czujnika orientacji), GPS/GNSS (czujnika położenia), rurki pitota (czujnika względnej prędkości wiatru). Do modułu podłączany jest także odbiornik z aparatury RC, natomiast jego wyjściem są sygnały PWM do ustawienia odpowiednich powierzchni sterowych lub prędkości silników. 
 Moduł kontrolera lotu może pracować w kilku trybach, z których najważniejszymi są:
-1.	Tryb manualny - bezpośrednie przekazanie sygnału z odbiornika na wyjście sterowania. Tryb ten może być używany podczas startu i lądowania, oblocie samolotu lub w sytuacjach awaryjnych. Pełną kontrolę nad statkiem ma wtedy osoba trzymająca aparaturę.
-2.	Tryb stabilizowany - rozszerzenie trybu manualnego - pilot ma wciąż kontrolę nad samolotem z poziomu aparatury, natomiast przy pomocy czujników znajdujących się na pokładzie samolot stabilizuje swój lot, dzięki czemu latanie nim jest zdecydowanie ułatwione, zwłaszcza większymi modelami.
-3.	Tryb autonomiczny - w tym trybie pojazd wykonuje zadaną misję. Podłączenie z aparaturą nie jest konieczne, a lot może się odbywać na bardzo długim dystansie. W przypadku zakończenia misji i braku dalszych poleceń samolot uruchomi procedurę RTL (return to landing) lub RTH (return to home) i zacznie zataczać okręgi nad wyznaczonym punktem na ustalonej, bezpiecznej wysokości.
+\begin{enumerate}
+
+
+	\item Tryb manualny - bezpośrednie przekazanie sygnału z odbiornika na wyjście sterowania. Tryb ten może być używany podczas startu i lądowania, oblocie samolotu lub w sytuacjach awaryjnych. Pełną kontrolę nad statkiem ma wtedy osoba trzymająca aparaturę.
+	\item Tryb stabilizowany - rozszerzenie trybu manualnego - pilot ma wciąż kontrolę nad samolotem z poziomu aparatury, natomiast przy pomocy czujników znajdujących się na pokładzie samolot stabilizuje swój lot, dzięki czemu latanie nim jest zdecydowanie ułatwione, zwłaszcza większymi modelami.
+	\item Tryb autonomiczny - w tym trybie pojazd wykonuje zadaną misję. Podłączenie z aparaturą nie jest konieczne, a lot może się odbywać na bardzo długim dystansie. W przypadku zakończenia misji i braku dalszych poleceń samolot uruchomi procedurę RTL (return to landing) lub RTH (return to home) i zacznie zataczać okręgi nad wyznaczonym punktem na ustalonej, bezpiecznej wysokości.
+
+\end{enumerate}
+	
 Dodatkowym zadaniem jest wysyłanie danych telemetrycznych w czasie rzeczywistym do stacji odbiorczej, co w praktyce przekłada się na umożliwienie podglądu pozycji i parametrów samolotu z poziomu laptopa, oraz konfiguracja ustawień i wgrywanie nowych misji.
+
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{kontrolery}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+%https://www.drony.net/the-orange-cube-standard-ads-b-proficnc-hex.html
+%http://www.mateksys.com/?portfolio=h743-slim
+%https://store.cuav.net/shop/x7-pro/
 
 ArduPilot/PX4
 Omówione w poprzednim punkcie urządzenia są jednostką, na której musi zostać uruchomione odpowiednie oprogramowanie. Odpowiada ono bezpośrednio za algorytmy wspomagania sterowania oraz lotów autonomicznych. Najczęściej wykorzystywanymi są ArduPilot oraz PX4. Oba te środowiska tworzone są na zasadzie open source, a więc korzystanie z nich jest darmowe i ogólnodostępne. Wgranie oraz aktualizacja środowiska jest możliwa przy pomocy dedykowanego programu po podłączeniu do komputera.
@@ -54,6 +100,12 @@ Omówione w poprzednim punkcie urządzenia są jednostką, na której musi zosta
 Oprogramowanie naziemne
 Mission Planner/QGroundControl
 Do konfiguracji kontrolera lotu niezbędne jest oprogramowanie, które pozwoli na wprowadzenie zmian w ustawieniach zachowania samolotu w powietrzu, a także pozwoli przygotować i zarządzać przebiegiem autonomicznej misji. Najpopularniejszymi programami współpracującymi z przytoczonymi kontrolerami jest Mission Planner oraz QGroundControl.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{missionplanner}
+    \caption{Dodać podpis :)}
+\end{figure}
 
 Przygotowanie misji w tych programach działa na zasadzie ustawienia pozycji oraz wysokości kolejnych punktów na trasie, zwanych waypointami. W przypadku wielowirnikowców możliwe jest ustawienie trasy po dowolnej krzywej, z uwagi na charakter sterowania nim w każdym kierunku i precyzyjne korygowanie trasy. W przypadku samolotów, nie jest możliwe tego typu sterowanie w powietrzu, dlatego pokonując trasę będzie dążył do śledzenia linii łączącej środki kolejnych punktów. Warto zauważyć, że same waypointy nie są punktami, a okręgami o określonym promieniu. Po przekroczeniu granicy okręgu punkt uznawany jest za zaliczony a samolot dopiero wtedy rozpoczyna manewr naprowadzający go na kolejny cel.
 
@@ -64,7 +116,7 @@ Modele elektro szybowców
 \subsection{Budowa samolotów kompozytowych}
 \subsection{Laminowanie ogniw fotowoltaicznych}
 \subsection{State of the art}
-\newpage
+\clearpage
 \section{Implementacja rozwiązania}
 \subsection{Budowa modelu samolotu}
 Charakterystyka pracy systemu lotu autonomicznego sprawia, że powinien  on zostać dostosowany do kontrolnego modelu samolotu. Podczas początkowych testów używany był w tym celu samolot Multiplex EasyGlider 4. Jest to komercyjny samolot o rozpiętości skrzydeł 1,8 metra, wykonany z Elaporu (polipropylen). Dzięki swoim parametrom aerodynamicznym możliwy jest nim stabilny lot o stosunkowo niskiej prędkości przelotowej. Dodatkową zaletą jest wytrzymałość na uderzenia, co w przypadku modelu testowego jest istotne w przypadku niepowodzeń.
@@ -188,6 +240,8 @@ Dodatkowym eksperymentem przeprowadzonym podczas badań było także sprawdzenie
 Mimo krótkiego czasu wykonywania pomiarów, halogenowe lampy wytwarzają bardzo dużą ilość ciepła, co przekłada się na spadek sprawności modułów fotowoltaicznych. Widoczne jest to nawet na pomiarach wykonanych w odstępie kilkunastu sekund, gdzie różnica maksymalnej mocy wynosi około 5\%. 
 
 Ostatnim wykonanym badaniem była analiza ogniw przy pomocy specjalistycznej kamery termowizyjnej. Podanie napięcia na końce panelu skutkuje stopniowym ogrzewaniem się ogniw. Dzięki tej technice możliwe jest wykrycie uszkodzeń powstałych w procesie laminowania ogniw lub skrzydeł. Miejsca uszkodzone stawiają większy opór elektryczny, a co za tym idzie wytwarzają więcej ciepła przy przepływie energii elektrycznej. A badaniu podano wykorzystano napięcie i natężenie znamionowe ogniw, a różnice w temperaturach sięgały kilku stopni Celsujasza. Zaobserwowano znacznie większe uszkodzenia szeregu ogniw na prawym skrzydle, co możne tłumaczyć różnicę koło 10\% maksymalnej mocy.
+
+Z uwagi na wznios skrzydeł wynoszący 5° oraz na ciągłą zmianę nachylenia względem słońca, rzeczywista średnia uzyskana moc w powietrzu jest niższa niż podczas statycznego badania. Przeprowadzenie szczegółowych badań rzeczywistej produkcji energii w trakcie lotu możliwe jest tylko przy odpowiednich warunkach pogodowych, także biorąc pod uwagę natężenie światła. Na terenie Polski takie warunki osiągnąć można tylko w okresie letnim. Samolot zdecydowanie najwięcej energii wykorzystuje na podtrzymanie pracy silnika. Na podstawie przeprowadzonych eksperymentów, podczas lotu zużywa około 4-6A. Przekłada się to na średnie za potrzebowanie energetyczne na poziomie około 50W. Szacunkową średnia moc instalacji fotowoltaicznej, na podstawie badań przeprowadzonych na podobnym modelu, można przyjąć około 30W. Stanowi to więc około 50\% zapotrzebowania energetycznego, co przełoży się na znacznie wydłużony czas lotu.
 
 \FloatBarrier
 \subsection{Moduł kontrolera lotu}
@@ -332,7 +386,11 @@ Cała definicja trasy składa się więc z kąta zawartego między osią samolot
 
 Uwaga: zgodnie z założeniem projektowym, wszystkie punkty znajdują się na tej samej wysokości. Z perspektywy programu możliwe by było wprowadzenie trzeciej zmiennej pozycji, jednak trening podczas lotu manualnego, w trakcie którego zbierane są dane testowe, oszacowanie wysokości, na której znajduje się samolot jest bardzo nieprecyzyjne, i mogło by negatywnie wpłynąć na wynik działania kontrolera.
 
-
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{estymacja}
+    \caption{Dodać podpis :)}
+\end{figure}
 
  \FloatBarrier
 \subsection{Stacja odbiorcza}
@@ -542,20 +600,81 @@ Drugim równocześnie testowym oprogramowaniem do uczenia maszynowego było narz
 		\item Translacja o bias.
 		\item Transformacja funkcją tangensa hiperbolicznego.
 	\end{enumerate}
-	\item Analogiczna propagacja do warstwy wyjściowej.
+	\item Propagacja do warstwy wyjściowej:
+	\begin{enumerate}
+		\item Mnożenie macierzy pierwszej warstwy przez macierz wag połączeń.
+		\item Translacja o bias.
+	\end{enumerate}
 	\item Translacja wyjścia o wartość minimalną (odejmowanie).
 	\item Skalowanie wyjścia o stałą wzmocnienia (dzielenie).
 	\item Translacja wyjścia o stały offset (dodawanie).
 \end{enumerate}
 
-Stałe skalowania i translacji są indywidualne dla każdego neuronu wejściowego i wyjściowego. Wykorzystany algorytm zwraca taką samą odpowiedź w środowisku treningowym (Matlab) jak i na mikrokontrolerze, osiągnięty zatem został cel implementacji zadanej sieci. 
+Stałe skalowania i translacji są indywidualne dla każdego neuronu wejściowego i wyjściowego. W pierwszej warstwie ukrytej funkcją aktywacji jest tangens hiperboliczny, w warstwie wyjściowej nie jest użyta funkcja aktywacji, wynik jest tylko liniowy skalowany. Wykorzystany algorytm zwraca taką samą odpowiedź w środowisku treningowym (Matlab) jak i na mikrokontrolerze, osiągnięty zatem został cel implementacji zadanej sieci.
 
 Uwaga: przygotowany algorytm umożliwia automatyczną zmianę ilości neuronów w każdej z warstw, dopiero modyfikacja struktury sieci (ilości warstw ukrytych) wymagałaby ręcznej interwencji w oprogramowanie i powielenia propagacji między warstwami odpowiednią ilość razy.
 
+Podczas lotów testowych udało się zgromadzić 20 000 punktów testowych, co odpowiada ponad 16 minutom samego lotu po trasie ósemki. Przy pomocy narzędzia Neural Net Fitting App możliwy jest trening opisanej sieci neuronowej z wykorzystaniem algorytmu Levenberga-Marquardta. 
+
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{siecmatlab}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+Struktura sieci została przygotowana w sposób analogiczny do modelu stworzonego w bibliotece TensorFlow. Dane wejściowe zostały podzielone na treningowe, testowe i walidacyjne w stosunku 70-15-15. Po zakończonym sukcesem treningu, trwającym kilkanaście sekund, możliwa jest obserwacja krzywej konwergencji średniego błędu kwadratowego sieci oraz wykresy stanu treningu. W okolicach czterdziestej piątej epoki uruchomione zostaje kryterium walidacyjne, a działanie programu zostaje zatrzymane.
+
+
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{performance}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{training_state}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+Po zakończonym procesie należy wygenerować model przy pomocy funkcji MATLAB Matrix-Only Function, do kodu wkleić przygotowany skrypt (opisany powyżej algorytm tłumaczenia do języka C++) w odpowiednim miejscu i finalnie uruchomić program. Po zakończeniu jego pracy automatycznie zapisywany jest plik nn.h, który należy skopiować do folderu źródłowego oprogramowania kontrolera.
+
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{nnh}
+    \caption{Dodać podpis :)}
+\end{figure}
+
 \FloatBarrier
 
-\subsection{Wyniki}
+\subsection{Wyniki działania algorytmu sterowania}
+Sterowanie w trybie autonomicznym zostaje uruchomione w trakcie lotu manualnego, w dowolnym momencie pokonywania ósemki. Na podstawie poprzedniej chwili czasowej, ostatniej ramki danych z aparatury pilota oraz na podstawie najnowszych danych telemetrycznych obliczany jest wynik działania sieci neuronowej. Jest on następnie odpowiednio skalowany i przekazywany bezpośrednio na wyjście serwomechanizmów i silnika. Z wykorzystaniem wytrenowanej sieci neuronowej wykonano kilka prób lotu autonomicznego, z czego kilkukrotnie z powodzeniem udało się wykonać część manewru. 
 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{aileci1}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{aileci2}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{aileci3}
+    \caption{Dodać podpis :)}
+\end{figure}
+
+Przy pomocy odtwarzacza zwizualizowano wybrane fragmenty lotu: żółtą linią zaznaczony został automatycznie wyznaczony ślad lotu samolotu w trybie całkowicie autonomicznym. Możemy zaobserwować wykonanie pełnego zakrętu, wyprostowanie lotu po wyjściu z zakrętu oraz manewr wejścia w zakręt z lotu po linii prostej. Uwaga: początek i koniec krzywej linii oznaczają momenty odpowiednio uruchomienia i wyłączenia trybu autonomicznego. Fakt wykonania wymienionych manewrów świadczy o powodzeniu początkowego pomysłu projektu, ponieważ ich wykonanie w sposób przypadkowy jest praktycznie niemożliwe.
+
+Należy jednak zaznaczyć, dlaczego pomimo wykonania poszczególnych manewrów poprawnie, samolot nie pokonał autonomicznie całej trasy. Niestety użycie rekurencyjnej sieci neuronowej okazało się być rozwiązaniem niewystarczającym. Fakt brania pod uwagę danych aktualnych i tych sprzed maksymalnie 50 ms sprawia, że kontroler nie może zaplanować i utrzymać dłużej manewru. Drobne błędy odpowiedzi sieci z każdą kolejną iteracją namnażają się - tylko dość szczęśliwe okoliczności i warunki decydowały o powodzeniu dłuższego manewru. Podczas zakrętu samolot błędy te powodowały przepadanie samolotu na skrzydło, spowodowane zbyt małą siłą nośną, czyli - patrząc od strony sterowania - złym stosunkiem przechylenia do prędkości lotu.
+
+Możliwym rozwiązaniem takiego problemu byłoby zastosowanie sieci będącej w stanie zapamiętać podejmowane decyzje na przestrzeni czasu nawet kilku sekund podczas manewru. Proponowanym rozwiązaniem byłoby zastosowanie struktury LSTM - Long Short-Term Memory, która na podstawie wcześniej podjętej decyzji (na przykład o wejściu w zakręt z określonym promieniem) kieruje późniejsze obliczenia.
+
+\FloatBarrier
 \section{Podsumowanie i wnioski}
 \subsection{Podsumowanie wyników doświadczeń}
 \subsection{Problemy}
