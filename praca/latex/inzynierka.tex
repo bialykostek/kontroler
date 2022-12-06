@@ -13,6 +13,8 @@
 \usepackage{placeins}
 \usepackage{amsmath}
 \usepackage{subfig}
+\usepackage{url}
+\usepackage{textcomp}
 \usepackage
 [
         a4paper,
@@ -21,6 +23,14 @@
         top = 2.5cm,
         bottom = 2.5cm
 ]{geometry}
+\usepackage{caption}
+\captionsetup[figure]{font=small}
+\usepackage[figurename=Rys.]{caption}
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
+
+\let\oldref\ref
+\renewcommand{\ref}[1]{(\oldref{#1})}
 
 \title{Neuronowy kontroler do sterowania bezzałogowym statkiem powietrznym}
 \author{Jan Kostecki}
@@ -41,12 +51,13 @@
 Pomysł na stworzenie autorskiego kontrolera lotu powstał w Studenckim Kole Naukowym AGH Solar Plane podczas przygotowań do odbywających się co roku międzynarodowych zawodach autonomicznych bezzałogowych statków powietrznych TUBITAK w Turcji. Z uwagi na dodatkowe punkty w ocenie finałowej za autorskie rozwiązania systemów pokładowych, podjęte zostały pierwszy próby przygotowania koncepcji takiego modułu. Jedną z misji konkursowych było wykonanie przez autonomiczny statek powietrzny trasy "leniwej ósemki" pomiędzy dwoma kolumnami. Postawione zostało więc pytanie: w jaki sposób można by przelać doświadczenie pilotów modeli samolotów (którzy są w stanie bardzo szybko i optymalnie pokonać trasę sterując samolotem manualnie) na system kontroli lotu? Jednym z pomysłów było wykorzystanie w tym celu algorytmów nauczania maszynowego, konkretnie treningu sztucznej sieci neuronowej. Projekt ostatecznie nie został rozwinięty przed wspomnianymi zawodami, czas na jego realizację przyszedł w późniejszym terminie, jednak część celów i założeń została zapożyczona z regulaminu.
 
 \subsection{Cel i zakres pracy}
-Podstawowym założeniem projektu jest przygotowanie kontrolera lotu, który za pomocą sieci neuronowej będzie w autonomiczny sposób sterować modelem samolotu w taki sposób, aby ten wykonał trasę ósemki pomiędzy dwoma kolumnami. Odległość między nimi wynosi 80 metrów. Dodatkowo samolot nie może przekroczyć wyznaczonego obszaru  wymiarach 120 metrów na 170 metrów.
+Podstawowym założeniem projektu jest przygotowanie kontrolera lotu, który za pomocą sieci neuronowej będzie w autonomiczny sposób sterować modelem samolotu w taki sposób, aby ten wykonał trasę ósemki pomiędzy dwoma kolumnami, jak pokazano na rysunku \ref{fig:osemka}. Odległość między nimi wynosi 80 metrów. Dodatkowo samolot nie może przekroczyć wyznaczonego obszaru  wymiarach 120 metrów na 170 metrów.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{osemka}
-    \caption{Dodać podpis :)}
+    \caption{Schemat misji samolotu na wyznaczonym obszarze}
+    \label{fig:osemka}
 \end{figure}
 
 Algorytm sterowania ma zostać wytrenowany na podstawie danych z przelotu pilota, który odpowiednią ilość razy wykona przelot treningowy. Zadaniem sztucznej inteligencji będzie skorelowanie zachowania pilota z sytuacją, w której znajduje się samolot. Następnie, w trybie autonomicznym, algorytm ma oszacować najbardziej prawdopodobne zachowanie pilota w danej chwili czasowej oraz bezpośrednio wykorzystać je do sterowania samolotem. 
@@ -54,239 +65,372 @@ Algorytm sterowania ma zostać wytrenowany na podstawie danych z przelotu pilota
 Przygotowanie opisanego algorytmu wiąże się z koniecznością przygotowania szeregu rozwiązań, którymi są:
 \begin{enumerate}
 	\item Neuronowy algorytm sterowania.
-	\item Środowiska uczącego.
+	\item Środowisko treningowe sieci neuronowej.
 	\item Oprogramowanie kontrolera.
 	\item Elektroniczny moduł kontrolera.
 	\item Samolot służący jako platforma treningowa.
 	\item Stacja odbiorczej.
 	\item Naziemne oprogramowanie.
-	\item Pozostałych elementów pozwalające na współpracę wszystkich wyżej wymienionych.
+	\item Pozostałych elementy pozwalające na współpracę wszystkich wyżej wymienionych.
 \end{enumerate}
 
 Poniższa praca zawiera przegląd wiedzy potrzebnej do zrozumienia opisu działań wykonywanych w części implementacyjnej, przeglądu aktualnego stanu wiedzy i istniejących rozwiązań, opis procesu wdrożenia wymienionych powyżej elementów, a także omówienie rezultatu i wyników podsumowanie oraz wnioski.
 
-Uwaga: określenie "środowisko" używane w poniższej pracy, w kontekście stworzonych programów, odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej. Warto również wspomnieć o wieloznaczności często używanego słowa "model". Model samolotu jest określeniem zdalnie sterowanego bezzałogowego statku powietrznego, którego wymiary nie przekraczają kilku metrów. Innym często padającym znaczeniem tego słowa jest model sztucznej inteligencji, który oznacza pewną konkretną instancję struktury danych wyniku nauczania maszynowego, w tym przypadku sieci neuronowej.
+\textbf{Uwaga}: określenie ``środowisko'' używane w poniższej pracy, w kontekście stworzonych programów, odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej. Warto również wspomnieć o wieloznaczności często używanego słowa ``model''. Model samolotu jest określeniem zdalnie sterowanego bezzałogowego statku powietrznego, którego wymiary nie przekraczają kilku metrów. Innym często padającym znaczeniem tego słowa odniesienie do modelu sztucznej inteligencji, który oznacza pewną konkretną instancję struktury danych wyniku nauczania maszynowego, w tym przypadku sieci neuronowej.
 
 \clearpage
 \section{Wstęp teoretyczny}
 
+\subsection{Technika sterowania samolotem}
+Problem sterowaniem trajektorią lotu samolotu jest dość nieoczywisty, ze względu charakter sposobu utrzymania się takiego urządzenia w powietrzu. Przede wszystkim, do utrzymania pokonania siły grawitacji wykorzystywana jest siła nośna wytwarzana na powierzchni skrzydeł. Jej źródłem jest różnica ciśnień nad i pod nim, spowodowana różnymi prędkościami przepływu strugi powietrza pod i nad profilem lotniczym skrzydła. Wartość generowanej siły nośnej jest proporcjonalna do różnicy tych prędkości, co w praktyce przekłada się na proporcjonalną zależność wartości siły nośnej do prędkości samolotu względem masy powietrza, w którym się porusza. Sytuację, w której samolot wytraca prędkość względem powietrza, co skutkuje utratą siły nośnej i w konsekwencji nagłym spadkiem i utratą sterowności nazywamy przeciągnięciem.
+
+Sterowanie samolotem odbywa się przy pomocy elementów nazywanych powierzchniami sterowymi. Są to lotki umieszczone na skrzydłach oraz stery wysokości i kierunku, umieszczone na stateczniku. Osie rotacji wegług angielskiej notacji nazywane są roll, pitch oraz yaw, jak zostało pokazane na rysunku \ref{fig:osie}. Poruszanie lotkami pozwala na wywołanie momentu działającego wzdłuż osi roll, co przekłada się na obrót wzdłuż niej, o ile pozwalają na to warunki. Analogicznie, moment w osi pitch wywołany jest przez ster wysokości, a w osi yaw - ster kierunku.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{osie}
+    \caption{Osie rotacji samolotu.}
+    \small Źródło: \url{en.wikipedia.org/wiki/Aircraft_principal_axes}
+    \label{fig:osie}
+\end{figure}
+
+Należy jednak zaznaczyć, że w celu wykonania zakrętu samolot należy najpierw przekręcić używając lotek, następnie korygować trajektorię przy pomocy steru wysokości, a ster kierunku służy tylko do zmniejszenie promienia zakrętu i kontrowania wiatru bocznego.
+
+\FloatBarrier
+ 
 \subsection{Rozwiązania dostępne na rynku}
-Na rynku dostępne są urządzenia spełniające definicję kontrolera do autonomicznego statku powietrznego - urządzenia te nadają się do wykorzystania zarówno w modelach samolotów jak i w wielowirnikowcach. Jednym z najpopularniejszych tego typu rozwiązań jest rodzina urządzeń Pixhawk. Jest to rozwiązaniem sprawdzone i często wykorzystywane w nawet zaawansowanych komercyjnych projektach. Kontroler lotu jest modułem zbierającym dane z różnych czujników, przede wszystkim IMU (czujnika orientacji), GPS/GNSS (czujnika położenia), rurki pitota (czujnika względnej prędkości wiatru). Do modułu podłączany jest także odbiornik z aparatury RC, natomiast jego wyjściem są sygnały PWM do ustawienia odpowiednich powierzchni sterowych lub prędkości silników. 
+Na rynku dostępne są urządzenia spełniające definicję kontrolera do autonomicznego statku powietrznego - urządzenia te nadają się do wykorzystania zarówno w modelach samolotów jak i w wielowirnikowcach. Jednym z najpopularniejszych tego typu rozwiązań jest rodzina urządzeń Pixhawk. Jest to rozwiązaniem sprawdzone i często wykorzystywane w nawet zaawansowanych komercyjnych projektach. Innymi dostępnymi rozwiązaniami są urządzenia Mateksys czy CUAV pokazane na rysunku \ref{fig:kontrolery}.
+
+Kontroler lotu jest urządzeniem zbierającym dane z różnych czujników, przede wszystkim IMU (czujnika orientacji), GPS/GNSS (czujnika położenia) czy rurki Pitota (czujnika względnej prędkości wiatru). Do modułu podłączany jest także odbiornik z aparatury RC, natomiast jego wyjściem są sygnały PWM do ustawienia odpowiednich powierzchni sterowych lub prędkości silników. 
 Moduł kontrolera lotu może pracować w kilku trybach, z których najważniejszymi są:
 \begin{enumerate}
 
 
 	\item Tryb manualny - bezpośrednie przekazanie sygnału z odbiornika na wyjście sterowania. Tryb ten może być używany podczas startu i lądowania, oblocie samolotu lub w sytuacjach awaryjnych. Pełną kontrolę nad statkiem ma wtedy osoba trzymająca aparaturę.
-	\item Tryb stabilizowany - rozszerzenie trybu manualnego - pilot ma wciąż kontrolę nad samolotem z poziomu aparatury, natomiast przy pomocy czujników znajdujących się na pokładzie samolot stabilizuje swój lot, dzięki czemu latanie nim jest zdecydowanie ułatwione, zwłaszcza większymi modelami.
-	\item Tryb autonomiczny - w tym trybie pojazd wykonuje zadaną misję. Podłączenie z aparaturą nie jest konieczne, a lot może się odbywać na bardzo długim dystansie. W przypadku zakończenia misji i braku dalszych poleceń samolot uruchomi procedurę RTL (return to landing) lub RTH (return to home) i zacznie zataczać okręgi nad wyznaczonym punktem na ustalonej, bezpiecznej wysokości.
+	\item Tryb stabilizowany - rozszerzenie trybu manualnego - pilot ma wciąż kontrolę nad samolotem z poziomu aparatury, natomiast przy pomocy czujników znajdujących się na pokładzie kontroler stabilizuje lot, dzięki czemu latanie jest zdecydowanie ułatwione, zwłaszcza większymi modelami.
+	\item Tryb autonomiczny - w tym trybie pojazd wykonuje zadaną misję, czyli przelot po kolejnych punktach na trasie. Podłączenie z aparaturą nie jest konieczne, a lot może się odbywać na bardzo długim dystansie. W przypadku zakończenia misji i braku dalszych poleceń samolot uruchomi procedurę RTL (return to landing) lub RTH (return to home) i zacznie zataczać okręgi nad wyznaczonym punktem na ustalonej, bezpiecznej wysokości.
 
 \end{enumerate}
 	
-Dodatkowym zadaniem jest wysyłanie danych telemetrycznych w czasie rzeczywistym do stacji odbiorczej, co w praktyce przekłada się na umożliwienie podglądu pozycji i parametrów samolotu z poziomu laptopa, oraz konfiguracja ustawień i wgrywanie nowych misji.
+Dodatkowym zadaniem kontrolera lotu jest wysyłanie danych telemetrycznych w czasie rzeczywistym do stacji odbiorczej, co w praktyce przekłada się na umożliwienie podglądu pozycji i parametrów samolotu z poziomu laptopa, oraz konfiguracja ustawień i wgrywanie nowych misji.
 
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{kontrolery}
-    \caption{Dodać podpis :)}
+    \caption{Komenrcyjne kontrolery lotu: Pixhawk Cube Orange, Mateksys H743-SLIM, CUAV X7-PRO}
+    \small Źródła: \url{en.wikipedia.org/wiki/Aircraft_principal_axes}, \url{www.mateksys.com/?portfolio=h743-slim}, \url{store.cuav.net/shop/x7-pro}
+    \label{fig:kontrolery}
 \end{figure}
 
-%https://www.drony.net/the-orange-cube-standard-ads-b-proficnc-hex.html
-%http://www.mateksys.com/?portfolio=h743-slim
-%https://store.cuav.net/shop/x7-pro/
+Wspomniane urządzenia z rodziny Pixhawk czy CUAV są jednostkami, na której musi zostać uruchomione odpowiednie oprogramowanie. Odpowiada ono bezpośrednio za algorytmy wspomagania sterowania oraz lotów autonomicznych. Najczęściej wykorzystywanymi są ArduPilot oraz PX4. Oba te środowiska tworzone są na zasadzie open-source, a więc korzystanie z nich jest darmowe i ogólnodostępne. 
 
-ArduPilot/PX4
-Omówione w poprzednim punkcie urządzenia są jednostką, na której musi zostać uruchomione odpowiednie oprogramowanie. Odpowiada ono bezpośrednio za algorytmy wspomagania sterowania oraz lotów autonomicznych. Najczęściej wykorzystywanymi są ArduPilot oraz PX4. Oba te środowiska tworzone są na zasadzie open source, a więc korzystanie z nich jest darmowe i ogólnodostępne. Wgranie oraz aktualizacja środowiska jest możliwa przy pomocy dedykowanego programu po podłączeniu do komputera.
-
-Oprogramowanie naziemne
-Mission Planner/QGroundControl
-Do konfiguracji kontrolera lotu niezbędne jest oprogramowanie, które pozwoli na wprowadzenie zmian w ustawieniach zachowania samolotu w powietrzu, a także pozwoli przygotować i zarządzać przebiegiem autonomicznej misji. Najpopularniejszymi programami współpracującymi z przytoczonymi kontrolerami jest Mission Planner oraz QGroundControl.
+Do konfiguracji kontrolera lotu niezbędne jest oprogramowanie, które pozwoli na wprowadzenie zmian w ustawieniach zachowania samolotu w powietrzu, a także pozwoli przygotować i zarządzać przebiegiem autonomicznej misji, ponadto będzie w stanie przetworzyć i zwizualizować dane telemetryczne odbierane w czasie rzeczywistym. Najpopularniejszymi programami współpracującymi z przytoczonymi kontrolerami jest Mission Planner oraz QGroundControl.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{missionplanner}
-    \caption{Dodać podpis :)}
+    \caption{Przygotowanie misji w programie Mission Planner}
+    \small Źródło: \url{ardupilot.org/planner}
+    \label{fig:missionplanner}
 \end{figure}
 
-Przygotowanie misji w tych programach działa na zasadzie ustawienia pozycji oraz wysokości kolejnych punktów na trasie, zwanych waypointami. W przypadku wielowirnikowców możliwe jest ustawienie trasy po dowolnej krzywej, z uwagi na charakter sterowania nim w każdym kierunku i precyzyjne korygowanie trasy. W przypadku samolotów, nie jest możliwe tego typu sterowanie w powietrzu, dlatego pokonując trasę będzie dążył do śledzenia linii łączącej środki kolejnych punktów. Warto zauważyć, że same waypointy nie są punktami, a okręgami o określonym promieniu. Po przekroczeniu granicy okręgu punkt uznawany jest za zaliczony a samolot dopiero wtedy rozpoczyna manewr naprowadzający go na kolejny cel.
+Przygotowanie misji w tych programach działa na zasadzie ustawienia pozycji oraz wysokości kolejnych punktów na trasie, zwanych waypointami, jak pokazano na rysunku \ref{fig:missionplanner}. W przypadku wielowirnikowców możliwe jest ustawienie trasy po dowolnej krzywej, z uwagi na możliwość sterowania nim w każdym kierunku i precyzyjne korygowanie trasy. W przypadku samolotów, takie sterowanie nie jest możliwe, dlatego pokonując trasę będą one dążyły do śledzenia linii łączącej środki kolejnych punktów. Warto zauważyć, że same waypointy nie są punktami, a okręgami o określonym promieniu. Po przekroczeniu granicy okręgu punkt uznawany jest za zaliczony a samolot rozpoczyna manewr naprowadzający go na kolejny cel.
 
-Modele elektro szybowców
-
-\subsection{Technika lotu samolotem}
-\subsection{Sztuczne sieci neuronowe}
-\subsection{Budowa samolotów kompozytowych}
-\subsection{Laminowanie ogniw fotowoltaicznych}
-\subsection{State of the art}
+\subsection{Przegląd literatury naukowej}
 \clearpage
 \section{Implementacja rozwiązania}
 \subsection{Budowa modelu samolotu}
-Charakterystyka pracy systemu lotu autonomicznego sprawia, że powinien  on zostać dostosowany do kontrolnego modelu samolotu. Podczas początkowych testów używany był w tym celu samolot Multiplex EasyGlider 4. Jest to komercyjny samolot o rozpiętości skrzydeł 1,8 metra, wykonany z Elaporu (polipropylen). Dzięki swoim parametrom aerodynamicznym możliwy jest nim stabilny lot o stosunkowo niskiej prędkości przelotowej. Dodatkową zaletą jest wytrzymałość na uderzenia, co w przypadku modelu testowego jest istotne w przypadku niepowodzeń.
+Charakterystyka pracy systemu lotu autonomicznego sprawia, że powinien  on zostać dostosowany do konkretnego modelu samolotu. Podczas początkowych testów używany był w tym celu samolot Multiplex EasyGlider 4, widoczny na zdjęciu \ref{fig:eg4}. Jest to komercyjny samolot o rozpiętości skrzydeł 1,8 metra, wykonany z Elaporu (polipropylen). Dzięki swoim parametrom aerodynamicznym możliwy jest nim stabilny lot przy stosunkowo niskiej prędkości przelotowej. Dodatkową zaletą jest jego wytrzymałość, co w przypadku modelu testowego jest istotne w przypadku niepowodzeń działania systemów pokładowych.
+
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\textwidth]{budowa1}
-    \caption{Dodać podpis :)}
+    \includegraphics[width=1\textwidth]{budowa1}\\
+    \label{fig:eg4}
+    \caption{Samolot EasyGlider 4 wraz z modułem kontrolera lotu}
 \end{figure}
-Samolot ten nie jest jednak przystosowany do przenoszenia większej ilości urządzeń podkładowych poza odbiornikiem i baterią. Jego mocno ograniczona objętość kadłuba sprawiała, że wymiana baterii wiązała się z każdorazowym rozłączeniem kabli oraz wyjęciem większości elektroniki. Taki proces każdorazowo związany jest z możliwością uszkodzenia elementów na płytce prototypowej, a także zajmował dużo czasu. Samolot jest także jedynie modelem służącym do testów, dlatego konieczne było zaprojektowanie i przygotowanie modelu spełniającego odpowiednie założenia wytrzymałościowe i aerodynamiczne. Model taki został zaprojektowany w programie XFLR5.
+
+EasyGlider 4 ten nie jest jednak przystosowany do przenoszenia większej ilości urządzeń podkładowych poza odbiornikiem i baterią. Jego mocno ograniczona objętość kadłuba sprawiała, że wymiana baterii wiązała się z każdorazowym rozłączeniem kabli oraz wyjęciem większości elektroniki. Taki proces naraża na uszkodzenie elementów na płytce prototypowej, a także zajmuje dużo czasu, zwłaszcza w warunkach polowych. Samolot posłużył do ogromnej ilości testów systemów oraz elektroniki, jednak zgodnie z założeniem projektu, docelowo używany samolot miał być dedykowany do modułu kontrolera. Konieczne więc było zaprojektowanie i przygotowanie modelu spełniającego odpowiednie założenia wytrzymałościowe i aerodynamiczne. Jego projekt został wykonany w programie XFLR5 i pokazany został na rysunku \ref{fig:xflr}.
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{xflr}
-    \caption{Dodać podpis :)}
+    \caption{Ekran główny programu XFLR5 z projektem samolotu}
+    \label{fig:xflr}
 \end{figure}
-Jako profil lotniczy skrzydła wybrany został FX 60-100. Jest on stosunkowo gruby oraz wklęsły w swojej dolnej części, co przekłada się na zwiększone opory powietrza oraz większą siłę nośną, przy równoczesnej niższej prędkości przelotowej. Na końcach skrzydeł znajdują się uszka o tym samym profilu. Kąt wzniosu skrzydeł wynosi 5º na każde skrzydło, natomiast uszka wzniesione są o dodatkowe 15 º.  Całkowita rozpiętość skrzydeł wynosi 2 metry.
+
+Jako profil lotniczy skrzydła wybrany został FX 60-100, pokazany na grafice \ref{fig:fx60}. Jest on stosunkowo gruby oraz wklęsły w swojej dolnej części, co przekłada się na zwiększone opory powietrza oraz większą siłę nośną, przy równoczesnej niższej prędkości przelotowej. Na końcach skrzydeł znajdują się uszka o tym samym profilu. Kąt wzniosu skrzydeł wynosi 5\textdegree na każdą stronę, natomiast uszka wzniesione są o dodatkowe 15\textdegree.  Całkowita rozpiętość skrzydeł wynosi 2 metry.
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{fx60}
-    \caption{Dodać podpis :)}
+    \caption{Profil lotniczy FX60-100}
+    \small Źródło: \url{airfoiltools.com/airfoil/details?airfoil=fx60100-il}
+    \label{fig:fx60}
 \end{figure}
-Statecznik poziomy i pionowy posiadają profil lotniczy NACA 0008, który jest profilem symetrycznym. Statecznik jest stosunkowo duży, co zapewnia dodatkową stabilizację podczas lotu. Znajduję się on 90 cm od początku krawędzi natarcia skrzydła głównego.
+
+Statecznik poziomy i pionowy posiadają profil lotniczy NACA 0008 (grafika \ref{fig:naca}), który jest profilem symetrycznym. Statecznik jest stosunkowo duży, co zapewnia dodatkową stabilizację podczas lotu. Znajduję się on 90 cm od początku krawędzi natarcia skrzydła głównego.
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{naca0008}
-    \caption{Dodać podpis :)}
+    \caption{Profil lotniczy NACA 0008}
+    \small Źródło: \url{airfoiltools.com/airfoil/details?airfoil=naca0008-il}
+    \label{fig:naca}
 \end{figure}
-Coś o parametrach samolotu?
-Po zakończeniu procesu projektowania, pierwszym niezbędnym elementem do przygotowania są bryty na skrzydła oraz statecznik wykonane z polistyrenu ekstrudowanego, potocznie nazywanego styrodurem. Ze styrodurowej płyty, przy pomocy plotera termicznego, za pomocą gorącego drutu wycinany jest obrys profili przez dwie oddalone od siebie karetki. W ten sposób możliwe jest otrzymanie dokładnej geometrii zaprojektowanego skrzydła, a równocześnie form negatywowych, które zostaną wykorzystane później w procesie laminowania.
+
+Dzięki przeprowadzeniu analizy projektu w programie XFLR możliwe jest uzyskanie parametrów aerodynamicznych samolotu.
+
+TUTAJ ANALIZA Z XFLR
+
+\FloatBarrier
+\paragraph{Wytworzenie elementów kompozytowych}\mbox{}
+
+Po zakończeniu procesu projektowania, pierwszym niezbędnym elementem do przygotowania są bryty na skrzydła oraz statecznik wykonane z polistyrenu ekstrudowanego, potocznie nazywanego styrodurem. Ze styrodurowej płyty, przy pomocy plotera termicznego, za pomocą gorącego drutu wycinany jest obrys profili przez dwie oddalone od siebie karetki, jak widoczne jest na zdjęciu \ref{fig:ploter}. W ten sposób możliwe jest otrzymanie dokładnej geometrii zaprojektowanego skrzydła, a równocześnie form negatywowych, które zostaną wykorzystane później w procesie laminowania.
+
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{budowa5}
-    \caption{Dodać podpis :)}
+    \caption{Proces wycinania brytów przy pomocy plotera termicznego}
+    \label{fig:ploter}
 \end{figure}
  
-W analogiczny sposób wycięte zostały bryty na uszka oraz elementy statecznika. Przed dalszym procesem skrzydła muszą zostać okablowane, czyli przewody doprowadzające zasilanie i sygnały do różnych elementów muszą zostać umieszczone w styrodurze tak, aby nie zaburzały powierzchni profilu lotniczego. W widocznym poniżej prawym skrzydle widoczne są przewody do modułu rurki Pitota, modułu ogniw fotowoltaicznych oraz do serwomechanizmu poruszającego lotką.
+W analogiczny sposób wycięte zostały bryty na uszka oraz elementy statecznika. Przed dalszymi działaniami skrzydła muszą zostać okablowane, czyli przewody doprowadzające zasilanie i sygnały do różnych elementów muszą zostać umieszczone w styrodurze w taki sposób, aby nie zaburzały powierzchni profilu lotniczego. W widocznym na zdjęciu \ref{fig:okablowane} prawym skrzydle widoczne są przewody do czujnika rurki Pitota, modułu ogniw fotowoltaicznych oraz do serwomechanizmu poruszającego lotką.
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{okablowany}
-    \caption{Dodać podpis :)}
+    \caption{Okablowane prawe skrzydło, widok na jego dolą stronę}
+    \label{fig:okablowane}
 \end{figure}
-Same ogniwa fotowoltaiczne zostały uprzednio zalaminowane przy pomocy opracowanej przez SKN AGH Solar Plane metodzie, która pozwala na przylutowanie do siebie szeregu ogniw, a następnie zabezpieczenie ich przy pomocy folii od górnej strony oraz włókna szklanego od dołu. Dzięki temu możliwe jest następne wykorzystanie takiego modułu w procesie laminowania skrzydeł. Zapewnia to możliwość ich późniejszego dostosowania do kształtu skrzydła bez znaczącego spadku sprawności.
+
+Same ogniwa fotowoltaiczne zostały uprzednio zalaminowane przy pomocy opracowanej przez SKN AGH Solar Plane metodzie, która pozwala na przylutowanie do siebie szeregu ogniw, a następnie zabezpieczenie ich przy pomocy folii od górnej strony oraz włókna szklanego od dołu. Dzięki temu możliwe jest następne wykorzystanie takiego modułu w procesie laminowania skrzydeł. Zapewnia to możliwość ich późniejszego dostosowania do kształtu skrzydła bez znaczącego spadku sprawności. Na zdjęciu \ref{fig:laminowanie} widoczny jest szereg ogniw fotowoltaicznych na folii Mylar, przykryty warstwą tkaniny szklanej, gotowy do dalszego procesu laminowania.
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{budowa7}
-    \caption{Dodać podpis :)}
+    \caption{Przygotowanie instalacji fotowoltaicznej podczas laminowania skrzydła}
+    \label{fig:laminowanie}
 \end{figure}
-Skrzydła zyskują swój ostateczną formę w procesie laminowania. Polega on na odpowiednim nałożeniu warstw laminatu na bryt i nasączeniu ich żywicą epoksydową. Z uwagi na instalację fotowoltaiczną umieszczoną na skrzydłach nie jest możliwe wykorzystanie laminatu z włókna węglowego, ponieważ istnieje bardzo duże ryzyko zwarcia instalacji na całej jej długości –przez dodatkową warstwę tkaniny szklanej przebić się mogą  pojedyncze włókna węglowe, będące bardzo dobrymi przewodnikami energii elektrycznej. Jako laminat wykorzystane więc zostały dwie warstwy tkaniny szklanej o gramaturze 48 g/m2 na każdą powierzchnię. Węglowy rowing został jedynie wykorzystany jako wzmocnienie krawędzi spływu, natomiast na krawędź natarcia oraz dźwigar zostały wykonane z taśmy węglowej o szerokości 20 mm (na dźwigrze znajdują się dwa). Na gotowy laminat zostaje położona folia Mylar, która pozwala odbić idealnie gładką powierzchnię. Tak przygotowane bryty laminaty są następnie umieszczane w worku próżniowym, z którego przy pomocy pompy usuwane jest powietrze do ciśnienia -400 mbar względem atmosfery. Ciśnienie to jest stosunkowo wysokie, w tego typu procesach częściej spotykane jest uzyskanie próżni rzędu -800 do -900 mbar, jednak taki nacisk może powodować pękanie ogniw fotowoltaicznych.
 
-Dzięki temu uzyskany jest bardzo duży, równomierny nacisk na całą powierzchnię brytu. Z uwagi na wypukło-wklęsły profil lotniczy skrzydła konieczne jest umieszczenie brytów w negatywowej formie, ponieważ worek poróżniony jest w stanie mocno naciągnąć kształt brytu. Widoczne na zdjęciu gaśnice oraz akumulatory służą jako dodatkowe obciążenie form. Czas schnięcia zastosowanej żywicy epoksydowej L285 wraz z utwardzaczem H287 wynosi około 24 godziny.
+Skrzydła zyskują swój ostateczną formę w procesie laminowania. Polega ona na odpowiednim nałożeniu warstw laminatu na bryt i nasączeniu ich żywicą epoksydową. Z uwagi na instalację fotowoltaiczną umieszczoną na skrzydłach nie jest możliwe wykorzystanie laminatu z włókna węglowego, ponieważ istnieje bardzo duże ryzyko zwarcia instalacji na całej jej długości - przez zabezpieczającą warstwę tkaniny szklanej przebić się mogą pojedyncze włókna węglowe, będące bardzo dobrymi przewodnikami energii elektrycznej. Jako laminat wykorzystane więc zostały dwie warstwy tkaniny szklanej o gramaturze 48 g/m2 na każdą powierzchnię. Węglowy rowing został jedynie wykorzystany jako wzmocnienie krawędzi spływu, natomiast krawędź natarcia oraz dźwigar zostały wykonane z taśmy węglowej o szerokości 20 mm (na dźwigarze znajdują się dwie warstwy). Na gotowy laminat zostaje położona folia Mylar, która pozwala odbić idealnie gładką powierzchnię. Tak przygotowane bryty laminaty są następnie umieszczane w worku próżniowym, z którego przy pomocy pompy usuwane jest powietrze do ciśnienia -400 mbar względem atmosfery. Ciśnienie to jest stosunkowo wysokie, w tego typu procesach częściej spotykane jest uzyskanie próżni rzędu -800 do -900 mbar, które nie zostało wykorzystane z uwagi na ryzyko uszkodzenia instalacji fotowoltaicznej.
+
+Dzięki zastosowaniu próżni, uzyskany jest bardzo duży, równomierny nacisk na całą powierzchnię brytu. Z uwagi na wypukło-wklęsły profil lotniczy skrzydła konieczne jest umieszczenie brytów w negatywowej formie, ponieważ worek poróżniony jest w stanie mocno naciągnąć styrodur. Na koniec formy zostały przyciśnięte ciężkimi przedmiotami, jak zaobserwować można na zdjęciu \ref{fig:schniecie}. Czas schnięcia zastosowanej żywicy epoksydowej L285 wraz z utwardzaczem H287 wynosi około 24 godziny, dopiero po tym czasie prace mogą być kontynuowane.
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{budowa9}
-    \caption{Dodać podpis :)}
+    \caption{Skrzydła umieszczone w formach negatywowych i worku próżniowym w trakcie schnięcia}
+    \label{fig:schniecie}
 \end{figure}
-W analogiczny sposób zalaminowane zostały uszka oraz elementy statecznika. Przy okazji tego procesu dodatkowo wzmocniono krawędzie natarcia i spływu skrzydeł
 
-Finalnym rezultatem procesu laminowania są widoczne na zdjęciu elementy.
+W analogiczny sposób zalaminowane zostały uszka oraz elementy statecznika. Przy okazji tego procesu dodatkowo wzmocniono krawędzie natarcia i spływu skrzydeł dodatkową warstwą włókien węglowych. Finalnym rezultatem procesu laminowania są widoczne na zdjęciu \ref{fig:kompozytki} elementy.
 
-Kolejnym etapem było połączenie skrzydeł oraz uszek. Efekt ten został osiągnięty przy pomocy kleju żywicznego Poxipol oraz przylaminowania fragmentów dwukierunkowej tkaniny węglowej.
  \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\textwidth]{budowa12}
-    \caption{Dodać podpis :)}
+    \includegraphics[width=1\textwidth]{budowa11}
+    \caption{Elementy powstałe w wyniku procesu laminowania}
+    \label{fig:kompozytki}
 \end{figure}
-Elementy statecznika także zostały sklejone przy pomocy kleju Poxipol. Całość została umieszczona na rurze węglowej o długości 1m i średnicy 20mm.
- Ostatnim niezbędnym laminowanym elementem była podstawka pod skrzydła, umożliwiająca uzyskanie kąta zaklinowania skrzydeł oraz ich systemu mocowania. Podstawka została zaprojektowana w programie Fusion 360, wyfrezowana na urządzeniu CNC i finalnie zalaminowana jedną warstwą dwukierunkowej tkaniny węglowej.
-Szkielet kadłuba został wykonany z list sosnowych, sklejonych ze sobą klejem cyjanoakrylowym. Wnętrze kadłuba zostało rozplanowane w taki sposób, aby umożliwić jak najwygodniejszy dostęp do modułu kontrolera oraz baterii. W skrzydłach umieszczone zostały węglowe tulejki, w których umieszczone są śruby mocujące M4, przy pomocy których skrzydła są przykręcane do kadłuba. 
+
+\FloatBarrier
+\paragraph{Łączenie elementów}\mbox{}
+
+Kolejnym etapem było połączenie skrzydeł oraz doklejenie do nich uszek. Efekt ten został osiągnięty przy pomocy kleju żywicznego Poxipol oraz wzmocnieniu połączeń fragmentami dwukierunkowej tkaniny węglowej. Elementy statecznika także zostały sklejone przy pomocy kleju Poxipol. Całość została umieszczona na rurze węglowej o długości 1m i średnicy 20mm. Gotowe elementy widoczne są na zdjęciu \ref{fig:sklejone}.
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{budowa13}
-    \caption{Dodać podpis :)}
+    \caption{Połączone skrzydła oraz sklejony statecznik wraz z rurą węglową}
+    \label{fig:sklejone}
 \end{figure}
-Stery kierunku i wysokości obsługiwane są przy pomocy serwomechanizmów umieszczonych w kadłubie oraz bowdenów umieszczonych wzdłuż rury ogonowej. We wszystkie powierzchnie sterowe wklejone zostały wykonane z płyty węglowej orczyki prowadzące. 
+
+Ostatnim niezbędnym laminowanym elementem była podstawka pod skrzydła, umożliwiająca uzyskanie kąta zaklinowania skrzydeł oraz ich systemu mocowania. Podstawka została zaprojektowana w programie Fusion 360, wyfrezowana na urządzeniu CNC i finalnie zalaminowana jedną warstwą dwukierunkowej tkaniny węglowej. Jak widać na zdjęciu \ref{fig:podstawka}, jej kształt jest dopasowana do dolnej powierzchni centralnej części skrzydeł. Na środku przygotowane zostały otwory na kable idące do kadłuba.
+
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{podstawka}
+    \caption{Podstawka pod skrzydła}
+    \label{fig:podstawka}
+\end{figure}
+
+\FloatBarrier
+\paragraph{Kadłub}\mbox{}
+
+Szkielet kadłuba został wykonany z listewek sosnowych, sklejonych ze sobą klejem cyjanoakrylowym, jak widać na zdjęciu \ref{fig:szkielet}. Kadłub jest przyklejony do rury ogonowej, pod podstawką pod skrzydła znajduje się dodatkowo wzmocniona sklejka. Wnętrze kadłuba zostało rozplanowane w taki sposób, aby umożliwić jak najwygodniejszy dostęp do modułu kontrolera oraz baterii. W skrzydłach oraz w podstawce umieszczone zostały węglowe tulejki, w których umieszczone są śruby mocujące M4, przy pomocy których skrzydła są przykręcane do kadłuba. 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\textwidth]{caly}
-    \caption{Dodać podpis :)}
+    \includegraphics[width=1\textwidth]{szkielet}
+    \caption{Złożony samolot z gotowym szkieletem kadłuba}
+    \label{fig:szkielet}
 \end{figure}
+
+Stery kierunku i wysokości obsługiwane są przy pomocy serwomechanizmów umieszczonych w kadłubie oraz bowdenów umieszczonych wzdłuż rury ogonowej, co pokazano na zdjęciu \ref{fig:tyl}. We wszystkie powierzchnie sterowe wklejone zostały wykonane z płyty węglowej orczyki prowadzące. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{tyl}
+    \caption{Tylna część kadłuba - miesce mocowania skrzydeł oraz serwomechnizmy wraz z bowdenami do sterów kierunku i wysokości}
+    \label{fig:tyl}
+\end{figure}
+
+Po umieszczeniu całej elektroniki podkładowej, szkielet kadłuba został wzmocniony i zabezpieczony balsą modelarską. Przewidziana została możliwość szybkiego dostępu do kontrolera jak i do baterii przy pomocy umieszczonych na zawiasach zamknięciach, zamykanych za pomocą śruby M3, jak widać na zdjęciu \ref{fig:przod}. Antena GPS umieszczana jest na specjalnej podstawce za pomocą rzepa.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{przod}
+    \caption{Przednia część kadłuba - zamknięcia osłaniające elektronikę i akumulator}
+    \label{fig:przod}
+\end{figure}
+
+\FloatBarrier
+\paragraph{Złożenie samolotu}\mbox{}
+
+Po złożeniu samolotu jego rozpiętość skrzydeł jest równa 204 cm, długość 130 cm i waży (razem z akumulatorem) około 1500 gramów. Do transportu możliwe jest odkręcenie skrzydeł, a później ich ponowne przykręcenie - cała operacja, razem z podłączeniem wtyczek, trwa zaledwie kilka minut. 
+
+Na zdjęciach widoczny jest złożony i uruchomiony samolot w trakcie pierwszego oblotu zaraz przed startem (zdjęcie \ref{fig:gotowy}) oraz po kilku pierwszych udanych lądowaniach (zdjęcie \ref{fig:lataxd}). Samolot został nazwany ``Dodo'' na cześć wymarłego ptaka nielota. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{dolotu}
+    \caption{Złożony samolot przed pierwszym oblotem}
+    \label{fig:gotowy}
+\end{figure}
+
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{budowa16}
-    \caption{Dodać podpis :)}
+    \caption{``Dodo'' po pierwszych lotach w rękach autora projektu}
+    \small Zdjęcie: inż. Andrzej Rusinowski
+    \label{fig:lataxd}
 \end{figure}
-Po umieszczeniu całej elektroniki podkładowej, szkielet kadłuba został wzmocniony i zabezpieczony balsą modelarską. Przewidziana została możliwość szybkiego dostępu do kontrolera jak i do baterii przy pomocy umieszczonych na zawiasach zamknięciach.
 
  \FloatBarrier
 \subsection{Moduł instalacji fotowoltaicznej}
-Prace nad kontrolerem opartym o sieć neuronową wymagają zebrania ogromnej ilości danych oraz obserwacji samolotu w powietrzu, co przekłada się na konieczność utrzymania samolotu w powietrzu tak długo jak to możliwe - każde lądowanie, wymiana baterii i kalibracja zajmuje bardzo cenny podczas testów czas. Aby zmaksymalizować czas samolotu w powietrzu, na jego skrzydłach umieszczona została instalacja fotowoltaiczna, która wspomaga zasilanie z baterii lub nawet pozwala ją częściowo naładować.
+Prace nad kontrolerem opartym o sieć neuronową wymagają zebrania ogromnej ilości danych oraz obserwacji zachowania podczas lotu, co przekłada się na konieczność utrzymania go w powietrzu tak długo jak to możliwe - każde lądowanie, wymiana baterii i kalibracja zajmuje bardzo cenne minuty podczas wyjazdu na testy. Aby zmaksymalizować czas samolotu w powietrzu, na jego skrzydłach umieszczona została instalacja fotowoltaiczna, która wspomaga zasilanie z baterii lub nawet pozwala ją częściowo naładować.
 
-Instalacja składa się z 12 ogniw SunPower gen. 4 (wymiary 125mm na 125mm), każde o znamionowej mocy 3,6W, działające przy napięciu maksymalnym 0,6V. Zostały one wybrane ze względu na wysoką sprawność sięgająca nawet 23\%, a dodatkowo możliwe jest ich kupienie w czystej, niezabezpieczonej formie. Pozwala to na umieszczenie ich na skrzydłach ze względu na grubość rzędu dziesiątej części milimetra oraz giętkość pozwalającą na dopasowanie do profilu lotniczego. Przed tym procesem konieczne jest jeszcze ich zlutowanie (na każde skrzydło wykonany został szereg 6 ogniw), a następnie odpowiednie zabezpieczenie. Odbywa się to poprzez umieszczenie warstwy folii zabezpieczającej o grubości 80$\mu$m przy pomocy strumienia gorącego powietrza. Powietrze znajdujące się pomiędzy ogniwami a folią jest uprzednio usuwane przy pomocy pompy próżniowej oraz wałeczków. Folia poza obrysem ogniw przykleja się do umieszonej pod spodem warstwy tkaniny szklanej o gramaturze 48$\frac{g}{m^2}$, która pozwala na późniejsze przyklejenie w trakcie procesu laminowania skrzydeł. 
-
-Wszystkie 12 ogniw umieszczone na skrzydłach połączone są szeregowo, co daje panel o mocy znamionowej 43,2W. Należy wziąć jednak pod uwagę zabezpieczenie ogniwa zwykłą folią (a nie na przykład EVA) oraz zakrzywienie ogniwa na skrzydle, co znacząco wpływa na ich sprawność, dlatego rzeczywista moc układu jest niższa. Z uwagi na brak odpowiednich warunków pogodowych, do jej sprawdzenia wykorzystane zostało stanowisko badawcze.
-
-Warto zaznaczyć, że uzyskanie instalacji o takiej mocy jest bardzo dużym sukcesem i nie było by możliwe bez setek godzin spędzonych na opracowaniu metod laminowania oraz umieszczania instalacji na skrzydłach przez SKN AGH Solar Plane.
-
-Dzięki uprzejmości doktora inżyniera Krzysztofa Sornka z Instytutu Zrównoważonego Rozwoju Energetycznego AGH możliwe było przeprowadzenie badań gotowej instalacji na skrzydłach. Z uwagi na brak warunków pogodowych, badania zostały przeprowadzone na stanowisku badawczym, które powala na uzyskanie mocy promieniowania zbliżonej do warunków podczas słonecznego dnia w lecie na ternie Polski - około 1000$\frac{W}{m^2}$. Uzyskane jest to dzięki systemowi lamp halogenowych, które niestety bardzo szybko się nagrzewają - badania musiały być więc prowadzone bardzo sprawnie. Było to możliwe dzięki użyciu skryptu do automatycznego pomiaru wykonanego przy pomocy sztucznego obciążenia. Badanie trwało więc zaledwie kilkanaście sekund i pozwoliło uniknąć zbytniego przegrzania ogniw fotowoltaicznych. Instalacja była badana osobno na każdym skrzydle ze względu na ograniczoną powierzchnię stanowiska. Wynikiem badań było uzyskanie charakterystyk prądowo-napięciowych, w tym także generowanej mocy w zależności od napięcia.
-
-\begin{figure}%
+\begin{figure}[ht]
     \centering
-    \subfloat[\centering label 1]{{\includegraphics[width=0.45\textwidth]{leweprzetarte} }}%
-    \qquad
-    \subfloat[\centering label 2]{{\includegraphics[width=0.45\textwidth]{praweprzetarte} }}%
-    \caption{2 Figures side by side}%
-    \label{fig:example}%
+    \includegraphics[width=1\textwidth]{panelki}
+    \caption{Widok na instalację fotowoltaiczną umieszczona na samolocie}
+    \label{fig:panelki}
 \end{figure}
 
-Na wykresach charakterystyka mocy ma widoczne globalne maksimum, które nazywane jest maksymalnym punktem pracy panelu fotowoltaicznego. Stosowne byłoby zatem użycie modułu MPPT (Maximum Power Point Tracker), który pozwala na dostosowanie zależności napięcia i naprężenia w taki sposób, aby uzyskiwać maksymalną moc. Niestety, takie moduły dostępne na rynku są dostosowane do znacznie większych instalacji, a ich wymiary i waga nie pozwalają na użycie w samolocie. Prace nad autorskim modułem zajęły by zbyt dużo czasu dlatego najlepszym rozwiązaniem jest użycie odpowiednio dobranej przetwornicy z rodziny step-up. Przy tak małej instalacji, różnica między użyciem przetwornicy a modułu MPPT jest bardzo mała, ponadto przetwornica pracuje w trybie ciągłym, komercyjne moduły MPPT potrzebują czasu liczonego w sekundach na ustawienie się. Zgodnie z założeniem projektowym samolot będzie wykonywał dużą ilość manewrów, zmieniając cały czas kąt nachylenia ogniw względem słońca, zatem przetwornica jest znacznie efektywnijszym rozwiązaniem. Wybranym modułem został Pololu U3V50AHV, pracujący z natężeniem do 5A i napięciem 3-30V. Przetwornica została ustawiona na napięcie wyjściowe 12,6V, co odpowiada maksymalnemu napięciu używanego akumulatora Li-Po 3S. Dzięki temu, w przypadku zużycia mniejszej ilości energii przez samolot niż jest w stanie wyprodukować instalacja fotowoltaiczna, nadmiar energii zostanie wykorzystany do ładowania pakietu baterii.
+Jak widać na zdjęciu \ref{panelki} , instalacja składa się z 12 ogniw SunPower gen. 4 (wymiary 125mm na 125mm), każde o znamionowej mocy 3,6W, działające przy napięciu maksymalnym 0,6V. Zostały one wybrane ze względu na wysoką sprawność sięgająca nawet 23\%, a dodatkowo możliwe jest ich kupienie w czystej, niezabezpieczonej formie. Pozwala to na umieszczenie ich na skrzydłach ze względu na grubość rzędu dziesiątej części milimetra oraz giętkość pozwalającą na dopasowanie do profilu lotniczego. Przed tym procesem konieczne jest jeszcze ich zlutowanie (na każde skrzydło wykonany został szereg 6 ogniw), a następnie odpowiednie zabezpieczenie. Odbywa się to poprzez umieszczenie warstwy folii  zabezpieczającej na wierzchniej stronie o grubości 80$\mu$m przy pomocy strumienia gorącego powietrza. Powietrze znajdujące się pomiędzy ogniwami a folią jest uprzednio usuwane przy pomocy pompy próżniowej oraz wałeczków. Folia poza obrysem ogniw przykleja się do umieszczonej poniżej warstwy tkaniny szklanej o gramaturze 48$\frac{g}{m^2}$, która pozwala na późniejszą integrację z pozostałymi warstwami kompozytu w procesie laminowania skrzydeł.
 
-Dodatkowym eksperymentem przeprowadzonym podczas badań było także sprawdzenie wpływu zabrudzenia na instalacji fotowoltaicznej na jej sprawność. Niestety okazało się, że różnica ta nie jest możliwa do wykrycia przy użyciu stanowiska badawczego tego typu - większy wpływ na wyniki miał stopień rozgrzania lamp czy delikatnie inne ustawienie skrzydła na stole roboczym.
+Wszystkie 12 ogniw umieszczone na skrzydłach połączone są szeregowo, co daje panel o mocy znamionowej 43,2W. Należy wziąć jednak pod uwagę zabezpieczenie ogniwa zwykłą folią, a nie na przykład dedykowaną folią EVA (etylenowy polioctan winylu) oraz zakrzywienie ogniw na skrzydle, co znacząco wpływa na ich sprawność.
 
-\begin{figure}%
+Dzięki uprzejmości doktora inżyniera Krzysztofa Sornka z Instytutu Zrównoważonego Rozwoju Energetycznego AGH możliwe było przeprowadzenie badań gotowej instalacji na skrzydłach. Z uwagi na brak warunków pogodowych, badania zostały przeprowadzone na stanowisku badawczym, które powala na uzyskanie mocy promieniowania zbliżonej do warunków podczas słonecznego dnia w lecie na ternie Polski - około 1000$\frac{W}{m^2}$. Uzyskane jest to dzięki systemowi lamp halogenowych, które niestety bardzo szybko się nagrzewają - pomiary musiały być więc wykonane bardzo sprawnie. Było to możliwe dzięki użyciu skryptu do automatycznego pomiaru przy pomocy modułu sztucznego obciążenia. Badanie trwało więc zaledwie kilkanaście sekund i pozwoliło uniknąć zbytniego przegrzania się ogniw fotowoltaicznych. Instalacja była badana osobno na każdym skrzydle ze względu na ograniczone pole robocze stanowiska. Wynikiem badań było uzyskanie charakterystyk prądowo-napięciowych, a także generowanej mocy w zależności od natężenia wyjściowego. Wyniki zebrano na wykresach \ref{fig:charakterystyki}. Lewe skrzydło było w stanie wytworzyć maksymalnie około 19W energii, prawe - 16W.
+
+\begin{figure}[ht]
     \centering
-    \subfloat[\centering label 1]{{\includegraphics[width=0.45\textwidth]{porownanie1} }}%
+    \subfloat{{\includegraphics[width=0.45\textwidth]{leweprzetarte} }}
     \qquad
-    \subfloat[\centering label 2]{{\includegraphics[width=0.45\textwidth]{porownanie2} }}%
-    \caption{2 Figures side by side}%
-    \label{fig:example}%
+    \subfloat{{\includegraphics[width=0.45\textwidth]{praweprzetarte} }}
+    \caption{Charakterystyka prądowo-napięciowa oraz generowana moc przez instalację na prawym i lewym skrzydle}
+    \label{fig:charakterystyki}
 \end{figure}
 
-Mimo krótkiego czasu wykonywania pomiarów, halogenowe lampy wytwarzają bardzo dużą ilość ciepła, co przekłada się na spadek sprawności modułów fotowoltaicznych. Widoczne jest to nawet na pomiarach wykonanych w odstępie kilkunastu sekund, gdzie różnica maksymalnej mocy wynosi około 5\%. 
+Na wykresach charakterystyka mocy ma widoczne globalne maksimum, które nazywane jest maksymalnym punktem pracy panelu fotowoltaicznego. Stosowne byłoby zatem użycie modułu MPPT (Maximum Power Point Tracker), który pozwala na dostosowanie zależności napięcia i natężenia w taki sposób, aby zawsze uzyskiwać maksymalną moc. Niestety, takie moduły dostępne na rynku są dostosowane do znacznie większych instalacji, a ich wymiary i waga nie pozwalają na użycie w tak małym samolocie. Prace nad autorskim modułem zajęły by zbyt dużo czasu dlatego najlepszym rozwiązaniem jest użycie odpowiednio dobranej przetwornicy z rodziny step-up. Przy tak małej instalacji, różnica między użyciem przetwornicy a modułem MPPT jest bardzo mała, ponadto przetwornica pracuje w trybie ciągłym, a moduły MPPT pracują w cyklach ustawiania parametrów co kilka sekund. Zgodnie z założeniem projektowym samolot będzie wykonywał dużą ilość manewrów, zmieniając cały czas kąt nachylenia ogniw względem słońca, zatem przetwornica jest znacznie efektywniejszym rozwiązaniem.
 
-Ostatnim wykonanym badaniem była analiza ogniw przy pomocy specjalistycznej kamery termowizyjnej. Podanie napięcia na końce panelu skutkuje stopniowym ogrzewaniem się ogniw. Dzięki tej technice możliwe jest wykrycie uszkodzeń powstałych w procesie laminowania ogniw lub skrzydeł. Miejsca uszkodzone stawiają większy opór elektryczny, a co za tym idzie wytwarzają więcej ciepła przy przepływie energii elektrycznej. A badaniu podano wykorzystano napięcie i natężenie znamionowe ogniw, a różnice w temperaturach sięgały kilku stopni Celsujasza. Zaobserwowano znacznie większe uszkodzenia szeregu ogniw na prawym skrzydle, co możne tłumaczyć różnicę koło 10\% maksymalnej mocy.
+Wybranym modułem został Pololu U3V50AHV, pracujący z natężeniem do 5A i napięciem 3-30V. Przetwornica została ustawiona na napięcie wyjściowe 12,6V, co odpowiada napięciu w pełni naładowanego używanego w samolocie akumulatora Li-Po 3S. Dzięki temu, w przypadku zużycia mniejszej ilości energii przez samolot niż jest w stanie wyprodukować instalacja fotowoltaiczna, jej nadmiar zostanie wykorzystany do ładowania pakietu akumulatora.
 
-Z uwagi na wznios skrzydeł wynoszący 5° oraz na ciągłą zmianę nachylenia względem słońca, rzeczywista średnia uzyskana moc w powietrzu jest niższa niż podczas statycznego badania. Przeprowadzenie szczegółowych badań rzeczywistej produkcji energii w trakcie lotu możliwe jest tylko przy odpowiednich warunkach pogodowych, także biorąc pod uwagę natężenie światła. Na terenie Polski takie warunki osiągnąć można tylko w okresie letnim. Samolot zdecydowanie najwięcej energii wykorzystuje na podtrzymanie pracy silnika. Na podstawie przeprowadzonych eksperymentów, podczas lotu zużywa około 4-6A. Przekłada się to na średnie za potrzebowanie energetyczne na poziomie około 50W. Szacunkową średnia moc instalacji fotowoltaicznej, na podstawie badań przeprowadzonych na podobnym modelu, można przyjąć około 30W. Stanowi to więc około 50\% zapotrzebowania energetycznego, co przełoży się na znacznie wydłużony czas lotu.
+Dodatkowym eksperymentem przeprowadzonym podczas badań było sprawdzenie wpływu zabrudzenia instalacji fotowoltaicznej na jej sprawność. Niestety okazało się, że różnica ta nie jest możliwa do wykrycia przy użyciu stanowiska badawczego tego typu - większy wpływ na wyniki miał stopień rozgrzania lamp czy delikatnie inne ustawienie skrzydła na stole roboczym.
+
+\begin{figure}[ht]
+    \centering
+    \subfloat{{\includegraphics[width=0.45\textwidth]{porownanie1} }}
+    \qquad
+    \subfloat{{\includegraphics[width=0.45\textwidth]{porownanie2} }}
+    \caption{Porównanie charakterystyk prądowo-napięciowych instalacji na lewym skrzydle w odstępie kilkunastu sekund podczas nagrzewania się na stanowisku badawczym}
+    \label{fig:cieple}
+\end{figure}
+
+Mimo krótkiego czasu wykonywania pomiarów, halogenowe lampy wytwarzają bardzo dużą ilość ciepła, co przekłada się na spadek sprawności modułów fotowoltaicznych. Widoczne jest to nawet na pomiarach wykonanych w odstępie kilkunastu sekund, gdzie różnica maksymalnej mocy wynosi około 5\%, co zaobserwować można na wykresach \ref{fig:cieple}. 
+
+Ostatnim wykonanym badaniem była analiza instalacji przy pomocy specjalistycznej kamery termowizyjnej. Podanie napięcia na końce panelu skutkuje stopniowym ogrzewaniem się ogniw. Dzięki tej technice możliwe jest wykrycie uszkodzeń powstałych w procesie laminowania ogniw lub skrzydeł. Miejsca uszkodzone stawiają większy opór elektryczny, a co za tym idzie wytwarzają więcej ciepła przy przepływie energii elektrycznej. W badaniu podano wykorzystano napięcie i natężenie znamionowe ogniw, a różnice w temperaturach sięgały kilku stopni Celsujasza. Na zestawieniu \ref{fig:uszkodzenia} zaobserwować można znacznie większe uszkodzenia szeregu ogniw na prawym skrzydle, co możne tłumaczyć różnicę koło 10\% maksymalnej mocy wytworzonej w poprzednim eksperymencie.
+
+\begin{figure}[ht]
+    \centering
+    \subfloat{{\includegraphics[width=0.45\textwidth]{kamerat} }}
+    \qquad
+    \subfloat{{\includegraphics[width=0.45\textwidth]{kamerat} }}
+    \caption{Porównanie obserwacji uszkodzeń ogniw fotowoltaicznych na prawym i lewym skrzydle przy pomocy kamery termowizyjnej [WSTAWIĆ DOBRE ZDJĘCIA]}
+    \label{fig:uszkodzenia}
+\end{figure}
+
+Samolot zdecydowanie najwięcej energii wykorzystuje na podtrzymanie pracy silnika. Na podstawie przeprowadzonych eksperymentów, podczas lotu zużywane jest średnio około 4-6A. Przekłada się to na zapotrzebowanie energetyczne na poziomie około 50W. 
+
+Z uwagi na wznios skrzydeł wynoszący 5\textdegree oraz na ciągłą zmianę nachylenia względem słońca, rzeczywista średnia uzyskana moc w powietrzu jest niższa niż podczas statycznego badania. Przeprowadzenie szczegółowych analizy rzeczywistej produkcji energii w trakcie lotu możliwe jest tylko przy odpowiednich warunkach pogodowych mając na uwadze odpowiednie natężenie światła. Na terenie Polski takie warunki osiągnąć można tylko w okresie letnim, jednak na podstawie podobnych eksperymentów prowadzonych w zespole AGH Solar Plane można oszacować średnią rzeczywistą produkcję energii podczas lotu jako około 80\% energii produkowanej w stanie spoczynku. Zatem moc znajdującej się na przygotowanym modelu instalacji oszacować można na około 30W, co stanowi ponad połowę zapotrzebowania energetycznego i przełoży się na znaczne wydłużenie lotu.
+
+Warto zaznaczyć, że uzyskanie instalacji o takiej mocy na skrzydłach samolotu jest bardzo dużym sukcesem i nie było by możliwe bez wielu godzin spędzonych na opracowaniu metod laminowania oraz umieszczania ogniw na skrzydłach przez członków zespołu AGH Solar Plane.
 
 \FloatBarrier
 \subsection{Moduł kontrolera lotu}
-Pierwszym krokiem podczas pracy nad projektem  było przygotowanie listy parametrów, które są brane pod uwagę przez pilota podczas zdalnego terowania modelem. Są to: wysokość, rotacja, prędkość względem ziemi, prędkość względem wiatru, położenie samolotu, kierunek dalszej planowanej trasy. Wszystkie te wymienione elementy muszą w analogiczny sposób być brane pod uwagę przez autonomiczną jednostkę sterującą, a zbierane muszą być przy pomocy sensorów i czujników umieszczonych na pokładzie samolotu. Jednym z kluczowych założeń takiego modułu jest jego nieprzerwane, niezatrzymane i nieopóźnione działanie w podczas pracy. Utrata kontroli nad samolotem oznacza niemal pewne uderzenie w ziemię w ciągu zaledwie kilku sekund. Dlatego jako główny komputer pokładowy został wybrany mikrokontroler Teensy 4.0. Dysponuje on mikroprocesorem ARM Cortex-M7, taktowanym w trybie standardowym z częstotliwością 600 MHz. Jego innymi istotnymi zaletami jest możliwość generowania sygnału PWM przez większość wyjść cyfrowych, duża pojemność pamięci Flash (1984K) oraz RAM (1024 KB), 7 portów szeregowych UART, a także możliwość programowania w środowisku Arduino IDE (z rozszerzeniem Teensyduino). Ta ostatnia cecha jest o tyle ważna, że pozwala na użycie bibliotek do sensorów, które są najczęściej przygotowane właśnie pod tą platformę. Ich migracja na inne technologie mogła by być problematyczna. Warto zauważyć, że teoretycznie jeszcze lepszymi parametrami cechują się moduły komputerów jednopłytkowych (ang. single-board computer) jak na przykład Raspberry Pi Zero W, na którym można uruchomić system Raspbian z rodziny UNIX. Uruchomienie programu kontrolera na takim mikrokomputerze byłoby prawdopodobnie software’owo stabilniejsze i pozwalało na łatwiejsze zarządzanie wyjątkami i błędami, jednakże w przypadku zawieszenia się systemu operacyjnego lub jakiegokolwiek innego czynnika mogącego przerwać płynność działania programu bardzo prawdopodobne jest utracenie kontroli nad samolotem. Dodatkowo, system operacyjny uruchamia się w najlepszym czasie około kilkunastu sekund, co w przypadku nieplanowanego restartu w powietrzu wywołanego na przykład chwilowym spadkiem napięcia na przetwornicy oznacza pewne rozbicie modelu. Teensy uruchamia się w czasie bliskim sekundy, dodatkowo przed inicjalizacją czujników (mogącą trwać 2-3 sekundy) program sprawdza w pamięci EEPROM czy samolot nie został uprzednio uzbrojony. Jeżeli tak, czujniki pozostają wyłączone, natomiast samolot przechodzi w awaryjny tryb manualny. To rozwiązanie zapewnia samolotowi najwyższe bezpieczeństwo.
-Pierwszy prototyp projektu wykorzystywał następujące moduły:
+Pierwszym krokiem podczas pracy nad projektem  było przygotowanie listy parametrów, które są brane pod uwagę przez pilota podczas zdalnego terowania modelem. Są to: wysokość, orientacja, prędkość względem ziemi, prędkość względem wiatru, położenie samolotu oraz dalsza planowana trasa. Wszystkie te wymienione elementy muszą w analogiczny sposób być brane pod uwagę przez autonomiczną jednostkę sterującą, a zbierane muszą być przy pomocy sensorów i czujników umieszczonych na pokładzie samolotu. 
+
+Jednym z kluczowych założeń kontrolera lotu jest jego nieprzerwane, niezatrzymane i nieopóźnione działanie w podczas pracy. Utrata kontroli nad samolotem oznacza niemal pewne uderzenie w ziemię w ciągu zaledwie kilku sekund. Dlatego jako główny komputer pokładowy został wybrany mikrokontroler Teensy 4.0. Dysponuje on mikroprocesorem ARM Cortex-M7, taktowanym w trybie standardowym z częstotliwością 600 MHz. Jego innymi istotnymi zaletami są możliwość generowania sygnału PWM przez większość wyjść cyfrowych, duża pojemność pamięci Flash (1984K) oraz RAM (1024 KB), 7 portów szeregowych UART, a także możliwość programowania w środowisku Arduino IDE (z rozszerzeniem Teensyduino). Ta ostatnia cecha jest o tyle ważna, że pozwala na użycie bibliotek do sensorów, które są najczęściej przygotowane właśnie pod to środowisko. Ich migracja na inne technologie mogła by być problematyczna. 
+
+Warto zauważyć, że teoretycznie jeszcze lepszymi parametrami cechują się moduły komputerów jednopłytkowych (ang. single-board computer) jak na przykład Raspberry Pi Zero W, na którym można uruchomić system Raspbian z rodziny UNIX. Uruchomienie programu kontrolera na takim mikrokomputerze byłoby prawdopodobnie stabilniejsze od strony oprogramowania i pozwalało na łatwiejsze zarządzanie wyjątkami i błędami, jednakże w przypadku zawieszenia się systemu operacyjnego lub jakiegokolwiek innego czynnika mogącego przerwać płynność działania programu, bardzo prawdopodobne jest utracenie kontroli nad samolotem. Dodatkowo, system operacyjny uruchamia się w najlepszym czasie około kilkunastu sekund, co w przypadku nieplanowanego restartu urządzenia w powietrzu, wywołanego na przykład chwilowym spadkiem napięcia na przetwornicy, oznacza pewne rozbicie modelu. Teensy uruchamia się w czasie bliskim sekundy, dodatkowo przed inicjalizacją czujników (mogącą trwać 2-3 sekundy) program sprawdza w pamięci EEPROM czy samolot nie został uprzednio uzbrojony. Jeżeli tak, czujniki pozostają wyłączone, natomiast samolot przechodzi w awaryjny tryb manualny. To rozwiązanie zapewnia najwyższe bezpieczeństwo.
+
+Pierwszy prototyp autorskiego kontrolera lotu wykorzystywał następujące moduły:
 1.	Mikrokontroler Teensy 3.2
 2.	Czujnik AltIMU v10
 3.	Odbiornik Spectrum DSMX DX6
 4.	Moduł GPS SparkFun NEO-M9N
 5.	Moduł karty microSD
-Całość umieszczona była we fragmencie pianki ochronnej i miało posłużyć do pierwszego sprawdzenia działania systemu. Mikrokontroler miał za zadanie gromadzić dane z czujników oraz odbierać sygnał od aparatury sterującej. W skład elektroniki pokładowej wchodziły też cztery serwomechanizmy sterujące powierzchnymi sterowymi (lotki, stery kierunki i wysokości), bezszczotkowy silnik, regulator prędkości (ESC) oraz pakiet baterii LiPo 2600mAh, który pozwalał na kilkanaście minut lotu. W module ESC znajduje się przetwornica typu UBEC 5V, która służyła jako źródło zasilania układu.
+
+Całość umieszczona była we fragmencie pianki ochronnej i miała posłużyć do pierwszego sprawdzenia działania systemu. Mikrokontroler miał za zadanie gromadzić dane z czujników oraz odbierać sygnał od aparatury sterującej i przekazywać go na wyjście. W skład elektroniki pokładowej wchodziły też cztery serwomechanizmy sterujące powierzchnymi sterowymi (lotki, stery kierunki i wysokości), bezszczotkowy silnik, regulator prędkości (ESC) oraz pakiet baterii Li-Po 3S 2600mAh, który pozwalał na kilkanaście minut lotu. W module ESC znajduje się przetwornica typu UBEC 5V, która służyła jako źródło zasilania układu.
  
-Wraz z kolejnymi etapami prac moduł karty microSD został zastąpiony przez moduł radiowy HC-12 operujący na częstotliwości 433 MHz. Wysyłanie danych w czasie rzeczywistym oraz ich zapis po stronie stacji odbiorczej okazał się bardziej praktycznym rozwiązaniem. Czujnik AltIMU v10, w skład którego wchodzi żyroskop, akcelerometr, magnetometr oraz wysokościomierz ciśnieniowy, okazał się działać nieprawidłowo. Został wymieniony na znacznie precyzyjniejszy moduł SparkFun ICM 20948. Dzięki wbudowanemu w bibliotekę algorytmowi DMP (InvenSense Digital Motion Processor) jest on w stanie z niesamowitą precyzją podać kąty Eulera rotacji (roll, pitch, yaw) oraz dokonywać autokalibracji podczas działania. Ma on niestety również wady: potrzebuje stosunkowo dużej ilości mocy obliczeniowej do działania oraz wysokiego taktowania procesora (producent zaleca co najmniej 100 MHz), jego poprawne działanie wymaga znacznie trudniejszej implementacji oprogramowania, a także nie jest w stanie wskazać bezwzględnego położenia w osi yaw, zatem przed każdym startem należy skalibrować go ręcznie. Czujnik rotacji jest jednym z kluczowych elementów kontrolera lotu i bardzo kluczowa jest jego powtarzalność i precyzja działania, wybrany moduł firmy SparkFun spełnia wyznaczone kryteria, a brakujący czujnik wysokościomierza został zastąpiony zewnętrznym modułem LPS25HB. Teensy 3.2 zostało zastąpione przez Teensy 4.0 z powodu lepszych parametrów oraz kompatybilności sprzętowej z biblioteką TensorflowLite.
-Po ostatecznym wyborze modułów przygotowana została druga wersja urządzenia, wraz  z testową płytką PCB. Jej projekt wykonany został w programie KiCAD, i miał zapewnić stabilną pracę urządzenia oraz wymiary umożliwiające wkładanie go do samolotu testowego EasyGlider. 
+Wraz z kolejnymi etapami prac moduł karty microSD został zastąpiony przez moduł radiowy HC-12 operujący na częstotliwości 433 MHz. Wysyłanie danych w czasie rzeczywistym oraz ich zapis po stronie stacji odbiorczej okazał się bardziej praktycznym rozwiązaniem. Czujnik AltIMU v10, w skład którego wchodzi żyroskop, akcelerometr, magnetometr oraz wysokościomierz ciśnieniowy, okazał się działać nieprawidłowo. Został wymieniony na znacznie precyzyjniejszy moduł SparkFun ICM 20948. Dzięki wbudowanemu w bibliotekę algorytmowi DMP (InvenSense Digital Motion Processor) jest on w stanie z niesamowitą precyzją podać kąty Eulera rotacji (roll, pitch, yaw) oraz dokonywać autokalibracji podczas działania. Ma on niestety również wady: potrzebuje stosunkowo dużej ilości mocy obliczeniowej do działania oraz wysokiego taktowania procesora (producent zaleca co najmniej 100 MHz), jego poprawne działanie wymaga znacznie trudniejszej implementacji od strony oprogramowania, a także nie jest w stanie wskazać bezwzględnego położenia w osi yaw, zatem przed każdym startem należy skalibrować go ręcznie. Czujnik orientacji jest jednym z ważniejszych elementów kontrolera lotu i bardzo kluczowa jest jego powtarzalność i precyzja działania - wybrany moduł firmy SparkFun spełnia wyznaczone kryteria, a brakujący czujnik wysokości został zastąpiony zewnętrznym modułem LPS25HB. Teensy 3.2 zostało zastąpione przez Teensy 4.0 z powodu lepszych parametrów oraz kompatybilności sprzętowej z biblioteką TensorFlowLite.
+
+Po ostatecznym wyborze modułów przygotowana została druga wersja urządzenia, wraz  z testową płytką PCB. Jej projekt wykonany został w programie KiCAD (rysunek \ref{fig:axd}), i miał zapewnić stabilną pracę urządzenia oraz wymiary umożliwiające wkładanie go do samolotu testowego EasyGlider 4. 
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{plytkastara}
-    \caption{A nice plot.}
+    \caption{Projekt płytki PCB wykonany w programie KiCAD}
+    \label{fig:axd}
 \end{figure}
-Przygotowany projekt zakładał wykonanie dwustronnej płytki PCB o wymiarach 90mm na 50mm. Wykonana została przy pomocy termotransferu tonera na specjalny laminat o grubości 1.5mm. Następnie niepotrzebna miedź została rozpuszczona w roztworze Nadsiarczanu Sodu. 
+
+Przygotowany projekt jest dwustronną płytką PCB o wymiarach 90mm na 50mm. Wykonana została przy pomocy metody termotransferu tonera na specjalny laminat o grubości 1.5mm. Następnie niepotrzebna miedź została rozpuszczona w roztworze Nadsiarczanu Sodu. Efekt jest widoczny na zdjęciu \ref{fig:stara}
+ 
   \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{pcb}
-    \caption{A nice plot.}
+    \caption{Płytka PCB wykonana metodą termotransferu}
+    \label{fig:stara}
 \end{figure}
-Aby zapewnić możliwość wymiany modułów, do gotowej płytki przylutowane zostały gniazda typu goldpin raster 2.54mm, które są kompatybilne ze wszystkimi wykorzystanymi modułami i pozwalają na szybkie przyłączanie oraz odłączanie. 
-   \begin{figure}[ht]
+
+Aby zapewnić możliwość wymiany elementów, do gotowej płytki przylutowane zostały gniazda żeńskie typu goldpin raster 2.54mm, które są kompatybilne ze wszystkimi wykorzystanymi modułami i pozwalają na szybkie przyłączanie oraz odłączanie. Gotowy kontroler przedstawiony został na zdjęciu \ref{fig:starycaly}. Część elektroniki jest na zdjęciu niewidoczna, znajduje się po drugiej stronie płytki.
+
+\begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{kontorolerstary}
-    \caption{A nice plot.}
+    \caption{Gotowy kontroler lotu na autorskiej płytce PCB}
+    \label{fig:starycaly}
 \end{figure}
-Po pierwszych próbach modułu w trakcie lotu okazało się, że czujnik wysokości zwraca bardzo niedokładne wyniki. Po dokładniejszej analizie okazało się, że sam czujnik działa poprawnie, jednak przez ruch silnika i śmigieł oraz pęd powietrza przelatującego przez kadłub samolotu, wyniki te są bardzo rozbieżne. Dużo bardziej precyzyjny okazał się pomiar wysokości przy pomocy modułu GPS i na jego podstawie opierane były dalsze obliczenia. 
+
+Po pierwszych próbach kontrolera w trakcie lotu okazało się, że czujnik wysokości zwraca bardzo niedokładne wyniki. Po analizie zebranych danych okazało się, że sam czujnik działa poprawnie, jednak przez ruch silnika i śmigieł oraz pęd powietrza przelatującego przez kadłub samolotu, wyniki w żaden sposób nie pokrywają z faktycznym stanem rzeczy. Widoczne jest to na porównaniu wyników z czujnika ciśnieniowego oraz modułu GPS (rysunek \ref{fig:alti}) - według pierwszego z nich samolot ląduje ponad 250 metrów nad miesce startu. Dużo bardziej precyzyjny okazał się pomiar wysokości przy pomocy modułu GPS i na jego podstawie opierane były dalsze obliczenia.
+
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{alti}
-    \caption{A nice plot.}
+    \caption{Porównanie odczytów wysokości z czujnika LPS25HB oraz modułu GPS}
+    \label{fig:alti}
 \end{figure}
-Warto zauważyć, że widoczna na zdjęciu płytka miała charakter prototypowy, stąd widoczne niedoskonałości wykonania oraz ślady wprowadzanych poprawek. Po ustaleniu ostatecznej listy komponentów oraz skonstruowaniu dedykowanego samolotu, zaprojektowana została ostateczna wersja modułu kontrolera. Na płytce PCB wszystkie moduły zostały umieszczone po jednej stronie, zmieniony został także sposób podłączenia do układu w samolocie – ręczne wpinanie kabli do serw, ESC oraz rurki Pitota zostało zastąpione jednym gniazdem, które przy okazji pełni rolę mocowania. Z uwagi na ograniczenia czasowe projektu, wywiercone otwory nie zostały zmetalizowane, sygnał przekazywany jest między warstwami za pomocą przelotek.
+
+Warto zaznaczyć, że widoczna na zdjęciu \ref{fig:starycaly} płytka miała charakter prototypowy, stąd widoczne niedoskonałości wykonania oraz ślady wprowadzanych poprawek. Po ustaleniu ostatecznej listy komponentów oraz skonstruowaniu dedykowanego samolotu, zaprojektowana została ostateczna wersja modułu kontrolera. Na płytce PCB wszystkie moduły zostały umieszczone po jednej stronie, zmieniony został także sposób podłączenia do układu w samolocie – ręczne wpinanie kabli do serw, ESC oraz rurki Pitota zostało zastąpione jednym gniazdem, które przy okazji pełni rolę mocowania. Dzięki temu, proces umieszczenia i wyjęcia kontrolera z samolotu trwa dosłownie sekundę i nie naraża elementów na uszkodzenie. Z uwagi na ograniczenia czasowe projektu, otwory w płytce PCB nie zostały poddane procesowi metalizacji, sygnał przekazywany jest między warstwami za pomocą przelotek. Zrezygnowano także z umieszczenia na płytce ciśnieniowego czujnika wysokości. Gotowy moduł widoczny jest na zdjęciu \ref{fig:dodokontroler}.
+
    \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{dodokontroler}
-    \caption{A nice plot.}
+    \caption{Finalny moduł kontrolera lotu.}
+    \label{dodokontroler}
 \end{figure}
 
-W skład elektorniki podkładowej samolotu wchodzą także serwomechanizmy do poruszania powierzchniami sterowymi samolotu. Z uwagi na rozmiar powierzchni sterowych, wybrane zostały serwomechanizmy GO-17 MG firmy Pelikan. Posiadają one moment obrotowy od 2,2$\frac{kg}{cm}$ przy napięciu zasilającym 4,8V do nawet 2,5$\frac{kg}{cm}$ przy napięciu 6V (w samolocie napięcie zasilające za przetwornicą wynosi znamionowo 5V, w praktyce ta wartość waha się w zakresie 5V-5.5V). Silnik napędzający samolot umieszczony jest w przedniej części kadłuba, razem z elektronicznym regulatorem prędkości ESC. Wybranym modelem został Dualsky Ecko V2 2814 970kV. Jego chwilowa moc maksymalna wynosi nawet do 400W, przy obciążeniu prądowym 33A. Zgodnie z zaleceniem producenta, dobrane do niego zostały śmigła  11x7. 
+
+W skład elektorniki podkładowej samolotu wchodzą także serwomechanizmy do poruszania powierzchniami sterowymi samolotu. Z uwagi na ich rozmiar, wybrane zostały serwomechanizmy GO-17 MG firmy Pelikan. Posiadają one moment obrotowy od 2,2$\frac{kg}{cm}$ przy napięciu zasilającym 4,8V do nawet 2,5$\frac{kg}{cm}$ przy napięciu 6V (w samolocie napięcie zasilające za przetwornicą wynosi znamionowo 5V, w praktyce ta wartość waha się w zakresie 5V-5.5V). Silnik napędzający samolot umieszczony jest w przedniej części kadłuba, razem z elektronicznym regulatorem prędkości ESC. Wybranym modelem został Dualsky Ecko V2 2814 970kV. Jego chwilowa moc maksymalna wynosi nawet do 400W, przy obciążeniu prądowym 33A. Zgodnie z zaleceniem producenta, dobrane do niego zostały śmigła 11x7.  
 
  \clearpage
 \subsection{Oprogramowanie kontrolera lotu}

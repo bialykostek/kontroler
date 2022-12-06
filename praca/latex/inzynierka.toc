@@ -3,32 +3,33 @@
 \contentsline {subsection}{\numberline {1.1}Koncepcja}{3}{}%
 \contentsline {subsection}{\numberline {1.2}Cel i zakres pracy}{3}{}%
 \contentsline {section}{\numberline {2}Wstęp teoretyczny}{5}{}%
-\contentsline {subsection}{\numberline {2.1}Rozwiązania dostępne na rynku}{5}{}%
-\contentsline {subsection}{\numberline {2.2}Technika lotu samolotem}{7}{}%
-\contentsline {subsection}{\numberline {2.3}Sztuczne sieci neuronowe}{7}{}%
-\contentsline {subsection}{\numberline {2.4}Budowa samolotów kompozytowych}{7}{}%
-\contentsline {subsection}{\numberline {2.5}Laminowanie ogniw fotowoltaicznych}{7}{}%
-\contentsline {subsection}{\numberline {2.6}State of the art}{7}{}%
-\contentsline {section}{\numberline {3}Implementacja rozwiązania}{8}{}%
-\contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{8}{}%
-\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{15}{}%
-\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{18}{}%
-\contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{23}{}%
-\contentsline {paragraph}{Algorytm estymacji trajektorii}{25}{}%
-\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{28}{}%
-\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{30}{}%
-\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{30}{}%
-\contentsline {paragraph}{Układ czteropanelowy}{31}{}%
-\contentsline {paragraph}{Strona: Wizualizacja}{33}{}%
-\contentsline {paragraph}{Strona: Mapa}{34}{}%
-\contentsline {paragraph}{Strona: Konsola}{34}{}%
-\contentsline {paragraph}{Strona: Konfiguracja}{35}{}%
-\contentsline {paragraph}{Strona: Ustawienia}{36}{}%
-\contentsline {paragraph}{Strona: Odtwarzacz}{36}{}%
-\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{37}{}%
-\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{45}{}%
-\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{47}{}%
-\contentsline {subsection}{\numberline {4.1}Podsumowanie wyników doświadczeń}{47}{}%
-\contentsline {subsection}{\numberline {4.2}Problemy}{47}{}%
-\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{47}{}%
-\contentsline {subsection}{\numberline {4.4}Wnioski}{47}{}%
+\contentsline {subsection}{\numberline {2.1}Technika sterowania samolotem}{5}{}%
+\contentsline {subsection}{\numberline {2.2}Rozwiązania dostępne na rynku}{6}{}%
+\contentsline {subsection}{\numberline {2.3}Przegląd literatury naukowej}{8}{}%
+\contentsline {section}{\numberline {3}Implementacja rozwiązania}{9}{}%
+\contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{9}{}%
+\contentsline {paragraph}{Wytworzenie elementów kompozytowych}{11}{}%
+\contentsline {paragraph}{Łączenie elementów}{14}{}%
+\contentsline {paragraph}{Kadłub}{15}{}%
+\contentsline {paragraph}{Złożenie samolotu}{16}{}%
+\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{18}{}%
+\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{22}{}%
+\contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{28}{}%
+\contentsline {paragraph}{Algorytm estymacji trajektorii}{30}{}%
+\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{33}{}%
+\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{35}{}%
+\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{35}{}%
+\contentsline {paragraph}{Układ czteropanelowy}{36}{}%
+\contentsline {paragraph}{Strona: Wizualizacja}{38}{}%
+\contentsline {paragraph}{Strona: Mapa}{39}{}%
+\contentsline {paragraph}{Strona: Konsola}{39}{}%
+\contentsline {paragraph}{Strona: Konfiguracja}{40}{}%
+\contentsline {paragraph}{Strona: Ustawienia}{41}{}%
+\contentsline {paragraph}{Strona: Odtwarzacz}{41}{}%
+\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{42}{}%
+\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{50}{}%
+\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{52}{}%
+\contentsline {subsection}{\numberline {4.1}Podsumowanie wyników doświadczeń}{52}{}%
+\contentsline {subsection}{\numberline {4.2}Problemy}{52}{}%
+\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{52}{}%
+\contentsline {subsection}{\numberline {4.4}Wnioski}{52}{}%

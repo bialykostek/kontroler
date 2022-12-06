@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 21.12) (preloaded format=pdflatex 2022.11.23)  5 DEC 2022 04:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 21.12) (preloaded format=pdflatex 2022.11.23)  6 DEC 2022 02:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -228,6 +228,13 @@ Package caption Info: float package is loaded.
 \sf@top=\skip57
 \sf@bottom=\skip58
 )
+(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\textcomp.sty
+Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
+)
 (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
 
@@ -251,32 +258,39 @@ Package: iftex 2020/03/06 v1.0d TeX engine tests
 \Gm@dimlist=\toks27
 
 (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+Package caption Info: Option `figurename' requires the `newfloat' package on in
+put line 29.
+
+(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/newfloat\newfloat.sty
+Package: newfloat 2019/09/02 v1.1l Defining new floating environments (AR)
+)
+(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/chngcntr\chngcntr.sty
+Package: chngcntr 2018/04/09 v1.1a change counter resetting
+Package chngcntr Info: \counterwithout already defined.
+(chngcntr)             Quitting chngcntr on input line 21.
+)
 (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdft
 ex.def
 File: l3backend-pdftex.def 2021-10-18 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count315
 \l__pdf_internal_box=\box55
-) (inzynierka.aux
-
-LaTeX Warning: Label `fig:example' multiply defined.
-
-)
+) (inzynierka.aux)
 \openout1 = `inzynierka.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 29.
-LaTeX Font Info:    ... okay on input line 29.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 29.
-LaTeX Font Info:    ... okay on input line 29.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 29.
-LaTeX Font Info:    ... okay on input line 29.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 29.
-LaTeX Font Info:    ... okay on input line 29.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 29.
-LaTeX Font Info:    ... okay on input line 29.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 29.
-LaTeX Font Info:    ... okay on input line 29.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 29.
-LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
 
 (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mki
 i
@@ -341,6 +355,7 @@ Package caption Info: End \AtBeginDocument code.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
+Package newfloat Info: `float' package detected.
 [1
 
 {C:/Users/User/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
@@ -349,355 +364,429 @@ Package caption Info: End \AtBeginDocument code.
 \openout3 = `inzynierka.toc'.
 
  [2]
-Overfull \hbox (3.70396pt too wide) in paragraph at lines 41--42
+Overfull \hbox (3.70396pt too wide) in paragraph at lines 51--52
 \T1/cmr/m/n/12 dzy-na-ro-do-wych za-wo-dach au-to-no-micz-nych bez-za-ªo-go-wyc
 h stat-ków po-wietrz-nych TU-
  []
 
-<images//osemka.png, id=13, 802.6583pt x 589.69244pt>
+<images//osemka.png, id=13, 999.47873pt x 589.69244pt>
 File: images//osemka.png Graphic file (type png)
 <use images//osemka.png>
-Package pdftex.def Info: images//osemka.png  used on input line 48.
-(pdftex.def)             Requested size: 426.79135pt x 313.55228pt.
+Package pdftex.def Info: images//osemka.png  used on input line 58.
+(pdftex.def)             Requested size: 426.79135pt x 251.8082pt.
 [3
 
 ] [4 <./images//osemka.png>]
-<images//kontrolery.png, id=23, 610.45085pt x 230.64894pt>
-File: images//kontrolery.png Graphic file (type png)
-<use images//kontrolery.png>
-Package pdftex.def Info: images//kontrolery.png  used on input line 89.
-(pdftex.def)             Requested size: 426.79135pt x 161.25606pt.
- [5
-
-]
-<images//missionplanner.jpg, id=27, 1012.78375pt x 600.2425pt>
-File: images//missionplanner.jpg Graphic file (type jpg)
-<use images//missionplanner.jpg>
-Package pdftex.def Info: images//missionplanner.jpg  used on input line 106.
-(pdftex.def)             Requested size: 426.79135pt x 252.94275pt.
- [6 <./images//kontrolery.png> <./images//missionplanner.jpg>] [7]
-<images//budowa1.jpg, id=36, 455.301pt x 209.583pt>
-File: images//budowa1.jpg Graphic file (type jpg)
-<use images//budowa1.jpg>
-Package pdftex.def Info: images//budowa1.jpg  used on input line 125.
-(pdftex.def)             Requested size: 426.79135pt x 196.46437pt.
-<images//xflr.png, id=37, 1284.8pt x 710.655pt>
-File: images//xflr.png Graphic file (type png)
-<use images//xflr.png>
-Package pdftex.def Info: images//xflr.png  used on input line 131.
-(pdftex.def)             Requested size: 426.79135pt x 236.06752pt.
-<images//fx60.png, id=38, 417.05812pt x 69.76062pt>
-File: images//fx60.png Graphic file (type png)
-<use images//fx60.png>
-Package pdftex.def Info: images//fx60.png  used on input line 137.
-(pdftex.def)             Requested size: 426.79135pt x 71.39224pt.
-<images//naca0008.png, id=39, 417.56pt x 56.21pt>
-File: images//naca0008.png Graphic file (type png)
-<use images//naca0008.png>
-Package pdftex.def Info: images//naca0008.png  used on input line 143.
-(pdftex.def)             Requested size: 426.79135pt x 57.45607pt.
-<images//budowa5.jpg, id=40, 1565.85pt x 720.6925pt>
-File: images//budowa5.jpg Graphic file (type jpg)
-<use images//budowa5.jpg>
-Package pdftex.def Info: images//budowa5.jpg  used on input line 150.
-(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
- [8
-
- <./images//budowa1.jpg>]
-<images//okablowany.png, id=45, 643.40375pt x 273.02pt>
-File: images//okablowany.png Graphic file (type png)
-<use images//okablowany.png>
-Package pdftex.def Info: images//okablowany.png  used on input line 157.
-(pdftex.def)             Requested size: 426.79135pt x 181.11026pt.
-<images//budowa7.jpg, id=46, 1565.85pt x 720.6925pt>
-File: images//budowa7.jpg Graphic file (type jpg)
-<use images//budowa7.jpg>
-Package pdftex.def Info: images//budowa7.jpg  used on input line 163.
-(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
- [9 <./images//xflr.png> <./images//fx60.png> <./images//naca0008.png>] [10 <./
-images//budowa5.jpg> <./images//okablowany.png>]
-<images//budowa9.jpg, id=56, 1565.85pt x 720.6925pt>
-File: images//budowa9.jpg Graphic file (type jpg)
-<use images//budowa9.jpg>
-Package pdftex.def Info: images//budowa9.jpg  used on input line 171.
-(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
-<images//budowa12.jpg, id=57, 1565.85pt x 720.6925pt>
-File: images//budowa12.jpg Graphic file (type jpg)
-<use images//budowa12.jpg>
-Package pdftex.def Info: images//budowa12.jpg  used on input line 181.
-(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
-<images//budowa13.jpg, id=58, 1565.85pt x 720.6925pt>
-File: images//budowa13.jpg Graphic file (type jpg)
-<use images//budowa13.jpg>
-Package pdftex.def Info: images//budowa13.jpg  used on input line 189.
-(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
- [11 <./images//budowa7.jpg>]
-<images//caly.png, id=62, 548.54938pt x 307.64937pt>
-File: images//caly.png Graphic file (type png)
-<use images//caly.png>
-Package pdftex.def Info: images//caly.png  used on input line 196.
-(pdftex.def)             Requested size: 426.79135pt x 239.36935pt.
-<images//budowa16.jpg, id=63, 1191.45125pt x 893.3375pt>
-File: images//budowa16.jpg Graphic file (type jpg)
-<use images//budowa16.jpg>
-Package pdftex.def Info: images//budowa16.jpg  used on input line 201.
-(pdftex.def)             Requested size: 426.79135pt x 320.0064pt.
- [12 <./images//budowa9.jpg> <./images//budowa12.jpg>] [13 <./images//budowa13.
-jpg>] [14 <./images//caly.png> <./images//budowa16.jpg>] [15
-
-]
-<images//leweprzetarte.jpg, id=81, 843.15pt x 632.3625pt>
-File: images//leweprzetarte.jpg Graphic file (type jpg)
-<use images//leweprzetarte.jpg>
-Package pdftex.def Info: images//leweprzetarte.jpg  used on input line 220.
-(pdftex.def)             Requested size: 192.0548pt x 144.0412pt.
-<images//praweprzetarte.jpg, id=82, 843.15pt x 632.3625pt>
-File: images//praweprzetarte.jpg Graphic file (type jpg)
-<use images//praweprzetarte.jpg>
-Package pdftex.def Info: images//praweprzetarte.jpg  used on input line 222.
-(pdftex.def)             Requested size: 192.0548pt x 144.0412pt.
-
-Overfull \hbox (3.6777pt too wide) in paragraph at lines 229--230
-[]\T1/cmr/m/n/12 Dodatkowym eks-pe-ry-men-tem prze-pro-wa-dzo-nym pod-czas ba-d
-a« byªo tak»e spraw-
+Overfull \hbox (6.68182pt too wide) in paragraph at lines 87--88
+[]\T1/cmr/m/n/12 Sterowanie sa-mo-lo-tem od-bywa si¦ przy po-mocy ele-men-tów n
+a-zy-wa-nych po-wierzch-
  []
 
-[16 <./images//leweprzetarte.jpg> <./images//praweprzetarte.jpg>]
-<images//porownanie1.jpg, id=87, 843.15pt x 632.3625pt>
+<images//osie.png, id=24, 1204.5pt x 534.99875pt>
+File: images//osie.png Graphic file (type png)
+<use images//osie.png>
+Package pdftex.def Info: images//osie.png  used on input line 91.
+(pdftex.def)             Requested size: 426.79135pt x 189.57077pt.
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 9
+3.
+(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\t1cmtt.fd
+File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+) [5
+
+ <./images//osie.png>]
+<images//kontrolery.png, id=30, 610.45085pt x 230.64894pt>
+File: images//kontrolery.png Graphic file (type png)
+<use images//kontrolery.png>
+Package pdftex.def Info: images//kontrolery.png  used on input line 119.
+(pdftex.def)             Requested size: 426.79135pt x 161.25606pt.
+ [6]
+<images//missionplanner.jpg, id=34, 1012.78375pt x 600.2425pt>
+File: images//missionplanner.jpg Graphic file (type jpg)
+<use images//missionplanner.jpg>
+Package pdftex.def Info: images//missionplanner.jpg  used on input line 131.
+(pdftex.def)             Requested size: 426.79135pt x 252.94275pt.
+ [7 <./images//kontrolery.png> <./images//missionplanner.jpg>] [8]
+
+Package caption Warning: \label without proper reference on input line 148.
+See the caption package documentation for explanation.
+
+
+LaTeX Warning: Reference `fig:eg4' on page 9 undefined on input line 143.
+
+<images//budowa1.jpg, id=43, 455.301pt x 209.583pt>
+File: images//budowa1.jpg Graphic file (type jpg)
+<use images//budowa1.jpg>
+Package pdftex.def Info: images//budowa1.jpg  used on input line 147.
+(pdftex.def)             Requested size: 426.79135pt x 196.46437pt.
+<images//xflr.png, id=44, 1284.8pt x 710.655pt>
+File: images//xflr.png Graphic file (type png)
+<use images//xflr.png>
+Package pdftex.def Info: images//xflr.png  used on input line 156.
+(pdftex.def)             Requested size: 426.79135pt x 236.06752pt.
+[9
+
+ <./images//budowa1.jpg>]
+<images//fx60.png, id=48, 417.05812pt x 69.76062pt>
+File: images//fx60.png Graphic file (type png)
+<use images//fx60.png>
+Package pdftex.def Info: images//fx60.png  used on input line 165.
+(pdftex.def)             Requested size: 426.79135pt x 71.39224pt.
+<images//naca0008.png, id=49, 417.56pt x 56.21pt>
+File: images//naca0008.png Graphic file (type png)
+<use images//naca0008.png>
+Package pdftex.def Info: images//naca0008.png  used on input line 175.
+(pdftex.def)             Requested size: 426.79135pt x 57.45607pt.
+ [10 <./images//xflr.png> <./images//fx60.png> <./images//naca0008.png>]
+<images//budowa5.jpg, id=56, 1565.85pt x 720.6925pt>
+File: images//budowa5.jpg Graphic file (type jpg)
+<use images//budowa5.jpg>
+Package pdftex.def Info: images//budowa5.jpg  used on input line 192.
+(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
+<images//okablowany.png, id=57, 643.40375pt x 273.02pt>
+File: images//okablowany.png Graphic file (type png)
+<use images//okablowany.png>
+Package pdftex.def Info: images//okablowany.png  used on input line 201.
+(pdftex.def)             Requested size: 426.79135pt x 181.11026pt.
+<images//budowa7.jpg, id=58, 1565.85pt x 720.6925pt>
+File: images//budowa7.jpg Graphic file (type jpg)
+<use images//budowa7.jpg>
+Package pdftex.def Info: images//budowa7.jpg  used on input line 210.
+(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
+ [11 <./images//budowa5.jpg>] [12 <./images//okablowany.png> <./images//budowa7
+.jpg>]
+<images//budowa9.jpg, id=66, 1565.85pt x 720.6925pt>
+File: images//budowa9.jpg Graphic file (type jpg)
+<use images//budowa9.jpg>
+Package pdftex.def Info: images//budowa9.jpg  used on input line 221.
+(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
+<images//budowa11.jpg, id=67, 455.301pt x 210.5685pt>
+File: images//budowa11.jpg Graphic file (type jpg)
+<use images//budowa11.jpg>
+Package pdftex.def Info: images//budowa11.jpg  used on input line 230.
+(pdftex.def)             Requested size: 426.79135pt x 197.38818pt.
+ [13 <./images//budowa9.jpg>]
+<images//budowa13.jpg, id=72, 1565.85pt x 720.6925pt>
+File: images//budowa13.jpg Graphic file (type jpg)
+<use images//budowa13.jpg>
+Package pdftex.def Info: images//budowa13.jpg  used on input line 242.
+(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
+ [14 <./images//budowa11.jpg> <./images//budowa13.jpg>]
+<images//podstawka.jpg, id=76, 1565.85pt x 720.6925pt>
+File: images//podstawka.jpg Graphic file (type jpg)
+<use images//podstawka.jpg>
+Package pdftex.def Info: images//podstawka.jpg  used on input line 251.
+(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
+<images//szkielet.jpg, id=77, 1565.85pt x 720.6925pt>
+File: images//szkielet.jpg Graphic file (type jpg)
+<use images//szkielet.jpg>
+Package pdftex.def Info: images//szkielet.jpg  used on input line 263.
+(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
+ [15 <./images//podstawka.jpg> <./images//szkielet.jpg>]
+<images//tyl.jpg, id=81, 1565.85pt x 720.6925pt>
+File: images//tyl.jpg Graphic file (type jpg)
+<use images//tyl.jpg>
+Package pdftex.def Info: images//tyl.jpg  used on input line 272.
+(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
+<images//przod.jpg, id=82, 1565.85pt x 720.6925pt>
+File: images//przod.jpg Graphic file (type jpg)
+<use images//przod.jpg>
+Package pdftex.def Info: images//przod.jpg  used on input line 281.
+(pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
+ [16 <./images//tyl.jpg> <./images//przod.jpg>]
+<images//dolotu.jpg, id=86, 4047.12pt x 1706.375pt>
+File: images//dolotu.jpg Graphic file (type jpg)
+<use images//dolotu.jpg>
+Package pdftex.def Info: images//dolotu.jpg  used on input line 295.
+(pdftex.def)             Requested size: 426.79135pt x 179.94275pt.
+<images//budowa16.jpg, id=87, 1191.45125pt x 893.3375pt>
+File: images//budowa16.jpg Graphic file (type jpg)
+<use images//budowa16.jpg>
+Package pdftex.def Info: images//budowa16.jpg  used on input line 302.
+(pdftex.def)             Requested size: 426.79135pt x 320.0064pt.
+ [17 <./images//dolotu.jpg>]
+<images//panelki.png, id=91, 1154.3125pt x 552.0625pt>
+File: images//panelki.png Graphic file (type png)
+<use images//panelki.png>
+Package pdftex.def Info: images//panelki.png  used on input line 314.
+(pdftex.def)             Requested size: 426.79135pt x 204.11671pt.
+
+
+LaTeX Warning: Reference `panelki' on page 18 undefined on input line 319.
+
+[18 <./images//budowa16.jpg>]
+<images//leweprzetarte.jpg, id=95, 843.15pt x 632.3625pt>
+File: images//leweprzetarte.jpg Graphic file (type jpg)
+<use images//leweprzetarte.jpg>
+Package pdftex.def Info: images//leweprzetarte.jpg  used on input line 327.
+(pdftex.def)             Requested size: 192.0548pt x 144.0412pt.
+<images//praweprzetarte.jpg, id=96, 843.15pt x 632.3625pt>
+File: images//praweprzetarte.jpg Graphic file (type jpg)
+<use images//praweprzetarte.jpg>
+Package pdftex.def Info: images//praweprzetarte.jpg  used on input line 329.
+(pdftex.def)             Requested size: 192.0548pt x 144.0412pt.
+ [19 <./images//panelki.png>]
+<images//porownanie1.jpg, id=105, 843.15pt x 632.3625pt>
 File: images//porownanie1.jpg Graphic file (type jpg)
 <use images//porownanie1.jpg>
-Package pdftex.def Info: images//porownanie1.jpg  used on input line 233.
+Package pdftex.def Info: images//porownanie1.jpg  used on input line 342.
 (pdftex.def)             Requested size: 192.0548pt x 144.0412pt.
-<images//porownanie2.jpg, id=88, 843.15pt x 632.3625pt>
+<images//porownanie2.jpg, id=106, 843.15pt x 632.3625pt>
 File: images//porownanie2.jpg Graphic file (type jpg)
 <use images//porownanie2.jpg>
-Package pdftex.def Info: images//porownanie2.jpg  used on input line 235.
+Package pdftex.def Info: images//porownanie2.jpg  used on input line 344.
 (pdftex.def)             Requested size: 192.0548pt x 144.0412pt.
- [17 <./images//porownanie1.jpg> <./images//porownanie2.jpg>] [18]
-<images//plytkastara.png, id=95, 606.76688pt x 336.25626pt>
+ [20 <./images//leweprzetarte.jpg> <./images//praweprzetarte.jpg>]
+<images//kamerat.png, id=110, 214.30063pt x 166.12062pt>
+File: images//kamerat.png Graphic file (type png)
+<use images//kamerat.png>
+Package pdftex.def Info: images//kamerat.png  used on input line 355.
+(pdftex.def)             Requested size: 192.0548pt x 148.876pt.
+File: images//kamerat.png Graphic file (type png)
+<use images//kamerat.png>
+Package pdftex.def Info: images//kamerat.png  used on input line 357.
+(pdftex.def)             Requested size: 192.0548pt x 148.876pt.
+ [21 <./images//porownanie1.jpg> <./images//porownanie2.jpg> <./images//kamerat
+.png>] [22] [23]
+<images//plytkastara.png, id=121, 606.76688pt x 336.25626pt>
 File: images//plytkastara.png Graphic file (type png)
 <use images//plytkastara.png>
-Package pdftex.def Info: images//plytkastara.png  used on input line 261.
+Package pdftex.def Info: images//plytkastara.png  used on input line 391.
 (pdftex.def)             Requested size: 426.79135pt x 236.52194pt.
-<images//pcb.png, id=96, 607.26875pt x 350.81062pt>
+
+Overfull \hbox (1.6492pt too wide) in paragraph at lines 396--397
+[]\T1/cmr/m/n/12 Przygotowany pro-jekt jest dwu-stronn¡ pªytk¡ PCB o wy-mia-rac
+h 90mm na 50mm.
+ []
+
+<images//pcb.png, id=122, 607.26875pt x 350.81062pt>
 File: images//pcb.png Graphic file (type png)
 <use images//pcb.png>
-Package pdftex.def Info: images//pcb.png  used on input line 267.
+Package pdftex.def Info: images//pcb.png  used on input line 400.
 (pdftex.def)             Requested size: 426.79135pt x 246.55605pt.
-<images//kontorolerstary.png, id=97, 516.42938pt x 241.40187pt>
+
+Overfull \hbox (2.40433pt too wide) in paragraph at lines 405--406
+\T1/cmr/m/n/12 zo-staªy gniazda »e«-skie typu gold-pin ra-ster 2.54mm, które s¡
+ kom-pa-ty-bilne ze wszyst-
+ []
+
+<images//kontorolerstary.png, id=123, 516.42938pt x 241.40187pt>
 File: images//kontorolerstary.png Graphic file (type png)
 <use images//kontorolerstary.png>
-Package pdftex.def Info: images//kontorolerstary.png  used on input line 273.
+Package pdftex.def Info: images//kontorolerstary.png  used on input line 409.
 (pdftex.def)             Requested size: 426.79135pt x 199.50893pt.
-<images//alti.jpg, id=98, 1445.4pt x 632.3625pt>
+[24 <./images//plytkastara.png>]
+<images//alti.jpg, id=128, 1445.4pt x 632.3625pt>
 File: images//alti.jpg Graphic file (type jpg)
 <use images//alti.jpg>
-Package pdftex.def Info: images//alti.jpg  used on input line 279.
+Package pdftex.def Info: images//alti.jpg  used on input line 418.
 (pdftex.def)             Requested size: 426.79135pt x 186.719pt.
-<images//dodokontroler.jpg, id=99, 1565.85pt x 720.6925pt>
+
+
+LaTeX Warning: Reference `fig:dodokontroler' on page 25 undefined on input line
+ 423.
+
+<images//dodokontroler.jpg, id=129, 1565.85pt x 720.6925pt>
 File: images//dodokontroler.jpg Graphic file (type jpg)
 <use images//dodokontroler.jpg>
-Package pdftex.def Info: images//dodokontroler.jpg  used on input line 285.
+Package pdftex.def Info: images//dodokontroler.jpg  used on input line 427.
 (pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
- [19] [20 <./images//plytkastara.png>] [21 <./images//pcb.png> <./images//konto
-rolerstary.png>] [22 <./images//alti.jpg> <./images//dodokontroler.jpg>]
-<images//diagramy.png, id=116, 597.11606pt x 513.39345pt>
+[25 <./images//pcb.png>] [26 <./images//kontorolerstary.png> <./images//alti.jp
+g>] [27 <./images//dodokontroler.jpg>]
+<images//diagramy.png, id=142, 597.11606pt x 513.39345pt>
 File: images//diagramy.png Graphic file (type png)
 <use images//diagramy.png>
-Package pdftex.def Info: images//diagramy.png  used on input line 304.
+Package pdftex.def Info: images//diagramy.png  used on input line 448.
 (pdftex.def)             Requested size: 426.79135pt x 366.95601pt.
- [23
+ [28
 
- <./images//diagramy.png>]
-[24]
-<images//nextwaypoint.png, id=126, 1927.2pt x 1084.05pt>
+ <./images//diagramy.png>] [29]
+<images//nextwaypoint.png, id=152, 1927.2pt x 1084.05pt>
 File: images//nextwaypoint.png Graphic file (type png)
 <use images//nextwaypoint.png>
-Package pdftex.def Info: images//nextwaypoint.png  used on input line 349.
+Package pdftex.def Info: images//nextwaypoint.png  used on input line 493.
 (pdftex.def)             Requested size: 426.79135pt x 240.06316pt.
- [25] [26 <./images//nextwaypoint.png>]
-<images//angles.png, id=138, 1927.2pt x 1084.05pt>
+
+[30] [31 <./images//nextwaypoint.png>]
+<images//angles.png, id=164, 1927.2pt x 1084.05pt>
 File: images//angles.png Graphic file (type png)
 <use images//angles.png>
-Package pdftex.def Info: images//angles.png  used on input line 372.
+Package pdftex.def Info: images//angles.png  used on input line 516.
 (pdftex.def)             Requested size: 426.79135pt x 240.06316pt.
- [27 <./images//angles.png>]
-<images//estymacja.png, id=143, 259.46938pt x 203.25937pt>
+ [32 <./images//angles.png>]
+<images//estymacja.png, id=169, 259.46938pt x 203.25937pt>
 File: images//estymacja.png Graphic file (type png)
 <use images//estymacja.png>
-Package pdftex.def Info: images//estymacja.png  used on input line 391.
+Package pdftex.def Info: images//estymacja.png  used on input line 535.
 (pdftex.def)             Requested size: 426.79135pt x 334.371pt.
-<images//stacjaodbiorcza.jpg, id=144, 1565.85pt x 720.6925pt>
+<images//stacjaodbiorcza.jpg, id=170, 1565.85pt x 720.6925pt>
 File: images//stacjaodbiorcza.jpg Graphic file (type jpg)
 <use images//stacjaodbiorcza.jpg>
-Package pdftex.def Info: images//stacjaodbiorcza.jpg  used on input line 400.
+Package pdftex.def Info: images//stacjaodbiorcza.jpg  used on input line 544.
 (pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
-<images//diagram_env.png, id=145, 1286.30562pt x 334.75063pt>
+<images//diagram_env.png, id=171, 1286.30562pt x 334.75063pt>
 File: images//diagram_env.png Graphic file (type png)
 <use images//diagram_env.png>
-Package pdftex.def Info: images//diagram_env.png  used on input line 407.
+Package pdftex.def Info: images//diagram_env.png  used on input line 551.
 (pdftex.def)             Requested size: 426.79135pt x 111.07077pt.
-
-[28 <./images//estymacja.png>] [29 <./images//stacjaodbiorcza.jpg> <./images//d
-iagram_env.png>]
-<images//starysystem.png, id=154, 955.06813pt x 343.78438pt>
+ [33 <./images//estymacja.png>] [34 <./images//stacjaodbiorcza.jpg> <./images//
+diagram_env.png>]
+<images//starysystem.png, id=180, 955.06813pt x 343.78438pt>
 File: images//starysystem.png Graphic file (type png)
 <use images//starysystem.png>
-Package pdftex.def Info: images//starysystem.png  used on input line 438.
+Package pdftex.def Info: images//starysystem.png  used on input line 582.
 (pdftex.def)             Requested size: 426.79135pt x 153.62616pt.
- [30]
-<images//weball.png, id=158, 963.6pt x 472.76625pt>
+ [35]
+<images//weball.png, id=184, 963.6pt x 472.76625pt>
 File: images//weball.png Graphic file (type png)
 <use images//weball.png>
-Package pdftex.def Info: images//weball.png  used on input line 448.
+Package pdftex.def Info: images//weball.png  used on input line 592.
 (pdftex.def)             Requested size: 426.79135pt x 209.38841pt.
- [31 <./images//starysystem.png> <./images//weball.png>]
-<images//przedlotem.png, id=165, 962.59625pt x 471.7625pt>
+ [36 <./images//starysystem.png> <./images//weball.png>]
+<images//przedlotem.png, id=190, 962.59625pt x 471.7625pt>
 File: images//przedlotem.png Graphic file (type png)
 <use images//przedlotem.png>
-Package pdftex.def Info: images//przedlotem.png  used on input line 467.
+Package pdftex.def Info: images//przedlotem.png  used on input line 611.
 (pdftex.def)             Requested size: 426.79135pt x 209.167pt.
-<images//podczaslotu.png, id=166, 962.59625pt x 471.26062pt>
+<images//podczaslotu.png, id=191, 962.59625pt x 471.26062pt>
 File: images//podczaslotu.png Graphic file (type png)
 <use images//podczaslotu.png>
-Package pdftex.def Info: images//podczaslotu.png  used on input line 473.
+Package pdftex.def Info: images//podczaslotu.png  used on input line 617.
 (pdftex.def)             Requested size: 426.79135pt x 208.94449pt.
-<images//polocie.png, id=167, 963.6pt x 470.25688pt>
+<images//polocie.png, id=192, 963.6pt x 470.25688pt>
 File: images//polocie.png Graphic file (type png)
 <use images//polocie.png>
-Package pdftex.def Info: images//polocie.png  used on input line 479.
+Package pdftex.def Info: images//polocie.png  used on input line 623.
 (pdftex.def)             Requested size: 426.79135pt x 208.27702pt.
-
-[32 <./images//przedlotem.png>] [33 <./images//podczaslotu.png> <./images//polo
-cie.png>]
-<images//wizualizacja.png, id=177, 830.10126pt x 260.47313pt>
+ [37 <./images//przedlotem.png>] [38 <./images//podczaslotu.png> <./images//pol
+ocie.png>]
+<images//wizualizacja.png, id=203, 830.10126pt x 260.47313pt>
 File: images//wizualizacja.png Graphic file (type png)
 <use images//wizualizacja.png>
-Package pdftex.def Info: images//wizualizacja.png  used on input line 491.
+Package pdftex.def Info: images//wizualizacja.png  used on input line 635.
 (pdftex.def)             Requested size: 426.79135pt x 133.9206pt.
-<images//mapa.png, id=178, 441.65pt x 259.46938pt>
+<images//mapa.png, id=204, 441.65pt x 259.46938pt>
 File: images//mapa.png Graphic file (type png)
 <use images//mapa.png>
-Package pdftex.def Info: images//mapa.png  used on input line 501.
+Package pdftex.def Info: images//mapa.png  used on input line 645.
 (pdftex.def)             Requested size: 426.79135pt x 250.75061pt.
- [34 <./images//wizualizacja.png> <./images//mapa.png>]
-<images//konsola.png, id=184, 537.50812pt x 272.51813pt>
+
+[39 <./images//wizualizacja.png> <./images//mapa.png>]
+<images//konsola.png, id=210, 537.50812pt x 272.51813pt>
 File: images//konsola.png Graphic file (type png)
 <use images//konsola.png>
-Package pdftex.def Info: images//konsola.png  used on input line 512.
+Package pdftex.def Info: images//konsola.png  used on input line 656.
 (pdftex.def)             Requested size: 426.79135pt x 216.38474pt.
-<images//config.png, id=185, 833.1125pt x 363.3575pt>
+<images//config.png, id=211, 833.1125pt x 363.3575pt>
 File: images//config.png Graphic file (type png)
 <use images//config.png>
-Package pdftex.def Info: images//config.png  used on input line 522.
+Package pdftex.def Info: images//config.png  used on input line 666.
 (pdftex.def)             Requested size: 426.79135pt x 186.14153pt.
- [35 <./images//konsola.png>]
-<images//settings.png, id=189, 356.83313pt x 136.00812pt>
+ [40 <./images//konsola.png>]
+<images//settings.png, id=215, 356.83313pt x 136.00812pt>
 File: images//settings.png Graphic file (type png)
 <use images//settings.png>
-Package pdftex.def Info: images//settings.png  used on input line 532.
+Package pdftex.def Info: images//settings.png  used on input line 676.
 (pdftex.def)             Requested size: 426.79135pt x 162.6818pt.
- [36 <./images//config.png> <./images//settings.png>]
-<images//player.png, id=195, 556.0775pt x 168.63pt>
+ [41 <./images//config.png> <./images//settings.png>]
+<images//player.png, id=221, 556.0775pt x 168.63pt>
 File: images//player.png Graphic file (type png)
 <use images//player.png>
-Package pdftex.def Info: images//player.png  used on input line 543.
+Package pdftex.def Info: images//player.png  used on input line 687.
 (pdftex.def)             Requested size: 426.79135pt x 129.42607pt.
- [37 <./images//player.png>]
-<images//kacperlata.jpg, id=201, 1565.85pt x 720.6925pt>
+ [42 <./images//player.png>]
+<images//kacperlata.jpg, id=226, 1565.85pt x 720.6925pt>
 File: images//kacperlata.jpg Graphic file (type jpg)
 <use images//kacperlata.jpg>
-Package pdftex.def Info: images//kacperlata.jpg  used on input line 559.
+Package pdftex.def Info: images//kacperlata.jpg  used on input line 703.
 (pdftex.def)             Requested size: 426.79135pt x 196.42606pt.
- [38 <./images//kacperlata.jpg>]
-<images//siec.png, id=205, 597.11606pt x 671.36066pt>
+ [43 <./images//kacperlata.jpg>]
+<images//siec.png, id=231, 597.11606pt x 671.36066pt>
 File: images//siec.png Graphic file (type png)
 <use images//siec.png>
-Package pdftex.def Info: images//siec.png  used on input line 569.
+Package pdftex.def Info: images//siec.png  used on input line 713.
 (pdftex.def)             Requested size: 426.79135pt x 479.86557pt.
- [39 <./images//siec.png>]
-<images//tfloss.png, id=210, 735.7086pt x 346.896pt>
+ [44 <./images//siec.png>]
+<images//tfloss.png, id=236, 735.7086pt x 346.896pt>
 File: images//tfloss.png Graphic file (type png)
 <use images//tfloss.png>
-Package pdftex.def Info: images//tfloss.png  used on input line 580.
+Package pdftex.def Info: images//tfloss.png  used on input line 724.
 (pdftex.def)             Requested size: 426.79135pt x 201.24216pt.
-
-[40 <./images//tfloss.png>] [41]
-<images//siecmatlab.png, id=218, 288.07625pt x 90.3375pt>
+ [45 <./images//tfloss.png>] [46]
+<images//siecmatlab.png, id=244, 288.07625pt x 90.3375pt>
 File: images//siecmatlab.png Graphic file (type png)
 <use images//siecmatlab.png>
-Package pdftex.def Info: images//siecmatlab.png  used on input line 621.
+Package pdftex.def Info: images//siecmatlab.png  used on input line 765.
 (pdftex.def)             Requested size: 426.79135pt x 133.84212pt.
-<images//performance.png, id=219, 1055.44313pt x 474.27188pt>
+<images//performance.png, id=245, 1055.44313pt x 474.27188pt>
 File: images//performance.png Graphic file (type png)
 <use images//performance.png>
-Package pdftex.def Info: images//performance.png  used on input line 630.
+Package pdftex.def Info: images//performance.png  used on input line 774.
 (pdftex.def)             Requested size: 426.79135pt x 191.78235pt.
-<images//training_state.png, id=220, 903.375pt x 474.27188pt>
+<images//training_state.png, id=246, 903.375pt x 474.27188pt>
 File: images//training_state.png Graphic file (type png)
 <use images//training_state.png>
-Package pdftex.def Info: images//training_state.png  used on input line 636.
+Package pdftex.def Info: images//training_state.png  used on input line 780.
 (pdftex.def)             Requested size: 426.79135pt x 224.0657pt.
-<images//nnh.png, id=221, 1043.9pt x 509.40312pt>
+<images//nnh.png, id=247, 1043.9pt x 509.40312pt>
 File: images//nnh.png Graphic file (type png)
 <use images//nnh.png>
-Package pdftex.def Info: images//nnh.png  used on input line 644.
+Package pdftex.def Info: images//nnh.png  used on input line 788.
 (pdftex.def)             Requested size: 426.79135pt x 208.26588pt.
- [42 <./images//siecmatlab.png>] [43 <./images//performance.png (PNG copy)> <./
-images//training_state.png (PNG copy)>]
-[44 <./images//nnh.png>]
-<images//aileci1.png, id=234, 342.27875pt x 249.93375pt>
+ [47 <./images//siecmatlab.png>] [48 <./images//performance.png (PNG copy)> <./
+images//training_state.png (PNG copy)>] [49 <./images//nnh.png>]
+<images//aileci1.png, id=260, 342.27875pt x 249.93375pt>
 File: images//aileci1.png Graphic file (type png)
 <use images//aileci1.png>
-Package pdftex.def Info: images//aileci1.png  used on input line 655.
+Package pdftex.def Info: images//aileci1.png  used on input line 799.
 (pdftex.def)             Requested size: 426.79135pt x 311.66893pt.
-<images//aileci2.png, id=235, 339.2675pt x 248.93pt>
+<images//aileci2.png, id=261, 339.2675pt x 248.93pt>
 File: images//aileci2.png Graphic file (type png)
 <use images//aileci2.png>
-Package pdftex.def Info: images//aileci2.png  used on input line 661.
+Package pdftex.def Info: images//aileci2.png  used on input line 805.
 (pdftex.def)             Requested size: 426.79135pt x 313.16345pt.
- [45
+ [50
 
  <./images//aileci1.png>]
-<images//aileci3.png, id=240, 339.2675pt x 249.93375pt>
+<images//aileci3.png, id=266, 339.2675pt x 249.93375pt>
 File: images//aileci3.png Graphic file (type png)
 <use images//aileci3.png>
-Package pdftex.def Info: images//aileci3.png  used on input line 667.
+Package pdftex.def Info: images//aileci3.png  used on input line 811.
 (pdftex.def)             Requested size: 426.79135pt x 314.42622pt.
- [46 <./images//aileci2.png> <./images//aileci3.png>] [47] (inzynierka.aux)
+ [51 <./images//aileci2.png> <./images//aileci3.png>] [52] (inzynierka.aux)
 
-LaTeX Warning: There were multiply-defined labels.
+LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 6466 strings out of 478659
- 111622 string characters out of 2846393
- 423529 words of memory out of 3000000
- 24508 multiletter control sequences out of 15000+600000
- 416234 words of font info for 55 fonts, out of 8000000 for 9000
+ 6893 strings out of 478659
+ 120271 string characters out of 2846393
+ 427572 words of memory out of 3000000
+ 24917 multiletter control sequences out of 15000+600000
+ 417694 words of font info for 60 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 69i,14n,79p,2737b,403s stack positions out of 5000i,500n,10000p,200000b,80000s
- <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1
-000.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\
-tcrm1200.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dp
-i600\ecbx1440.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/
-ec/dpi600\ecbx1200.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jkna
-ppen/ec/dpi600\ecbx1728.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour
-/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/l
-jfour/jknappen/ec/dpi600\ecrm1440.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts
-/pk/ljfour/jknappen/ec/dpi600\ecrm2074.pk><C:/Users/User/AppData/Local/Programs
-/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/User/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/User/AppDat
-a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/User
-/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Use
-rs/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><
-C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8
-.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/c
-m/cmsy10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
-sfonts/cm/cmsy8.pfb>
-Output written on inzynierka.pdf (47 pages, 11789697 bytes).
+ 69i,14n,79p,1603b,414s stack positions out of 5000i,500n,10000p,200000b,80000s
+ <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1
+200.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\
+ectt1095.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dp
+i600\ecrm1095.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/
+ec/dpi600\ecbx1440.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour/jkna
+ppen/ec/dpi600\ecbx1200.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/ljfour
+/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts/pk/l
+jfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\User\AppData\Local\MiKTeX\fonts
+/pk/ljfour/jknappen/ec/dpi600\ecrm1440.pk> <C:\Users\User\AppData\Local\MiKTeX\
+fonts/pk/ljfour/jknappen/ec/dpi600\ecrm2074.pk><C:/Users/User/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/User/AppData/L
+ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/User/A
+ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users
+/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C
+:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.
+pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm
+/cmr8.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
+nts/cm/cmsy10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/publ
+ic/amsfonts/cm/cmsy8.pfb>
+Output written on inzynierka.pdf (52 pages, 15067005 bytes).
 PDF statistics:
- 572 PDF objects out of 1000 (max. 8388607)
+ 713 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 256 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 291 words of extra memory for PDF output out of 10000 (max. 10000000)
 
