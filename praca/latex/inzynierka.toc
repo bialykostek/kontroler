@@ -11,25 +11,25 @@
 \contentsline {paragraph}{Wytworzenie elementów kompozytowych}{11}{}%
 \contentsline {paragraph}{Łączenie elementów}{14}{}%
 \contentsline {paragraph}{Kadłub}{15}{}%
-\contentsline {paragraph}{Złożenie samolotu}{16}{}%
+\contentsline {paragraph}{Złożenie samolotu}{17}{}%
 \contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{18}{}%
 \contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{22}{}%
 \contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{28}{}%
 \contentsline {paragraph}{Algorytm estymacji trajektorii}{30}{}%
-\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{33}{}%
+\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{34}{}%
 \contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{35}{}%
-\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{35}{}%
-\contentsline {paragraph}{Układ czteropanelowy}{36}{}%
-\contentsline {paragraph}{Strona: Wizualizacja}{38}{}%
-\contentsline {paragraph}{Strona: Mapa}{39}{}%
-\contentsline {paragraph}{Strona: Konsola}{39}{}%
-\contentsline {paragraph}{Strona: Konfiguracja}{40}{}%
-\contentsline {paragraph}{Strona: Ustawienia}{41}{}%
-\contentsline {paragraph}{Strona: Odtwarzacz}{41}{}%
-\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{42}{}%
-\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{50}{}%
-\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{52}{}%
-\contentsline {subsection}{\numberline {4.1}Podsumowanie wyników doświadczeń}{52}{}%
-\contentsline {subsection}{\numberline {4.2}Problemy}{52}{}%
-\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{52}{}%
-\contentsline {subsection}{\numberline {4.4}Wnioski}{52}{}%
+\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{36}{}%
+\contentsline {paragraph}{Układ czteropanelowy}{37}{}%
+\contentsline {paragraph}{Strona: Wizualizacja}{39}{}%
+\contentsline {paragraph}{Strona: Mapa}{40}{}%
+\contentsline {paragraph}{Strona: Konsola}{41}{}%
+\contentsline {paragraph}{Strona: Konfiguracja}{41}{}%
+\contentsline {paragraph}{Strona: Ustawienia}{42}{}%
+\contentsline {paragraph}{Strona: Odtwarzacz}{42}{}%
+\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{43}{}%
+\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{51}{}%
+\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{54}{}%
+\contentsline {subsection}{\numberline {4.1}Podsumowanie efektów prac}{54}{}%
+\contentsline {subsection}{\numberline {4.2}Problemy}{54}{}%
+\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{55}{}%
+\contentsline {subsection}{\numberline {4.4}Wnioski}{56}{}%

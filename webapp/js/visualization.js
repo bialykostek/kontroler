@@ -215,7 +215,7 @@ function visualizationFrame(){
     ctx.arc(visRightColumn[0], visRightColumn[1], 30, 0, 2 * Math.PI, false);
     ctx.fillStyle = '#00add4';
     ctx.fill();
-/*
+
     //next waypoint line
     ctx.beginPath();
     ctx.lineWidth = 1;
@@ -291,7 +291,7 @@ function visualizationFrame(){
         ctx.strokeStyle = "#FFFF00";
         ctx.stroke();
     }
-    */
+    
 }
 
 function visualizationInit(){
