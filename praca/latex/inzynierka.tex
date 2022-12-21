@@ -15,6 +15,7 @@
 \usepackage{subfig}
 \usepackage{url}
 \usepackage{textcomp}
+\usepackage{pdfpages}
 \usepackage
 [
         a4paper,
@@ -43,7 +44,8 @@
 \begin{document}
 
 \onehalfspacing
-\maketitle
+\includepdf[pages={1}]{tytulowa.pdf}
+
 \newpage
 \tableofcontents
 
@@ -52,10 +54,12 @@
 \section{Wprowadzenie}
 \subsection{Koncepcja}
 
-Pomysł na stworzenie autorskiego kontrolera lotu powstał w Studenckim Kole Naukowym AGH Solar Plane podczas przygotowań do odbywających się co roku międzynarodowych zawodów autonomicznych bezzałogowych statków powietrznych TUBITAK w Turcji. Z uwagi na dodatkowe punkty w ocenie finałowej za autorskie rozwiązania systemów pokładowych, podjęte zostały pierwsze próby przygotowania koncepcji takiego modułu. Jedną z misji konkursowych było wykonanie przez autonomiczny statek powietrzny trasy "leniwej ósemki" pomiędzy dwoma kolumnami. Postawione zostało więc pytanie: w jaki sposób można by przelać doświadczenie pilotów modeli samolotów (którzy są w stanie bardzo szybko i optymalnie pokonać trasę sterując samolotem manualnie) na system kontroli lotu? Jednym z pomysłów było wykorzystanie w tym celu algorytmów nauczania maszynowego, konkretnie treningu sztucznej sieci neuronowej. Projekt ostatecznie nie został rozwinięty przed wspomnianymi zawodami, czas na jego realizację przyszedł w późniejszym terminie, jednak część celów i założeń została zapożyczona z regulaminu.
+Bezzałogowe statki powietrzne w ostatnich latach zyskały bardzo dużą popularność z uwagi na rosnącą dostępność tego typu produktów ich malejące koszty. Wielowirnikowe drony stały się powszechne w komercyjnym zastosowaniu ze względu na łatwość obsługi i sterowania, również małe samoloty znajdują zastosowanie cywilne jak i militarne. Wraz z rozwojem automatyzacji i samodzielności urządzeń, pojawiła się konieczność rozwoju systemów autonomicznych do planowania i wykonywania misji statkami powietrznymi.
+
+Pomysł na stworzenie autorskiego kontrolera lotu powstał w Studenckim Kole Naukowym AGH Solar Plane podczas przygotowań do odbywających się co roku międzynarodowych zawodów autonomicznych bezzałogowych statków powietrznych TUBITAK w Turcji. Z uwagi na dodatkowe punkty w ocenie finałowej za autorskie rozwiązania systemów pokładowych, podjęte zostały pierwsze próby przygotowania koncepcji takiego modułu. Jedną z misji konkursowych było wykonanie przez autonomiczny statek powietrzny trasy "leniwej ósemki" pomiędzy dwoma kolumnami. Postawione zostało więc pytanie: w jaki sposób można by przelać doświadczenie pilotów modeli samolotów (którzy są w stanie bardzo szybko i optymalnie pokonać trasę sterując samolotem manualnie) na system kontroli lotu? Jednym z pomysłów było wykorzystanie w tym celu algorytmów uczenia maszynowego, konkretnie treningu sztucznej sieci neuronowej. Projekt ostatecznie nie został rozwinięty przed wspomnianymi zawodami, czas na jego realizację przyszedł w późniejszym terminie, jednak część celów i założeń została zapożyczona z regulaminu.
 
 \subsection{Cel i zakres pracy}
-Podstawowym założeniem projektu jest przygotowanie kontrolera lotu, który za pomocą sieci neuronowej będzie w autonomiczny sposób sterować modelem samolotu w taki sposób, aby ten wykonał trasę ósemki pomiędzy dwoma kolumnami, jak pokazano na rysunku \ref{fig:osemka}. Odległość między nimi wynosi 80 metrów. Dodatkowo samolot nie może przekroczyć wyznaczonego obszaru o wymiarach 120 na 170 metrów.
+Podstawowym założeniem projektu jest przygotowanie platformy testowej i kontrolera lotu, który za pomocą sieci neuronowej będzie w autonomiczny sposób sterować modelem samolotu. Docelowo ma on wykonać trasę ósemki pomiędzy dwoma kolumnami, jak pokazano na rysunku \ref{fig:osemka}. Odległość między nimi wynosi 80 metrów. Dodatkowo samolot nie może przekroczyć wyznaczonego obszaru o wymiarach 120 na 170 metrów.
 
 \begin{figure}[ht]
     \centering
@@ -80,17 +84,29 @@ Przygotowanie opisanego algorytmu wiąże się z koniecznością przygotowania s
 
 Poniższa praca zawiera opis wiedzy potrzebnej do zrozumienia opisu działań wykonywanych w części implementacyjnej, przegląd literatury naukowej i istniejących rozwiązań, opis procesu wdrożenia wymienionych powyżej elementów, a także omówienie rezultatu i podsumowanie wniosków.
 
-\textbf{Uwaga}: określenie ``środowisko'' używane w poniższej pracy, w kontekście stworzonych programów, odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej. Warto również wspomnieć o wieloznaczności często używanego słowa ``model''. Model samolotu jest określeniem zdalnie sterowanego bezzałogowego statku powietrznego, którego wymiary nie przekraczają kilku metrów. Innym często padającym znaczeniem tego słowa jest odniesienie do modelu sztucznej inteligencji, który oznacza pewną konkretną instancję struktury danych wyniku nauczania maszynowego, w tym przypadku sieci neuronowej.
+\textbf{Uwaga}: określenie ``środowisko'' używane w poniższej pracy, w kontekście stworzonych programów, odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej.
 
 \clearpage
 \section{Wstęp teoretyczny}
 
+\subsection{Budowa modeli samolotów kompozytowych}
+Mimo, że historia lotnictwa sięga końca XIX wieku, zainteresowanie tworzeniem modeli samolotów, czyli dziedziną nazywaną potocznie modelarstwem, narodziło się niedługo później i ma tradycję od ponad 100 lat. Rozwój mobilnej elektroniki z czasem pozwolił na upowszechnienie możliwości zdalnego sterowania tego typu konstrukcjami. Najpopularniejszym surowcem używanym do wytworzenia modeli samolotów jest drewno w postaci sklejki modelarskiej, balsy czy listewek sosnowych. Skrzydła takiego samolotu mają najczęściej konstrukcję żeberkową, na którą nakładany jest materiał tworzący ich powierzchnię, przykładowo folia termokurczliwa lub odpowiednia bibuła. Bardziej zaawansowanym rozwiązaniem wykonania skrzydeł jest wykorzystanie materiałów kompozytowych, które z definicji składają się z dwóch chemicznie różnych substancji połączonych ze sobą na poziomie makroskopowym, a co najważniejsze, posiadają lepsze własności materiałowe niż każda składowa osobno. W modelarstwie stosowanymi materiałami są najczęściej tkaniny szklane, węglowe oraz aramidowe (znane też jako Kevlar) umieszczone w osnowie z żywicy epoksydowej. Proces wytworzenia takiego kompozytu można przeprowadzić nawet w domowym warsztacie, jednak jest on dużo bardziej złożony i wiąże się z większymi kosztami. Elementy kompozytowe charakteryzują się zdecydowanie lepszymi własnościami wytrzymałościowymi - są twardsze i sztywniejsze, równocześnie zachowując mniejszą masę. Najlepsze parametry z nich mają skrzydła węglowe, wykonane z tkanin takich jak TeXtreme, jednak w porównaniu do tkanin szklanych są one o rzędy wielkości bardziej kosztowne. Wersje aero, dedykowane do zastosowań lotniczych, są dodatkowo prasowane, co przekłada się na finalną lepszą powierzchnię skrzydeł. 
+
+Winglety są końcowymi fragmentami skrzydeł, które są wzniesione o dodatkowy kąt i mają za zadanie rozpraszanie wirów indukcyjnych (zaburzeń ruchu powietrza) co poprawia osiągi aerodynamiczne samolotu, a także wspomaga stabilizację lotu.
+
+Pierwszym krokiem w procesie wykonania skrzydeł kompozytowych jest przygotowanie brytu, czyli bryły odpowiadającej geometrii według projektu. Bryt taki może zostać wycięty przy pomocy gorącego drutu lub wyfrezowany, przykładowo ze styroduru (polistyrenu ekstrudowanego), używanego w budownictwie do ocieplania budynków. Gotowy bryt poddany jest procesowi laminowania wybranymi materiałami i finalnie służy jako wypełnienie utrzymujące kształt oraz sztywność. Wypłukanie go jest możliwe przy pomocy acetonu, jednak należy wtedy dodatkowo wzmocnić konstrukcję, na przykład żeberkami. W podobny sposób wykonać można kompozytowy kadłub, jednakże należy zwrócić uwagę na fakt, że włókna węglowe bardzo skutecznie blokują komunikację radiową, dlatego anteny powinny się znajdować na zewnątrz lub miejsce gdzie są umieszczone powinno być wykonane z innego materiału.
+
+Innymi problemami przy konstrukcji samolotu są także metody wykonania statecznika i poruszanie powierzchniami sterowymi. Dwa najpopularniejsze podejścia to wykorzystanie bowdenów (rurek z tworzywa sztucznego z metalowym prętem prowadzącym umieszczonym w środku) umożliwiających przenoszenie momentu serwomechnizmu przez metalowy rdzeń, oraz system naciągu przy pomocy żyłki oraz sprężyny umieszczonej przy zawiasach. Druga metoda jest używana przy mniejszych modelach, gdzie największy nacisk położony jest na zminimalizowanie masy startowej. Same powierzchnie sterowane poruszane są przy pomocy orczyków, które muszą być przygotowane w taki sposób, aby umożliwić ruch w obu kierunkach.
+
+Modele samolotów podzielone są na kilkanaście kategorii, z uwagi na rozmiar, napęd oraz przeznaczenie. Samoloty wykonane samodzielnie często nie posiadają podwozia, startują poprzez wyrzucenie z ręki z odpowiednią prędkością, lądują natomiast na dolnej części kadłuba. Podłoże takie jak trawa w zupełności wystarcza do zamortyzowania uderzenia i wyhamowania modelu.
+ 
+
 \subsection{Technika sterowania samolotem}
 Problem sterowaniem trajektorią lotu samolotu jest dość nieoczywisty ze względu charakter sposobu utrzymania się takiego urządzenia w powietrzu. Przede wszystkim, do pokonania siły grawitacji wykorzystywana jest siła nośna wytwarzana na powierzchni skrzydeł. Jej źródłem jest różnica ciśnień nad i pod nimi, spowodowana różnymi prędkościami przepływu strugi powietrza od górnej i dolnej strony profilu lotniczego. Wartość generowanej siły nośnej jest proporcjonalna do różnicy tych prędkości, co w praktyce przekłada się na proporcjonalną zależność wartości siły nośnej do prędkości samolotu względem masy powietrza, w którym się porusza. Sytuację, w której samolot wytraca prędkość względem powietrza, co skutkuje utratą siły nośnej i w konsekwencji nagłym spadkiem i utratą sterowności nazywamy przeciągnięciem.
 
-Sterowanie samolotem odbywa się przy pomocy elementów nazywanych powierzchniami sterowymi. Są to lotki umieszczone na skrzydłach oraz stery wysokości i kierunku znajdujące się na stateczniku. Osie rotacji według angielskiej notacji nazywane są \textit{roll}, \textit{pitch} oraz \textit{yaw}, jak zostało pokazane na rysunku \ref{fig:osie}. Poruszanie lotkami pozwala na wywołanie momentu działającego wzdłuż osi roll, co przekłada się na obrót wzdłuż niej, o ile pozwalają na to warunki. Analogicznie, moment w osi pitch wywołany jest przez ster wysokości, a w osi yaw - ster kierunku.
+Sterowanie samolotem odbywa się przy pomocy elementów nazywanych powierzchniami sterowymi. Są to lotki umieszczone na skrzydłach oraz stery wysokości i kierunku znajdujące się na stateczniku. Osie rotacji według angielskiej notacji nazywane są \textit{roll}, \textit{pitch} oraz \textit{yaw}, jak zostało pokazane na rysunku \ref{fig:osie}. Poruszanie lotkami pozwala na wywołanie momentu działającego wzdłuż osi \textit{roll}, co przekłada się na obrót wzdłuż niej, o ile pozwalają na to warunki. Analogicznie, moment w osi \textit{pitch} wywołany jest przez ster wysokości, a w osi \textit{yaw} - ster kierunku.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{osie}
     \caption{Osie rotacji samolotu.}
@@ -98,7 +114,17 @@ Sterowanie samolotem odbywa się przy pomocy elementów nazywanych powierzchniam
     \label{fig:osie}
 \end{figure}
 
-Należy jednak zaznaczyć, że w celu wykonania zakrętu samolot należy najpierw przekręcić używając lotek, następnie korygować trajektorię przy pomocy steru wysokości, a ster kierunku służy tylko do zmniejszenie promienia zakrętu i kontrowania wiatru bocznego.
+Należy jednak zaznaczyć, że w celu wykonania zakrętu samolot należy najpierw przekręcić wokół osi \textit{roll} używając lotek, następnie korygować trajektorię przy pomocy steru wysokości, a ster kierunku służy tylko do zmniejszenie promienia zakrętu i kontrowania wiatru bocznego.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{dx6e}
+    \caption{Aparatura Spektrum DX6e DSMX do sterowania modelami samolotów.}
+    \small Źródło: \url{www.modellers.no/spektrum/48167/spektrum-dx6e-dsmx-u-mottaker}
+    \label{fig:dx6e}
+\end{figure}
+
+Pilot w celu sterowania modelem posługuje się aparaturą o wyglądzie zbliżonym do zdjęcia \ref{fig:dx6e}. Na rynku dostępne jest dużo urządzeń tego typu, jednak wspólną ich cechą jest system sterowania przy pomocy dwóch gałek. Istnieje kilka standardów ustawienia ruchu gałki ze sterowaną wartością, jednym z nich jest tak zwany MODE 2, w który lewa gałka w osi pionowej odpowiada za gaz, w osi poziomej za ster kierunku, natomiast w prawej gałce oś pionowa odpowiada ruchowi steru wysokości, a pozioma - wychyleniem lotem. Warto zaznaczyć, że gałki standardowo wracają do pozycji środkowej przy pomocy mechanicznego systemu sprężyn, we wszystkich osiach poza tą odpowiedzialną za prędkość silnika - pozostaje ona w ustalonej pozycji. Najnowsze aparatury posiadają system automatycznego przenoszenia sprężyn pomiędzy gałkami przy pomocy przesuwanego elementu umieszczonego na jej odwrocie. Do sterowania wykorzystane są także dwupozycyjne i trójpozycyjne przełączniki umieszczone w górnej części aparatury. Mogą służyć do przełączania trybów, wysuwania klap czy podwozia.
 
 \FloatBarrier
  
@@ -140,7 +166,30 @@ Do konfiguracji kontrolera lotu niezbędne jest oprogramowanie, które pozwoli n
 
 Przygotowanie misji w tych programach działa na zasadzie ustawienia pozycji oraz wysokości kolejnych punktów na trasie, zwanych waypointami, jak pokazano na rysunku \ref{fig:missionplanner}. W przypadku wielowirnikowców możliwe jest ustawienie trasy po dowolnej krzywej, z uwagi na możliwość sterowania nim w każdym kierunku i precyzyjne korygowanie trasy. Z kolei w samolotach takie sterowanie nie jest możliwe, dlatego pokonując trasę będą one dążyły do śledzenia linii łączącej środki kolejnych punktów. Warto zauważyć, że same waypointy nie są punktami, a okręgami o określonym promieniu. Po przekroczeniu granicy okręgu punkt uznawany jest za zaliczony, a samolot rozpoczyna manewr naprowadzający go na kolejny cel.
 \FloatBarrier
-\subsection{Przegląd literatury naukowej}
+
+\subsection{Samoloty solarne}
+Rozwój szeroko rozumianej elektromobilności jest ważnym krokiem na drodze rozwoju cywilizacji technicznej. Pierwsze próby zainstalowania modułów fotowoltaicznych na skrzydłach samolotu pojawiły się już w latach siedemdziesiątych ubiegłego wieku, kiedy to powstały samoloty takie Solaris czy Sunrise II. Warto zauważyć, że wspomniane samoloty nie miały pokładowych magazynów energii, ich loty trwały kilka minut, natomiast sprawności ogniw fotowoltaicznych wynosiły tylko 14\% (obecnie ponad 20\%). Były to jednak wciąż bezzałogowe modele, pierwsi ludzie zasiedli za sterami takich maszyn dopiero na początku lat osiemdziesiątych - eksperymentalny samolot \textit{Solar Challenger} przeleciał wtedy kanał La Manche. Z czasem na pokładzie pojawiły się akumulatory, w roku 1990 załogowy \textit{Sunseeker} spędził w powietrzu 121 godzin. W kolejnych latach rozwiane były projekty takie jak \textit{Helios}, \textit{Pathfinder Plus} czy \textit{Centurion}. W roku 2006 pojawiła się koncepcja i możliwości wykonania samolotu, który poza samym lotem będzie wykonywał różne badania i pomiary otoczenia przy pomocy umieszczonej na pokładzie aparatury. W roku 2011 samolot \textit{Solar-Impulse} (zdjęcie \ref{fig:solimp}) o rozpiętości skrzydeł 80 metrów okrążył całą planetę, z międzylądowaniem na każdym kontynencie \cite{Design of Solar Powered Airplane}. Innym przykładem samolotu solarnego może być Zephyr, który był samolotem typu HALE UAV (ang. \textit{high altitude long endurance}), który poruszał się na wysokości ponad 10 km . Na jego pokładzie znajdowała się aparatura pomiarowa, a także dedykowany kontroler lotu. Jego rekordem był nieprzerwany lot przez 87 godzin nad terytorium Arizony, na wysokości 20 kilometrów \cite{zephyr}. Wato zauważyć, że do osiągnięcia takiego etapu zaawansowania projektu, przez kilka lat powstawały jego kolejne wersje rozwojowe.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{solarimpulse}
+    \caption{Samolot solarny Solar Impulse podczas lotu w roku 2010.}
+    \small Źródło: \url{www.researchgate.net/figure/Solar-Impulse-fl-ight-on-April-7-th-2010_fig3_287064916}
+    \label{fig:solimp}
+\end{figure}
+
+Docelowym założeniem działania samolotu solarnego jest jego teoretycznie nieograniczony czas lotu. W trakcie dnia wykorzystuje on energię zebraną na ogniwach fotowoltaicznych do podtrzymania pracy urządzeń pokładowych oraz silnika, a także do ładowania pakietu akumulatora, który służy jako źródło zasilania podczas lotu nocnego. Powtarzając ten cykl, przy założeniu odpowiednich warunków pogodowych, możliwe by było utrzymanie ciągłego lotu. W praktyce zastosowania takiego samolotu ograniczone są tylko przez podłączoną do niego aparaturę - może wykonywać misje patrolujące, obserwacje, poszukiwania, czy działać jako stacja lokalna tymczasowa stacja przekaźnikowa. Warto zauważyć, że współcześnie wiele z takich misji wykonywana jest przez wielowirnikowe drony, jednak ich czas lotu jest stosunkowo krótki, generują także stosunkowo duży hałas.
+
+Proces projektowania tego typu samolotu wymaga optymalizacji pomiędzy konstrukcją, instalacją fotowoltaiczną oraz elektroniką pokładową. Literatura naukowa podaje propozycje różnych wzorów zależności między wartościami, jednak założenia początkowe każdego projektu sprawiają, że ujednolicenie ich jest praktycznie niemożliwe. Niektóre źródła zbierają wszystkie parametry optymalizacyjne, jest ich czasem nawet 25, zaczynając od powierzchni skrzydeł, profilu lotniczego, wymiaru i sprawności instalacji fotowoltaicznej, ale także przechodząc do docelowych warunków w jakich poruszał się będzie samolot, czyli długości dnia czy masy ładunku \cite{robotics}. Ważnym czynnikiem jest też wzięcie pod uwagę mechanicznego użycia elementów - zawiasów, przekładni czy silnika - ciągła praca takich urządzeń, projektowanych do zdecydowanie krótszych zastosowań niż wielogodzinne loty, mogą być przyczyną awarii \cite{developing a solar}. 
+
+\subsection{Sztuczne sieci neuronowe}
+Wraz z rozwojem komputerów jasne stało się, że niektóre problemy dla klasycznych algorytmów okażą się trudne lub niemożliwe do uzyskania. Powstały więc pomysły stworzenia programów oparty o sztuczną inteligencję, czyli algorytmy mające zdolność do uczenia się na podstawie zebranych danych lub w sposób adaptacyjny. W latach czterdziestych pierwszy raz pojawił się pomysł odwzorowania struktury przetwarzania danych przez biologiczną zasadę pracy układu nerwowego. W taki sposób przełożono neurony na algorytm perceptronu, które mogły zostać ułożone w wielowarstwowe struktury. 
+
+\subsection{Autonomiczne sterowanie statkiem powietrznym}
+Proces zaprojektowania klasycznego kontrolera lotu wymaga opracowania algorytmu, który poradzi sobie ze stabilizacją w każdych warunkach oraz ze sterowaniem po wyznaczonej trasie. Oprogramowanie, które będzie spełniać takie zadanie, jest bardzo trudne do przygotowania i nie ma możliwości dalszej adaptacji. Alternatywnym pomysłem jest wykorzystanie algorytmów sztucznej inteligencji, które po odpowiednim treningu będą w stanie spełnić oba kryteria, a także mogą zostać dodatkowo przystosowane do nowych warunków. 
+
+Sterowanie modelami samolotów przy pomocy sieci neuronowych tylko i wyłącznie sieci neuronowych nie jest popularnym rozwiązaniem w literaturze naukowej. Częściej spotykanym pomysłem 
+
 \clearpage
 \section{Implementacja rozwiązania}
 \subsection{Budowa modelu samolotu}
@@ -162,7 +211,7 @@ EasyGlider 4 nie jest jednak przystosowany do przenoszenia większej ilości urz
     \label{fig:xflr}
 \end{figure}
 
-Jako profil lotniczy skrzydła wybrany został FX 60-100, widniejący na grafice \ref{fig:fx60}. Jest on stosunkowo gruby oraz wklęsły w swojej dolnej części, co przekłada się na zwiększone opory powietrza oraz większą siłę nośną, przy równoczesnej niższej prędkości przelotowej. Na końcach skrzydeł znajdują się uszka o tym samym profilu. Kąt wzniosu skrzydeł wynosi 5\textdegree na każdą stronę, natomiast uszka wzniesione są o dodatkowe 15\textdegree.  Całkowita rozpiętość skrzydeł wynosi 2 metry.
+Jako profil lotniczy skrzydła wybrany został FX 60-100, widniejący na grafice \ref{fig:fx60}. Jest on stosunkowo gruby oraz wklęsły w swojej dolnej części, co przekłada się na zwiększone opory powietrza oraz większą siłę nośną, przy równoczesnej niższej prędkości przelotowej. Na końcach skrzydeł znajdują się winglety o tym samym profilu. Kąt wzniosu skrzydeł wynosi 5\textdegree na każdą stronę, natomiast winglety wzniesione są o dodatkowe 15\textdegree. Całkowita rozpiętość skrzydeł wynosi 2 metry. Wartości kątów i wymiarów zostały dobrane przy pomocy praktyki modelarskiej oraz analiz programu XFLR5 w celu otrzymania optymalnych parametrów.
 
  \begin{figure}[ht]
     \centering
@@ -172,7 +221,7 @@ Jako profil lotniczy skrzydła wybrany został FX 60-100, widniejący na grafice
     \label{fig:fx60}
 \end{figure}
 
-Statecznik poziomy i pionowy posiadają profil lotniczy NACA 0008 (grafika \ref{fig:naca}), który jest profilem symetrycznym. Statecznik jest stosunkowo duży, co zapewnia dodatkową stabilizację podczas lotu. Znajduję się on 90 cm od początku krawędzi natarcia skrzydła głównego.
+Statecznik poziomy i pionowy posiadają profil lotniczy NACA 0008 (grafika \ref{fig:naca}), ze względu na symetryczny profil często znajdujący zastosowanie w statecznikach modelach tej klasy. Statecznik jest stosunkowo duży, co zapewnia dodatkową stabilizację podczas lotu. Znajduję się on 90 cm od początku krawędzi natarcia skrzydła głównego.
 
  \begin{figure}[ht]
     \centering
@@ -182,7 +231,7 @@ Statecznik poziomy i pionowy posiadają profil lotniczy NACA 0008 (grafika \ref{
     \label{fig:naca}
 \end{figure}
 
-Dzięki przeprowadzeniu analizy projektu w programie XFLR możliwe jest uzyskanie parametrów aerodynamicznych samolotu. Na wykresach \ref{fig:wykresy} obserwować można cztery zależności. Wykres w lewym górnym informuje o zależności prędkości w pionie i poziome, wykres w prawym góry rogu podaje zależność prędkości przelotowej od kąta natarcia. Zależność Cm(Alfa) na lewym dolnym wykresie informuje o stabilności samolotu, która będzie optymalna w punkcie przecięcia z osią X. Z wykresu w prawym dolnym rogu odczytać można zależność doskonałości aerodynamicznej od kąta natarcia skrzydeł. Doskonałość jest dystansem jaki przeszybuje samolot tracąc przy tym metr wysokości. 
+Dzięki przeprowadzeniu analizy projektu w programie XFLR5 możliwe jest uzyskanie parametrów aerodynamicznych samolotu. Na wykresach \ref{fig:wykresy} obserwować można cztery zależności. Wykres w lewym górnym informuje o zależności prędkości w pionie i poziome, wykres w prawym góry rogu podaje zależność prędkości przelotowej od kąta natarcia. Zależność Cm(Alfa) na lewym dolnym wykresie informuje o stabilności samolotu, która będzie optymalna w punkcie przecięcia z osią X. Z wykresu w prawym dolnym rogu odczytać można zależność doskonałości aerodynamicznej od kąta natarcia skrzydeł. Doskonałość jest dystansem jaki przeszybuje samolot tracąc przy tym metr wysokości. 
 
 Na podstawie wykresów możliwe jest określenie odpowiedniego kąta natarcia skrzydeł jako kąta 2,5\textdegree. Prędkość przelotowa wynosi wtedy 7m/s, a współczynnik doskonałości jest równy 18.
 
@@ -205,7 +254,7 @@ Po zakończeniu procesu projektowania, pierwszym niezbędnym elementem do przygo
     \label{fig:ploter}
 \end{figure}
  
-W analogiczny sposób wycięte zostały bryty na uszka oraz elementy statecznika. Przed dalszymi działaniami skrzydła muszą zostać okablowane, czyli przewody doprowadzające zasilanie i sygnały do różnych elementów muszą zostać umieszczone w styrodurze w taki sposób, aby nie zaburzały powierzchni profilu lotniczego. W prawym skrzydle (zdjęcie \ref{fig:okablowane}) widoczne są przewody do czujnika rurki Pitota, modułu ogniw fotowoltaicznych oraz do serwomechanizmu poruszającego lotką.
+W analogiczny sposób wycięte zostały bryty na winglety oraz elementy statecznika. Przed dalszymi działaniami skrzydła muszą zostać okablowane, czyli przewody doprowadzające zasilanie i sygnały do różnych elementów muszą zostać umieszczone w styrodurze w taki sposób, aby nie zaburzały powierzchni profilu lotniczego. W prawym skrzydle (zdjęcie \ref{fig:okablowane}) widoczne są przewody do czujnika rurki Pitota, modułu ogniw fotowoltaicznych oraz do serwomechanizmu poruszającego lotką.
 
  \begin{figure}[ht]
     \centering
@@ -223,9 +272,9 @@ Same ogniwa fotowoltaiczne zostały uprzednio zalaminowane przy pomocy metody op
     \label{fig:laminowanie}
 \end{figure}
 
-Skrzydła zyskują swój ostateczną formę w procesie laminowania. Polega ona na odpowiednim nałożeniu warstw laminatu na bryt i nasączeniu ich żywicą epoksydową. Z uwagi na instalację fotowoltaiczną umieszczoną na skrzydłach nie jest możliwe wykorzystanie laminatu z włókna węglowego, ponieważ istnieje bardzo duże ryzyko zwarcia instalacji na całej jej długości - przez zabezpieczającą warstwę tkaniny szklanej przebić się mogą pojedyncze włókna węglowe, będące bardzo dobrymi przewodnikami energii elektrycznej. Jako laminat wykorzystane więc zostały dwie warstwy tkaniny szklanej o gramaturze 48 g/m2 na każdą powierzchnię. Węglowy rowing został jedynie wykorzystany jako wzmocnienie krawędzi spływu, natomiast krawędź natarcia oraz dźwigar zostały wykonane z taśmy węglowej o szerokości 20 mm (na dźwigarze znajdują się dwie warstwy). Na gotowy laminat zostaje położona folia Mylar, która pozwala odbić idealnie gładką powierzchnię. Tak przygotowane bryty laminaty są następnie umieszczane w worku próżniowym, z którego przy pomocy pompy usuwane jest powietrze do ciśnienia -400 mbar względem atmosfery. Ciśnienie to jest stosunkowo wysokie, w tego typu procesach częściej spotykane jest uzyskanie próżni rzędu -800 do -900 mbar, które nie zostało wykorzystane z uwagi na ryzyko uszkodzenia instalacji fotowoltaicznej.
+Skrzydła zyskują swój ostateczną formę w procesie laminowania. Polega ona na odpowiednim nałożeniu warstw laminatu na bryt i nasączeniu ich żywicą epoksydową. Z uwagi na instalację fotowoltaiczną umieszczoną na skrzydłach nie jest możliwe wykorzystanie laminatu z włókna węglowego, ponieważ istnieje bardzo duże ryzyko zwarcia instalacji na całej jej długości - przez zabezpieczającą warstwę tkaniny szklanej przebić się mogą pojedyncze włókna węglowe, będące bardzo dobrymi przewodnikami energii elektrycznej. Jako laminat wykorzystane więc zostały dwie warstwy tkaniny szklanej o gramaturze 48 g/m2 na każdą powierzchnię. Węglowy rowing (bardzo długa wiązka włókien) został jedynie wykorzystany jako wzmocnienie krawędzi spływu, natomiast krawędź natarcia oraz dźwigar zostały wykonane z taśmy węglowej o szerokości 20 mm (na dźwigarze znajdują się dwie warstwy). Na gotowy laminat zostaje położona folia Mylar, która pozwala odbić idealnie gładką powierzchnię. Tak przygotowane bryty laminaty są następnie umieszczane w worku próżniowym, z którego przy pomocy pompy usuwane jest powietrze do ciśnienia -400 mbar względem atmosfery. Ciśnienie to jest stosunkowo wysokie, w tego typu procesach częściej spotykane jest uzyskanie próżni rzędu -800 do -900 mbar, które nie zostało wykorzystane z uwagi na ryzyko uszkodzenia instalacji fotowoltaicznej.
 
-Dzięki zastosowaniu próżni uzyskany jest bardzo duży, równomierny nacisk na całą powierzchnię brytu. Z uwagi na wypukło-wklęsły profil lotniczy skrzydła konieczne jest umieszczenie brytów w negatywowej formie, ponieważ worek poróżniony może mocno naciągnąć styrodur. Na koniec formy zostały przyciśnięte ciężkimi przedmiotami, jak zaobserwować można na zdjęciu \ref{fig:schniecie}. Czas schnięcia zastosowanej żywicy epoksydowej L285 wraz z utwardzaczem H287 wynosi około 24 godziny, dopiero po tym czasie prace mogą być kontynuowane.
+Dzięki zastosowaniu próżni uzyskany jest bardzo duży, równomierny nacisk na całą powierzchnię brytu. Z uwagi na wypukło-wklęsły profil lotniczy skrzydła konieczne jest umieszczenie brytów w negatywowej formie, ponieważ worek próżniowy może mocno naciągnąć styrodur. Na koniec formy zostały przyciśnięte ciężkimi przedmiotami, jak zaobserwować można na zdjęciu \ref{fig:schniecie}. Czas schnięcia zastosowanej żywicy epoksydowej L285 wraz z utwardzaczem H287 wynosi około 24 godziny, dopiero po tym czasie prace mogą być kontynuowane.
 
  \begin{figure}[ht]
     \centering
@@ -234,7 +283,7 @@ Dzięki zastosowaniu próżni uzyskany jest bardzo duży, równomierny nacisk na
     \label{fig:schniecie}
 \end{figure}
 
-W analogiczny sposób zalaminowane zostały uszka oraz elementy statecznika. Przy okazji tego procesu wzmocniono krawędzie natarcia i spływu skrzydeł dodatkową warstwą włókien węglowych. Finalnym rezultatem procesu laminowania są widoczne na zdjęciu \ref{fig:kompozytki} elementy.
+W analogiczny sposób zalaminowane zostały winglety oraz elementy statecznika. Przy okazji tego procesu wzmocniono krawędzie natarcia i spływu skrzydeł dodatkową warstwą włókien węglowych. Finalnym rezultatem procesu laminowania są widoczne na zdjęciu \ref{fig:kompozytki} elementy.
 
  \begin{figure}[ht]
     \centering
@@ -285,7 +334,7 @@ Stery kierunku i wysokości obsługiwane są przy pomocy serwomechanizmów umies
     \label{fig:tyl}
 \end{figure}
 
-Po umieszczeniu całej elektroniki podkładowej szkielet kadłuba wzmocniono i zabezpieczono balsą modelarską. Przewidziana została możliwość szybkiego dostępu do kontrolera jak i do baterii przy pomocy umieszczonych na zawiasach zamknięciach, zamykanych za pomocą śruby M3, jak widać na zdjęciu \ref{fig:przod}. Antena GPS umieszczana jest na specjalnej podstawce za pomocą rzepa.
+Po umieszczeniu całej elektroniki podkładowej szkielet kadłuba wzmocniono i zabezpieczono obudową wykonaną z balsy modelarskiej. Przewidziana została możliwość szybkiego dostępu do kontrolera jak i do baterii przy pomocy umieszczonych na zawiasach zamknięciach, zamykanych za pomocą śruby M3, jak widać na zdjęciu \ref{fig:przod}. Antena GPS umieszczana jest na specjalnej podstawce za pomocą rzepa.
 
 \begin{figure}[ht]
     \centering
@@ -462,11 +511,11 @@ Ciągłość pracy kontrolera jest jednym z najważniejszych założeń projekto
 \item Portów szeregowych do komunikacji
 \item Serwomechanizmów 
 \item Biblioteki odczytującej dane z odbiornika
-\item Odczytanie wartości stanu uzbrojenia silnika z pamięci EEPROM
+\item Odczytanie wartości stanu uzbrojenia silnika (włączenia go z poziomu oprogramowania) z pamięci EEPROM
 
 \end{enumerate}
 
-Jeżeli silnik został uzbrojony (włączony z poziomu oprogramowania) oznacza to, że samolot najprawdopodobniej znajduje się w powietrzu, dlatego od razu uruchamiany jest tryb awaryjny, aby pilot miał największe szanse na uratowanie modelu. W innym przypadku inicjalizowane są czujniki IMU oraz GPS.
+Jeżeli odczytana wartość o stanie uruchomienia silnika wskazuje, że został on uzbrojony przed startem systemu, samolot najprawdopodobniej wystartował i doszło do restartu kontrolera w powietrzu - od razu uruchamiany jest więc tryb awaryjny, aby pilot miał największe szanse na uratowanie modelu. W innym przypadku inicjalizowane są czujniki IMU oraz GPS.
 
 Oprogramowanie ma pozwolić na dwa tryby lotu – manualny oraz autonomiczny. W pierwszym z nich dane z czujników nie mają wpływu na lot, sygnał z aparatury jest przekazywany bezpośrednio na wyjścia.
  
@@ -591,7 +640,7 @@ Programem obsługującym dwustronną komunikację ze stacją odbiorczą jest prz
     \label{fig:env}
 \end{figure}
 
-Warto wspomnieć, że komunikacja odbywa się przez moduły HC-12, które są transceiverami (połączeniem transmittera oraz receivera), czyli umożliwiają komunikację dwustronną. Moduł ten ma pewne ograniczenia, widoczne przede wszystkim przy próbie równoczesnego nadawania oraz odbierania danych. Po uruchomieniu transmisji, samolot nadaje informacje w trybie ciągłym, dlatego wysłanie do niego poleceń jest bardzo utrudnione i mało prawdopodobne. Z tego powodu na aparaturze jeden z przełączników działa jako blokada transmisji danych od strony oprogramowania kontrolera, która umożliwia zatrzymanie wysyłania oraz bezproblemowe odbieranie informacji.
+Warto wspomnieć, że komunikacja odbywa się przez moduły HC-12, które są połączeniem nadajnika i odbiornika, czyli umożliwiają komunikację dwustronną. Moduł ten ma pewne ograniczenia, widoczne przede wszystkim przy próbie równoczesnego nadawania oraz odbierania danych. Po uruchomieniu transmisji, samolot nadaje informacje w trybie ciągłym, dlatego wysłanie do niego poleceń jest bardzo utrudnione przez małe prawdopodobieństwo odczytania kompletnej ramki. Z tego powodu na aparaturze jeden z przełączników działa jako blokada transmisji danych od strony oprogramowania kontrolera, która umożliwia zatrzymanie wysyłania oraz bezproblemowe odbieranie informacji.
 
 \FloatBarrier
 \subsection{Protokół komunikacji}
@@ -630,7 +679,7 @@ Podczas testów samolotu bardzo szybko okazało się, że do efektywnej pracy na
 
 Program został przygotowany w formie strony internetowej tak, aby możliwy był do niego dostęp z poziomu przeglądarki. Niestety, szybko okazało się, że jest to rozwiązanie tylko tymczasowe - brak możliwości podglądu danych w czasie rzeczywistym znacząco utrudniał pracę nad samym kontrolerem - największym problemem był brak możliwości sprawdzenia poprawności działania algorytmów przetwarzające dane lokalizacyjne i estymacji trajektorii lotu. Ponadto podczas testów w warunkach polowych bardzo uciążliwa była konieczność ponownej kompilacji całego programu i wgrywania do mikrokontrolera przy każdej zmianie parametrów. 
 
-Pojawił się więc pomysł stworzenia aplikacji, która pozwoli na podgląd danych w czasie rzeczywistym, konfigurację samolotu oraz zapis i analizę zebranych danych. Projektując system największy nacisk położony został na jego przejrzystość, łatwość obsługi i praktyczność tak, aby pozwolić zaoszczędzić każdą cenną sekundę podczas wykonywania lotów testowych. Ekran główny wykonanej aplikacji można zobaczyć na zdjęciu \ref{fig:weball}.
+Pojawił się więc pomysł stworzenia aplikacji, która pozwoli na podgląd danych w czasie rzeczywistym, konfigurację samolotu oraz zapis i analizę zebranych danych. Projektując system największy nacisk położony został na jego przejrzystość, łatwość obsługi i praktyczność tak, aby pozwolić zaoszczędzić każdą cenną sekundę podczas wykonywania lotów testowych. Ekran główny wykonanej aplikacji można zobaczyć na grafice \ref{fig:weball}.
 
  \begin{figure}[ht]
     \centering
@@ -747,11 +796,11 @@ Strona odtwarzacza pozwala na podgląd zapisanych plików z danymi z przelotów 
 
 \FloatBarrier
 \subsection{Trening sieci neuronowej}
-Przygotowania wszystkich elementów wymienionych w poprzednich rozdziałach okazało się niezbędne do przejścia do procesu nauczania maszynowego. Sprawdzenie niezawodności poszczególnych systemów i poprawności informacji pozwoliło na przystąpienie do zbierania danych treningowych.
+Przygotowania wszystkich elementów wymienionych w poprzednich rozdziałach okazało się niezbędne do przejścia do procesu uczenia maszynowego. Sprawdzenie niezawodności poszczególnych systemów i poprawności informacji pozwoliło na przystąpienie do zbierania danych treningowych.
 
 W celu przygotowania algorytmów sztucznej inteligencji pierwszym krokiem było określenie wyboru algorytmu przetwarzania danych - wybór padł na rekurencyjną sieć neuronową, ze względu na sposób i możliwość jej nauczania, a także na możliwość rekurencyjnego brania pod uwagę poprzedniej chwili czasowej. Zgodnie z założeniem projektu sterowanie samolotem ma się odbywać w pełni poprzez sztuczną inteligencję - odpowiedź z sieci neuronowej jest kierowana prosto na serwomechanizmy i silnik. 
 
-Kolejnym z założeń projektu było wykorzystanie doświadczenia pilotów w sterowaniu modelami  bezpośrednio do nauki algorytmu sterowania. Lot modelem samolotu jest niezwykle trudnym zadaniem, a wykonanie wielu powtarzalnych przelotów trasy (w tym przypadku "ósemki") wymaga bardzo dużej ilości praktyki. Głównym pilotem samolotu został więc Kacper Krempa, wicemistrz Polski w kategorii lotów modelami F3K oraz wicemistrz Europy w lotach modeli kosmicznych, widoczny na zdjęciu \ref{fig:kacper}.
+Kolejnym z założeń projektu było wykorzystanie doświadczenia pilotów w sterowaniu modelami  bezpośrednio do nauki algorytmu sterowania. Lot modelem samolotu jest niezwykle trudnym zadaniem, a wykonanie wielu powtarzalnych przelotów trasy (w tym przypadku "ósemki") wymaga bardzo dużej praktyki. Głównym pilotem samolotu został więc Kacper Krempa, wicemistrz Polski w kategorii lotów modelami F3K oraz wicemistrz Europy w lotach modeli kosmicznych, widoczny na zdjęciu \ref{fig:kacper}.
 
  \begin{figure}[ht]
     \centering
@@ -776,7 +825,7 @@ Problem sterowania samolotem jest dość liniowo zależny od jego stanu - wychyl
 
 W bibliotece TensorFlow sieć ta zdefiniowana jest jako model typu Sequential, z przyjętą sigmoidalną funkcją aktywacji oraz definicją błędu pomiarowego jako średni błąd kwadratowy. Do procesu nauczania wykorzystano dane zebrane podczas przelotów treningowych.
 
-Trening został przeprowadzony na podstawie około 1500 chwil czasowych. Po około 35 epokach spadek błędu jest niewielki (wykres \ref{fig:tren1}), dalsze działanie algorytmu może więc skutkować przeuczeniem sieci. Po przetestowaniu działania na przykładowych danych testowych otrzymany wynik predykcji sieci zdaje się być poprawny, zatem sieć można wstępnie uznać za wytrenowaną.
+Trening został przeprowadzony na podstawie około 1500 chwil czasowych. Po około 35 epokach spadek błędu jest nieznaczny (wykres \ref{fig:tren1}). Po przetestowaniu działania na przykładowych danych testowych otrzymany wynik predykcji sieci zdaje się być poprawny, zatem sieć można wstępnie uznać za wytrenowaną.
 
  \begin{figure}[H]
     \centering
@@ -785,7 +834,7 @@ Trening został przeprowadzony na podstawie około 1500 chwil czasowych. Po oko�
     \label{fig:tren1}
 \end{figure}
 
-Jedną z wad biblioteki TensorFlow jest brak bezpośredniego dostępu do struktury wytrenowanej sieci neuronowej - macierzy wag połączeń oraz biasów. Sposobem na wygenerowanie modelu jest jego konwersja do pliku typu TFlite. Biblioteka TensorFlowLite jest biblioteką dedykowaną dla urządzeń mobilnych, która umożliwia wykorzystanie modelu na docelowym urządzeniu, takim jak telefon, mikrokontroler czy w aplikacji komputerowej. Modele TFlite są lżejsze oraz zoptymalizowane do pracy z wykorzystaniem mniejszych zasobów obliczeniowych i pamięciowych.
+Sposobem na wyeksportowanie modelu przygotowanego przy użyciu biblioteki TensorFlow jest jego konwersja do pliku typu TFlite. Biblioteka TensorFlowLite jest biblioteką dedykowaną dla urządzeń mobilnych, która umożliwia wykorzystanie modelu na docelowym urządzeniu, takim jak telefon, mikrokontroler czy w aplikacji komputerowej. Modele TFlite są lżejsze oraz zoptymalizowane do pracy z wykorzystaniem mniejszych zasobów obliczeniowych i pamięciowych.
 
 Wersja biblioteki TensorFlowLite dostępna na mikrokontrolery jest kompatybilna ze środowiskiem Arduino IDE. Jednak nie jest ona dostępna dla wszystkich mikroprocesorów, oficjalnie wspierane jest niewiele urządzeń takich jak Arduino Nano 33 BLE Sense, STM32F746 czy ESP-EYE. Mimo braku oficjalnego wsparcia, na wykorzystanym w projekcie Teensy 4.0 (mikroprocesor ARM Cortex-M7) istnieje możliwość uruchomienia biblioteki. Plik z modelem sieci neuronowej TFlite musi uprzednio zostać przemieniony na tablicę znaków w systemie szesnastkowym, która może zostać zinterpretowana przez język C/C++. W tym celu można wykorzystać dostępną w systemach UNIX komendę xdd lub użyć skryptu w Pythonie. Finalnie otrzymany plik można zapisać z rozszerzeniem .h i zaimportować przez kompilator AVR-GCC po stronie środowiska Arduino. Model można poddać dodatkowemu procesowi kwantyzacji, co pozwala jeszcze bardziej ograniczyć jego zapotrzebowanie na moc obliczeniową oraz pamięciową - podczas treningu liczby zmiennoprzecinkowe zapisane są w formacie float64, kwantyzacja pozwala na implementację z wykorzystaniem na przykład postaci float32 czy float16.
 
@@ -818,12 +867,12 @@ Stałe skalowania i translacji są indywidualne dla każdego neuronu wejścioweg
 
 \textbf{Uwaga:} przygotowany algorytm umożliwia automatyczną zmianę ilości neuronów w każdej z warstw. Dopiero modyfikacja struktury sieci (ilości warstw ukrytych) wymagałaby ręcznej interwencji w oprogramowanie i powielenia głębokości algorytmu propagacji między warstwami.
 
-Podczas lotów treningowych udało się zgromadzić 20 000 punktów testowych, co odpowiada ponad 16 minutom samego lotu po trasie ósemki. Przy pomocy narzędzia Neural Net Fitting App możliwy jest trening opisanej sieci neuronowej z wykorzystaniem algorytmu Levenberga-Marquardta. 
+Podczas lotów treningowych udało się zgromadzić 20 000 punktów danych, co odpowiada ponad 16 minutom samego lotu po trasie ósemki. Przy pomocy narzędzia Neural Net Fitting App możliwy jest trening opisanej sieci neuronowej z wykorzystaniem algorytmu Levenberga-Marquardta. 
 
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{siecmatlab}
-    \caption{Struktura sieci stworzonej w środowisku Matlab.}
+    \caption{Struktura sieci stworzonej w środowisku Matlab. Połączenia rekurencyjne nie są zaznaczone, rekurencja jest uwzględniona w danych wejściowych.}
     \label{fig:siecmatlab}
 \end{figure}
 
@@ -888,16 +937,16 @@ Przy pomocy odtwarzacza zwizualizowano wybrane fragmenty lotu. Żółtą linią 
 \clearpage
 \section{Podsumowanie i wnioski}
 
-\subsection{Podsumowanie efektów prac}
+\subsection{Podsumowanie wykonanych prac}
 Z założonych celów projektu zdecydowaną większość udało się zrealizować, co jest bardzo dużym sukcesem. Poniżej przygotowano zestawienie wykonanych prac:
 \begin{enumerate}
-\item Zbudowano kompozytowy samolot ``Dodo'', o rozpiętości skrzydeł dwóch metrów i wadze około 1.5 kg, który został przygotowany do pełnej kompatybilności z opracowywany kontrolerem lotu. 
-\item Instalacja fotowoltaiczna umieszczona na skrzydłach samolotu jest w stanie wygenerować około 30W mocy podczas lotu, co stanowi ponad połowę zapotrzebowania energetycznego i przekłada się na znaczne wydłużenie czasu lotu.
+\item Zaprojektowano i zbudowano kompozytowy samolot ``Dodo'', o rozpiętości skrzydeł dwóch metrów i wadze około 1.5 kg, który został przygotowany do pełnej kompatybilności z opracowywany kontrolerem lotu. 
+\item Zaprojektowana i wykonana w ramach pracy instalacja fotowoltaiczna umieszczona na skrzydłach samolotu jest w stanie wygenerować około 30W mocy podczas lotu, co stanowi ponad połowę zapotrzebowania energetycznego i przekłada się na znaczne wydłużenie czasu lotu.
 \item Przygotowany został elektroniczny moduł kontrolera lotu umieszczanego w kadłubie w specjalnym gnieździe mocującym. Na płytce PCB znajdują się jedynie niezbędne i przetestowane komponenty.
 \item Wykonano oprogramowanie kontrolera lotu, które pozwala na sterowanie samolotem w trybie manualnym i zbieranie danych treningowych, a także na uruchomienie trybu autonomicznego i sterowanie poprzez sieć neuronową.
 \item Opracowano protokół wymiany informacji, dzięki któremu komunikacja pomiędzy poszczególnymi elementami środowiska jest szybka i niezawodna.
 \item Dane zbierane przez samolot można oglądać w czasie rzeczywistym dzięki wykonanej stacji odbiorczej oraz stworzonej aplikacji webowej. Pozwala ona również na ich zapis i odtwarzanie, a także na pełną konfigurację kontrolera.
-\item Na podstawie 20000 danych z chwil czasowych została wytrenowana rekurencyjna sieć neuronowa do sterowania samolotem, która kilkukrotnie poradziła sobie z wykonaniem fragmentów manewru.
+\item Na podstawie danych 20000 z chwil czasowych została wytrenowana rekurencyjna sieć neuronowa do sterowania samolotem, która kilkukrotnie poradziła sobie z wykonaniem fragmentów manewru.
 
 \end{enumerate}
 

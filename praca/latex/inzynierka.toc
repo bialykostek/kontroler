@@ -3,33 +3,36 @@
 \contentsline {subsection}{\numberline {1.1}Koncepcja}{3}{}%
 \contentsline {subsection}{\numberline {1.2}Cel i zakres pracy}{3}{}%
 \contentsline {section}{\numberline {2}Wstęp teoretyczny}{5}{}%
-\contentsline {subsection}{\numberline {2.1}Technika sterowania samolotem}{5}{}%
-\contentsline {subsection}{\numberline {2.2}Rozwiązania dostępne na rynku}{6}{}%
-\contentsline {subsection}{\numberline {2.3}Przegląd literatury naukowej}{8}{}%
-\contentsline {section}{\numberline {3}Implementacja rozwiązania}{9}{}%
-\contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{9}{}%
-\contentsline {paragraph}{Wytworzenie elementów kompozytowych}{11}{}%
-\contentsline {paragraph}{Łączenie elementów}{14}{}%
-\contentsline {paragraph}{Kadłub}{15}{}%
-\contentsline {paragraph}{Złożenie samolotu}{17}{}%
-\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{18}{}%
-\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{22}{}%
-\contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{28}{}%
-\contentsline {paragraph}{Algorytm estymacji trajektorii}{30}{}%
-\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{34}{}%
-\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{35}{}%
-\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{36}{}%
-\contentsline {paragraph}{Układ czteropanelowy}{37}{}%
-\contentsline {paragraph}{Strona: Wizualizacja}{39}{}%
-\contentsline {paragraph}{Strona: Mapa}{40}{}%
-\contentsline {paragraph}{Strona: Konsola}{41}{}%
-\contentsline {paragraph}{Strona: Konfiguracja}{41}{}%
-\contentsline {paragraph}{Strona: Ustawienia}{42}{}%
-\contentsline {paragraph}{Strona: Odtwarzacz}{42}{}%
-\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{43}{}%
-\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{51}{}%
-\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{54}{}%
-\contentsline {subsection}{\numberline {4.1}Podsumowanie efektów prac}{54}{}%
-\contentsline {subsection}{\numberline {4.2}Problemy}{54}{}%
-\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{55}{}%
-\contentsline {subsection}{\numberline {4.4}Wnioski}{56}{}%
+\contentsline {subsection}{\numberline {2.1}Budowa modeli samolotów kompozytowych}{5}{}%
+\contentsline {subsection}{\numberline {2.2}Technika sterowania samolotem}{6}{}%
+\contentsline {subsection}{\numberline {2.3}Rozwiązania dostępne na rynku}{8}{}%
+\contentsline {subsection}{\numberline {2.4}Samoloty solarne}{10}{}%
+\contentsline {subsection}{\numberline {2.5}Sztuczne sieci neuronowe}{12}{}%
+\contentsline {subsection}{\numberline {2.6}Autonomiczne sterowanie statkiem powietrznym}{12}{}%
+\contentsline {section}{\numberline {3}Implementacja rozwiązania}{13}{}%
+\contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{13}{}%
+\contentsline {paragraph}{Wytworzenie elementów kompozytowych}{15}{}%
+\contentsline {paragraph}{Łączenie elementów}{18}{}%
+\contentsline {paragraph}{Kadłub}{19}{}%
+\contentsline {paragraph}{Złożenie samolotu}{21}{}%
+\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{22}{}%
+\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{26}{}%
+\contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{32}{}%
+\contentsline {paragraph}{Algorytm estymacji trajektorii}{34}{}%
+\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{38}{}%
+\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{39}{}%
+\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{40}{}%
+\contentsline {paragraph}{Układ czteropanelowy}{41}{}%
+\contentsline {paragraph}{Strona: Wizualizacja}{43}{}%
+\contentsline {paragraph}{Strona: Mapa}{44}{}%
+\contentsline {paragraph}{Strona: Konsola}{45}{}%
+\contentsline {paragraph}{Strona: Konfiguracja}{45}{}%
+\contentsline {paragraph}{Strona: Ustawienia}{46}{}%
+\contentsline {paragraph}{Strona: Odtwarzacz}{46}{}%
+\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{47}{}%
+\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{55}{}%
+\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{58}{}%
+\contentsline {subsection}{\numberline {4.1}Podsumowanie efektów prac}{58}{}%
+\contentsline {subsection}{\numberline {4.2}Problemy}{58}{}%
+\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{59}{}%
+\contentsline {subsection}{\numberline {4.4}Wnioski}{60}{}%

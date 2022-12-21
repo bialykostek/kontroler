@@ -1,0 +1,20 @@
+1. Uszko - po analizie okazało się, że bardziej poprawnie jest je nazwać wingletem (uszko to bardziej potoczna nazwa modelarska), termin zamieniłem i jest też wytłumaczony we wstępie teoretycznym
+2. Czcionka - na razie zostawiłem jeszcze standardowe Computer Modern - czy taka czcionka może zostać w końcowej wersji czy sztywnym wymaganiem jest Times New Roman? Uważam, że Computer Modern jest ładniejsza i ma naukowy klimat, ale to oczywiście tylko kwestia gustu :)
+3. Wykresy z programu XFLR5 - formatowanie osi X wynika z konieczności odczytanie kształt krzywej i wartości różnych punktów na osi Y, a same wykresy mają swój początek lub koniec w określonych przedziałach, także nie są błędnie formatowane - tylko się z nimi pracuje. Program niestety nie jest też idealny i to jest najlepszy wygląd wykresów jaki udało mi się uzyskać, ale w odwróconych kolorach wygląda lepiej.
+4. Eksport macierzy z tensorflow - faktycznie, jest do nich dostęp, jest to mój błąd i prawdopodobnie wynika z efektu potwierdzenia sprzed ponad roku, kiedy próbowałem rozwiązać problem wgrywania modelu na mikrokontoler - musiałem źle zapamiętać jakiś problem, w ostatnim czasie nawet nie próbowałem podejścia bezpośrednio z macierzami wag z tensorflow, korzystałem z dedykowanej biblioteki. Być może rozwiązało by to część problemów, ale w sumie użycie matlaba daje ten sam rezultat i było trochę wygodniejsze z przygotowaniem kodu do C++. Fragment tekstu zmieniłem na poprawny.
+5. "Uwaga" - zdaję sobię sprawę, że podobna forma występuje w instrukcjach, jednak są to akapity które mają zwrócić uwagę na szczególne (często praktyczne) aspekty omawianego tematu - ciężko mi jest znaleźć inne pasujące słowo. Jeżeli uważa Pan, że jednak lepiej by było odejść od tej formy to można je po prostu włączyć do tekstu. W zamyśle mają skupić i ponowić uwagę czytelnika, być lekką odskocznią od reszty tekstu i dodatkowo zaciekawić.
+6. 
+
+
+TODO
+
+czcionka
+ref zdjec
+teoria nn
+teoria auav
+bibliografia
+dyskusja
+wnioski
+nazwy rozdzialow
+uwagi z pdf
+podziękowania
