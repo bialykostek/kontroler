@@ -32,9 +32,6 @@
 \usepackage{chngcntr}
 \counterwithin{figure}{subsection}
 
-\let\oldref\ref
-\renewcommand{\ref}[1]{(\oldref{#1})}
-
 \allowdisplaybreaks
 
 \title{Neuronowy kontroler do sterowania bezzałogowym statkiem powietrznym}
@@ -90,7 +87,16 @@ Poniższa praca zawiera opis wiedzy potrzebnej do zrozumienia opisu działań wy
 \section{Wstęp teoretyczny}
 
 \subsection{Budowa modeli samolotów kompozytowych}
-Mimo, że historia lotnictwa sięga końca XIX wieku, zainteresowanie tworzeniem modeli samolotów, czyli dziedziną nazywaną potocznie modelarstwem, narodziło się niedługo później i ma tradycję od ponad 100 lat. Rozwój mobilnej elektroniki z czasem pozwolił na upowszechnienie możliwości zdalnego sterowania tego typu konstrukcjami. Najpopularniejszym surowcem używanym do wytworzenia modeli samolotów jest drewno w postaci sklejki modelarskiej, balsy czy listewek sosnowych. Skrzydła takiego samolotu mają najczęściej konstrukcję żeberkową, na którą nakładany jest materiał tworzący ich powierzchnię, przykładowo folia termokurczliwa lub odpowiednia bibuła. Bardziej zaawansowanym rozwiązaniem wykonania skrzydeł jest wykorzystanie materiałów kompozytowych, które z definicji składają się z dwóch chemicznie różnych substancji połączonych ze sobą na poziomie makroskopowym, a co najważniejsze, posiadają lepsze własności materiałowe niż każda składowa osobno. W modelarstwie stosowanymi materiałami są najczęściej tkaniny szklane, węglowe oraz aramidowe (znane też jako Kevlar) umieszczone w osnowie z żywicy epoksydowej. Proces wytworzenia takiego kompozytu można przeprowadzić nawet w domowym warsztacie, jednak jest on dużo bardziej złożony i wiąże się z większymi kosztami. Elementy kompozytowe charakteryzują się zdecydowanie lepszymi własnościami wytrzymałościowymi - są twardsze i sztywniejsze, równocześnie zachowując mniejszą masę. Najlepsze parametry z nich mają skrzydła węglowe, wykonane z tkanin takich jak TeXtreme, jednak w porównaniu do tkanin szklanych są one o rzędy wielkości bardziej kosztowne. Wersje aero, dedykowane do zastosowań lotniczych, są dodatkowo prasowane, co przekłada się na finalną lepszą powierzchnię skrzydeł. 
+Mimo, że historia lotnictwa sięga końca XIX wieku, zainteresowanie tworzeniem modeli samolotów, czyli dziedziną nazywaną potocznie modelarstwem, narodziło się niedługo później i ma tradycję od ponad 100 lat. Rozwój mobilnej elektroniki z czasem pozwolił na upowszechnienie możliwości zdalnego sterowania tego typu konstrukcjami. Najpopularniejszym surowcem używanym do wytworzenia modeli samolotów jest drewno w postaci sklejki modelarskiej, balsy czy listewek sosnowych. Skrzydła takiego samolotu mają najczęściej konstrukcję żeberkową, na którą nakładany jest materiał tworzący ich powierzchnię, przykładowo folia termokurczliwa lub odpowiednia bibuła. Bardziej zaawansowanym rozwiązaniem wykonania skrzydeł jest wykorzystanie materiałów kompozytowych, które z definicji składają się z dwóch chemicznie różnych substancji połączonych ze sobą na poziomie makroskopowym, a co najważniejsze, posiadają lepsze własności materiałowe niż każda składowa osobno. W modelarstwie stosowanymi materiałami są najczęściej tkaniny szklane, węglowe oraz aramidowe (znane też jako Kevlar) umieszczone w osnowie z żywicy epoksydowej. Proces wytworzenia takiego kompozytu można przeprowadzić nawet w domowym warsztacie, jednak jest on dużo bardziej złożony i wiąże się z większymi kosztami. Elementy kompozytowe charakteryzują się zdecydowanie lepszymi własnościami wytrzymałościowymi - są twardsze i sztywniejsze, równocześnie zachowując mniejszą masę. Najlepsze parametry z nich mają skrzydła węglowe, wykonane z tkanin takich jak TeXtreme, jednak w porównaniu do tkanin szklanych są one o rzędy wielkości bardziej kosztowne. Wersje aero, dedykowane do zastosowań lotniczych, są dodatkowo prasowane, co przekłada się na finalną lepszą powierzchnię skrzydeł. Przykładowe skrzydłow wykonane z tego materiału widoczne jest na zdjęciu \ref{fig:frykas}.
+
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{frykas}
+    \caption{Skrzydła samolotu ``Frykas'' wykonane z materiału TeXtreme.}
+    \small Zdjęcie: Natalia Książek
+    \label{fig:frykas}
+\end{figure}
+
 
 Winglety są końcowymi fragmentami skrzydeł, które są wzniesione o dodatkowy kąt i mają za zadanie rozpraszanie wirów indukcyjnych (zaburzeń ruchu powietrza) co poprawia osiągi aerodynamiczne samolotu, a także wspomaga stabilizację lotu.
 
@@ -183,12 +189,35 @@ Docelowym założeniem działania samolotu solarnego jest jego teoretycznie nieo
 Proces projektowania tego typu samolotu wymaga optymalizacji pomiędzy konstrukcją, instalacją fotowoltaiczną oraz elektroniką pokładową. Literatura naukowa podaje propozycje różnych wzorów zależności między wartościami, jednak założenia początkowe każdego projektu sprawiają, że ujednolicenie ich jest praktycznie niemożliwe. Niektóre źródła zbierają wszystkie parametry optymalizacyjne, jest ich czasem nawet 25, zaczynając od powierzchni skrzydeł, profilu lotniczego, wymiaru i sprawności instalacji fotowoltaicznej, ale także przechodząc do docelowych warunków w jakich poruszał się będzie samolot, czyli długości dnia czy masy ładunku \cite{robotics}. Ważnym czynnikiem jest też wzięcie pod uwagę mechanicznego użycia elementów - zawiasów, przekładni czy silnika - ciągła praca takich urządzeń, projektowanych do zdecydowanie krótszych zastosowań niż wielogodzinne loty, mogą być przyczyną awarii \cite{developing a solar}. 
 
 \subsection{Sztuczne sieci neuronowe}
-Wraz z rozwojem komputerów jasne stało się, że niektóre problemy dla klasycznych algorytmów okażą się trudne lub niemożliwe do uzyskania. Powstały więc pomysły stworzenia programów oparty o sztuczną inteligencję, czyli algorytmy mające zdolność do uczenia się na podstawie zebranych danych lub w sposób adaptacyjny. W latach czterdziestych pierwszy raz pojawił się pomysł odwzorowania struktury przetwarzania danych przez biologiczną zasadę pracy układu nerwowego. W taki sposób przełożono neurony na algorytm perceptronu, które mogły zostać ułożone w wielowarstwowe struktury. 
+Wraz z rozwojem komputerów jasne stało się, że niektóre problemy dla klasycznych algorytmów okażą się trudne lub niemożliwe do rozwiązania. Zaproponowaną alternatywą były odpowiednie struktury danych oraz sposób ich przetworzenia oraz optymalizacji nazwane sztuczną inteligencją, z uwagi na ich coraz lepsze osiągi wraz z przetworzeniem większej ilości danych. Jednym z takich algorytmów są sieci neuronowe, oparte o budowę układu nerwowego. Struktura wielowarstwowego perceptornu, czyli algorytmicznego ujęcia neuronu, jest najpopularniejszym z nic i znalazł wiele zastosowań w problemach przybliżania funkcji czy klasyfikacji. Rekurencyjna sieć neuronowa w ramach danych wejściowych bierze pod uwagę wynik swojego poprzedniego działania \cite{en.wikipedia.org/wiki/Multilayer_perceptron}.
+
+Proces treningu sieci dzielony jest na trzy podstawowe typy: 
+
+\begin{enumerate}
+	\item Uczenie nadzorowane (ang. \textit{supervised learning}) - polega na nauczeniu się przewidywania pożądanego przez nauczyciela rezultatu na podstawie danych wejściowych.
+	\item Uczenie nienadzorowane (ang. \textit{unsupervised learning}) - polega na wyszukiwaniu wzorców lub klasyfikacji cech bez ingerencji nauczyciela.
+	\item Uczenie przez wzmacnianie (ang. \textit{reinforcement learning}) - polega na uczeniu poprzez samoistne doskonalenie się w zadanym środowisku treningowym.
+\end{enumerate}
+
+W celu efektywnego uczenia nadzorowanego należy wykorzystać algorytm optymalizacyjny treningu. Ich przykładami mogą być algorytm Levenberga-Marquardta, który wymaga więcej pamięci przy krótszym czasie działania, algorytm regularyzacji Bayesina zajmujący więcej czasu, ale lepiej radzący sobie z trudnymi danymi, czy metoda gradientu sprężonego o mniejszej złożoności pamięciowej, która zatrzymuje się po zakończeniu spadku błędu. 
+
+W ostatnich latach na rynku pojawiło się wiele narzędzi do wygodnej pracy z sieciami neuronowymi. Jednym z nich jest środowisko MATLAB wraz z rozszerzeniem Deep Learning Toolbox, oferującym możliwość korzystania z graficznego programu do zarządzania treningiem sieci. Innym popularnym przykładem są biblioteki do języka Python3: TensorFlow oraz PyTorch.
+
+W celu przetwarzania sekwencji danych warto zastosować sieć LSTM (ang. \textit{Long Short-Term Memory}), w skład której wchodzą komórki oraz bramek wejścia, wyjścia oraz zapomnienia. Dzięki temu przepływ sygnałów jest dodatkowo regulowany, co w praktyce przekłada się na możliwość pamiętania danych z długich okresów czasowych i brania ich oraz podjętych decyzji pod uwagę. 
 
 \subsection{Autonomiczne sterowanie statkiem powietrznym}
-Proces zaprojektowania klasycznego kontrolera lotu wymaga opracowania algorytmu, który poradzi sobie ze stabilizacją w każdych warunkach oraz ze sterowaniem po wyznaczonej trasie. Oprogramowanie, które będzie spełniać takie zadanie, jest bardzo trudne do przygotowania i nie ma możliwości dalszej adaptacji. Alternatywnym pomysłem jest wykorzystanie algorytmów sztucznej inteligencji, które po odpowiednim treningu będą w stanie spełnić oba kryteria, a także mogą zostać dodatkowo przystosowane do nowych warunków. 
 
-Sterowanie modelami samolotów przy pomocy sieci neuronowych tylko i wyłącznie sieci neuronowych nie jest popularnym rozwiązaniem w literaturze naukowej. Częściej spotykanym pomysłem 
+Proces zaprojektowania klasycznego kontrolera lotu wymaga opracowania algorytmu, który poradzi sobie ze stabilizacją w każdych warunkach oraz ze sterowaniem po wyznaczonej trasie. Środowisko PX4 uruchomione na urządzeniu Pixhawk w tym celu wykorzystuje rozbudowany regulator PID. Istnieje możliwość konfiguracji zarówno jego struktury jak i wartości parametrów. Kontroler tym samym rozwiązuje zadanie obliczenia różnicy pomiędzy obecnym położeniem a zadanym i na tej podstawie dobiera wychyły powierzchni sterowych\cite{https://docs.px4.io/main/en/config_mc/pid_tuning_guide_multicopter.html}. Warto zauważyć, że sama zadana pozycja również jest sparametryzowana - przykładowo obliczone ułożenie samolotu w zakręcie jest determinowane przez jego minimalny promień. \cite{https://docs.px4.io/main/en/flight_stack/controller_diagrams.html}. Wszelkie obliczenia wykonywane są przy użyciu kwaternionów.
+
+Oprogramowanie, które będzie spełniać takie zadanie, jest bardzo trudne do przygotowania i nie ma możliwości dalszej adaptacji. Alternatywnym pomysłem jest wykorzystanie algorytmów sztucznej inteligencji, które po odpowiednim treningu będą w stanie spełnić oba kryteria, a także mogą zostać dodatkowo przystosowane do nowych warunków.
+
+Pomimo dużego potencjału wykorzystania sztucznych sieci neuronowych, wykorzystanie ich do sterowania bezzałogowymi modelami samolotów nie jest popularne w literaturze naukowej. W obrębie statków powietrznych są one częściej aplikowane do wielowirnikowców, prawdopodobnie ze względu na możliwość zatrzymania jego pracy w powietrzu w przypadku niepowodzenia działania algorytmów sterowania. Samoloty potrzebują ciągłego, nieprzerwanego sterowania do samego utrzymania się w powietrzu, dlatego prace badające ten obszar częściej skupiają się na testach w warunkach symulacyjnych niż prowadzeniu rzeczywistych eksperymentów \cite{glowny}. 
+
+Jednym z proponowanych podejść stworzenia algorytmu sterowania opartym o sieć neuronową jest przygotowanie środowiska do symulacji oraz wykorzystanie nauczania przez wzmacnianie. Proponowaną siecią neuronową jest sieć LSTM ze względu na analizę danych z historycznych chwil czasowych. Modele zostały wytrenowane w symulacji, a następnie najlepsze z nich zostały bezpośrednio przeniesione do samolotu testowego osiągając lepsze rezultaty śledzenia trasy w zadanej misji niż kontrolery oparte na klasycznych regulatorach \cite{glowny}. 
+
+Innym przykładem może być sieć neuronowa działająca na kontrolerze opartym o układ regulatora definiowany na płaszczyźnie liczb zespolonych \textit{S-plane} działającego na bazie logiki rozmytej, opracowana przez profesora Liu Xuemin. Zadaniem sztucznej inteligencji jest dobór parametrów systemu w celu uzyskania stabilnego lotu - algorytm w czasie rzeczywistym musi dobierać odpowiednie wartości dla regulatora. Symulacje wykazały, że użycie takiego podejścia po procesie nauczania (wykorzystano zarówno nauczenia nadzorowane jak i nienadzorowane) zdecydowanie skraca czas odpowiedzi układu, brak przeregulowania oraz pozwala na płynniejsze zachowanie samolotu w powietrzu. \cite{the motion controller}.
+
+Sieci neuronowe znajdują także szereg innych zastosowań w systemach sterowania bezzałogowymi statkami powietrznymi. Często spotykanym zagadnieniem jest optymalna korekta trajektorii w celu ominięcia przeszkód na trasie \cite{learnignbased} czy planowanie lotu  formacji grupy bezzałogowych samolotów \cite{2017IEEE}.
 
 \clearpage
 \section{Implementacja rozwiązania}
@@ -387,7 +416,7 @@ Wszystkie ogniwa umieszczone na skrzydłach połączone są szeregowo, co daje p
     \label{fig:badanie}
 \end{figure}
 
-Dzięki uprzejmości doktora inżyniera Krzysztofa Sornka z Instytutu Zrównoważonego Rozwoju Energetycznego AGH możliwe było przeprowadzenie badań gotowej instalacji na skrzydłach. Z uwagi na brak warunków pogodowych, pomiary zostały przeprowadzone na stanowisku badawczym (zdjęcie \ref{fig:badanie}), które powala na uzyskanie mocy promieniowania świetlnego zbliżonego do warunków podczas słonecznego dnia w lecie na ternie Polski - około 1000$\frac{W}{m^2}$. Warunki takie wytwarza system lamp halogenowych, które niestety bardzo szybko się nagrzewają - pomiary musiały być więc wykonane bardzo sprawnie. Było to możliwe dzięki użyciu skryptu do automatycznego pomiaru przy pomocy modułu sztucznego obciążenia. Badanie trwało więc zaledwie kilkanaście sekund i pozwoliło uniknąć zbytniego przegrzania się ogniw fotowoltaicznych. Instalacja była badana osobno na każdym skrzydle ze względu na ograniczone pole robocze stanowiska. Wynikiem badań było uzyskanie charakterystyk prądowo-napięciowych, a także generowanej mocy w zależności od natężenia wyjściowego. Wyniki zebrano na wykresach \ref{fig:charakterystyki}. Lewe skrzydło było w stanie wytworzyć maksymalnie około 19W energii, prawe - 16 W.
+Dzięki uprzejmości doktora inżyniera Krzysztofa Sornka z Instytutu Zrównoważonej Energetyki możliwe było przeprowadzenie badań gotowej instalacji na skrzydłach. Z uwagi na brak warunków pogodowych, pomiary zostały przeprowadzone na stanowisku badawczym (zdjęcie \ref{fig:badanie}), które powala na uzyskanie mocy promieniowania świetlnego zbliżonego do warunków podczas słonecznego dnia w lecie na ternie Polski - około 1000$\frac{W}{m^2}$. Warunki takie wytwarza system lamp halogenowych, które niestety bardzo szybko się nagrzewają - pomiary musiały być więc wykonane bardzo sprawnie. Było to możliwe dzięki użyciu skryptu do automatycznego pomiaru przy pomocy modułu sztucznego obciążenia. Badanie trwało więc zaledwie kilkanaście sekund i pozwoliło uniknąć zbytniego przegrzania się ogniw fotowoltaicznych. Instalacja była badana osobno na każdym skrzydle ze względu na ograniczone pole robocze stanowiska. Wynikiem badań było uzyskanie charakterystyk prądowo-napięciowych, a także generowanej mocy w zależności od natężenia wyjściowego. Wyniki zebrano na wykresach \ref{fig:charakterystyki}. Lewe skrzydło było w stanie wytworzyć maksymalnie około 19W energii, prawe - 16 W.
 
 \begin{figure}[ht]
     \centering
@@ -681,6 +710,8 @@ Program został przygotowany w formie strony internetowej tak, aby możliwy był
 
 Pojawił się więc pomysł stworzenia aplikacji, która pozwoli na podgląd danych w czasie rzeczywistym, konfigurację samolotu oraz zapis i analizę zebranych danych. Projektując system największy nacisk położony został na jego przejrzystość, łatwość obsługi i praktyczność tak, aby pozwolić zaoszczędzić każdą cenną sekundę podczas wykonywania lotów testowych. Ekran główny wykonanej aplikacji można zobaczyć na grafice \ref{fig:weball}.
 
+\textbf{Uwaga:} Na potrzeby czytelnej wizualizacji w aplikacji zastosowano odwróconą szatę kolorystyczną. Domyślnie dominuje ciemna paleta barw, znacznie wygodniejsza w użyciu.
+
  \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{weball}
@@ -934,6 +965,18 @@ Przy pomocy odtwarzacza zwizualizowano wybrane fragmenty lotu. Żółtą linią 
 
 
 \FloatBarrier
+
+
+
+\subsection{Pliki źródłowe projektu}
+Ze względu na czytelność pracy, nie załączony w niej został kod źródłowy projektu. Jest on dostępny w publicznym repozytorium razem ze wszystkimi innymi plikami z wykorzystanych programów. Repozytorium znajduje się pod adresem:
+
+\begin{center}
+\url{github.com/bialykostek/kontroler}
+\end{center}
+
+
+
 \clearpage
 \section{Podsumowanie i wnioski}
 
@@ -950,8 +993,21 @@ Z założonych celów projektu zdecydowaną większość udało się zrealizowa�
 
 \end{enumerate}
 
-\subsection{Problemy}
-W trakcie pracy nad projektem wystąpiło wiele problemów. Najwięcej z nich związanych było z samym modułem kontrolera i zapewnienie jego nieprzerwanej pracy. Pojawiły się problemy z elektroniką, uszkodzonymi lub wadliwymi częściami czy czujnikami, zbyt małą ilością miejsca w kadłubie samolotu testowego EasyGlider 4 czy uszkodzenia przy nieudanych lądowaniach. 
+
+\subsection{Możliwości rozwoju projektu}
+
+Należy zaznaczyć, że pomimo poprawnego wykonania poszczególnych fragmentów manewru, samolot nie pokonał autonomicznie całej trasy. Niestety użycie rekurencyjnej sieci neuronowej okazało się być rozwiązaniem niewystarczającym. Fakt brania pod uwagę danych aktualnych i tych sprzed maksymalnie 50 ms sprawia, że kontroler nie może zaplanować i utrzymać dłuższego manewru. Drobne błędy odpowiedzi sieci z każdą kolejną iteracją namnażają się - tylko dość szczęśliwe okoliczności i warunki decydowały o powodzeniu dłuższego manewru. Błędy te powodowały przepadanie samolotu na skrzydło spowodowane zbyt małą siłą nośną, czyli - patrząc od strony sterowania - złym stosunkiem przechylenia do prędkości lotu. Pokazuje to jak istotne są dla sterowania historyczne decyzje sprzed kilku sekund.
+
+Możliwym rozwiązaniem takiego problemu byłoby zastosowanie sieci będącej w stanie zapamiętać podejmowane decyzje na przestrzeni czasu nawet kilku sekund. Proponowanym rozwiązaniem byłoby zastosowanie struktury LSTM, która na podstawie wcześniej podjętej decyzji (na przykład o wejściu w zakręt z określonym promieniem) kieruje późniejsze obliczenia.
+
+Projekt mógłby być również rozwinięty pod względem układu energetycznego, przede wszystkim wykonywania pomiarów w trakcie lotu. W ten sposób możliwe byłoby monitorowanie poziomu naładowania baterii, mocy generowanej przez instalację fotowoltaiczną oraz chwilowego wykorzystania energii.
+
+Połączeniem wyżej wymienionych pomysłów jest jeszcze idący dalej w przyszłość projekt optymalizacji energetycznej samolotu przy pomocy algorytmów sterowania. Podczas pokonywania długiego dystansu samolot mógłby poruszać się nie w linii prostej a długimi łukami, aby zwiększyć ilość energii produkowanej przez ogniwa fotowoltaiczne przez zmniejszenie kąta padania światła. Dodatkowo możliwa by była optymalizacja samej trajektorii lotu - wykorzystanie wpływu kominów termicznych, wiatru i lotu szybowcowego.
+
+
+
+\subsection{Dyskusja}
+W trakcie pracy nad projektem wystąpiło wiele problemów różnej natury: zarówno sprzętowej jak i po stronie oprogramowania. Najwięcej z nich związanych było z samym modułem kontrolera i zapewnienie jego nieprzerwanej pracy. Pojawiły się problemy z elektroniką, uszkodzonymi lub wadliwymi częściami czy czujnikami, zbyt małą ilością miejsca w kadłubie samolotu testowego EasyGlider 4 czy uszkodzenia przy nieudanych lądowaniach. 
 
 Opracowanie programu do sterowania również było bardzo problematyczne, zwłaszcza przez użycie czujników o wysokiej precyzji, które wysyłają bardzo duże ilości danych przez magistralę $I^2C$. Komunikacja radiowa również sprawiła problemy - jak się okazało przyczyną pojawiających się losowo błędów programu był niewystarczający bufor pamięci magistrali UART. Problem ten był jednak tak rzadki i losowy (prawdopodobnie częściowo zależny też od przetwarzania danych z ciśnieniowego czujnika wysokości LPS25HB), że jego wykrycie i naprawienie zajęło bardzo dużą ilość czasu.
 
@@ -959,16 +1015,14 @@ Problemy występowały także przy budowie samolotu i wynikały z braku doświad
 
 Paradoksalnie, najmniej problematycznym systemem do zaprogramowania okazała się być aplikacja webowa do przetwarzania danych, mimo że tej kod jest kilkanaście razy dłuższy niż oprogramowania kontrolera, serwera czy aplikacji przekaźnikowej.
 
-\subsection{Możliwości rozwoju projektu}
+Opisane problemy nie okazały się zablokować projektu, który został dokończony i działa zgodnie z założeniem. Duża część prac polegała na przygotowaniu możliwości dalszego działania lub jego usprawnienia. Wydawać by się mogło, że niektóre z nich były bezcelowe lub różnica czasu poświęconego ich przygotowanie oraz czasu, które pozwoliły bezpośrednio zaoszczędzić nie jest na korzyść twórcy. Jednakże, jako że projekt rozwijany był równocześnie na kilku płaszczyznach, na bieżąco projektowane były funkcje lub elementy mogące tylko poprawić bilans czasu oszczędzonego w przyszłych działaniach. Należy również zaznaczyć ich pośredni wpływ biorąc pod uwagę czynnik ludzki. W projekcie indywidualnym nietrudno jest wpaść w efekt potwierdzenia bez świeżego spojrzenia innej osoby, co przekładać się może na utrudnione poszukiwanie źródeł nawet powtarzających się problemów. Każde narzędzie, dające możliwość monitorowania i usprawnienia działania środowiska z perspektywy testów każdorazowo okazało się być inwestycją zwrotną. Wszystkie te działania pozwoliły na zakończenie projektu z sukcesem. Jego podstawowe założenia zostały spełnione -  przygotowany został kontroler lotu oraz platforma testowa do jego badań. Algorytm sterowania działa poprawnie i wykonuje część manewrów, możliwy jest także dalszy jego rozwój jak i innych aspektów środowiska.
 
-Należy zaznaczyć, że pomimo poprawnego wykonania poszczególnych fragmentów manewru, samolot nie pokonał autonomicznie całej trasy. Niestety użycie rekurencyjnej sieci neuronowej okazało się być rozwiązaniem niewystarczającym. Fakt brania pod uwagę danych aktualnych i tych sprzed maksymalnie 50 ms sprawia, że kontroler nie może zaplanować i utrzymać dłuższego manewru. Drobne błędy odpowiedzi sieci z każdą kolejną iteracją namnażają się - tylko dość szczęśliwe okoliczności i warunki decydowały o powodzeniu dłuższego manewru. Błędy te powodowały przepadanie samolotu na skrzydło spowodowane zbyt małą siłą nośną, czyli - patrząc od strony sterowania - złym stosunkiem przechylenia do prędkości lotu. Pokazuje to jak istotne są dla sterowania historyczne decyzje sprzed kilku sekund.
 
-Możliwym rozwiązaniem takiego problemu byłoby zastosowanie sieci będącej w stanie zapamiętać podejmowane decyzje na przestrzeni czasu nawet kilku sekund. Proponowanym rozwiązaniem byłoby zastosowanie struktury LSTM - Long Short-Term Memory, która na podstawie wcześniej podjętej decyzji (na przykład o wejściu w zakręt z określonym promieniem) kieruje późniejsze obliczenia.
+\subsection{Podziękowania}
+Powyżej opisany projekt nie powstałby bez badań prowadzonych w zespole AGH Solar Plane. Kilkuletnie doświadczenie i wiedza zarówno energetyczna oraz konstrukcyjna pozwoliła realizację samolotu ``Dodo''. Szczególne podziękowania należą się opiekunowi pracy doktorowi habilitowanemu inżynierowi Ziemowitowi Dworakowskiemu za pomoc w przygotowaniu pracy oraz algorytmów sztucznej inteligencji, Kacprowi Krempie oraz Filipowi Pieniążkowi za bezcenną wiedzę i doświadczenie modelarskie, doktorowi inżynierowi Krzysztofowi Sornkowi za pomoc w przeprowadzeniu badań instalacji fotowoltaicznej, oraz wszystkich innych osób, które w sposób bezpośredni lub pośredni przyczyniły się do realizacji projektu.
 
-Projekt mógłby być również rozwinięty pod względem układu energetycznego, przede wszystkim wykonywania pomiarów w trakcie lotu. W ten sposób możliwe byłoby monitorowanie poziomu naładowania baterii, mocy generowanej przez instalację fotowoltaiczną oraz chwilowego wykorzystania energii.
-
-Połączeniem wyżej wymienionych pomysłów jest jeszcze idący dalej w przyszłość projekt optymalizacji energetycznej samolotu przy pomocy algorytmów sterowania. Podczas pokonywania długiego dystansu samolot mógłby poruszać się nie w linii prostej a długimi łukami, aby zwiększyć ilość energii produkowanej przez ogniwa fotowoltaiczne przez zmniejszenie kąta padania światła. Dodatkowo możliwa by była optymalizacja samej trajektorii lotu - wykorzystanie wpływu kominów termicznych, wiatru i lotu szybowcowego.
 
 \subsection{Wnioski}
+W ramach projektu neuronowego kontrolera lotu do sterowania bezzałogowym statkiem powietrznym wykonano szereg składowych środowiska, zarówno sprzętowego jak model samolotu testowego, umieszczona na nim instalacja fotowoltaiczna czy elektronika pokładowa, a także oprogramowania systemów kontroli czy naziemnej stacji odbiorczej. Wykorzystanie wszystkich tych elementów pozwoliło na zbieranie i przetwarzanie danych w czasie rzeczywistym oraz ich wizualizację, a docelowo wykorzystane zostały one do treningu rekurencyjnej sieci neuronowej, która jest bazą algorytmu sterowania. Wykorzystanie jej w powietrzu pozwoliło na wykonanie części planowanych manewrów, co dowodzi możliwości wykorzystania tego typu struktury w sterowaniu modelem samolotu. Planowanym dalszym rozwojem projektu jest użycie sieci LSTM zamiast wielowarstwowego perceptronu w celu wyeliminowania nawarstwiających się błędów sterowania.
 
 \end{document}

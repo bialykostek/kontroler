@@ -6,33 +6,35 @@
 \contentsline {subsection}{\numberline {2.1}Budowa modeli samolotów kompozytowych}{5}{}%
 \contentsline {subsection}{\numberline {2.2}Technika sterowania samolotem}{6}{}%
 \contentsline {subsection}{\numberline {2.3}Rozwiązania dostępne na rynku}{8}{}%
-\contentsline {subsection}{\numberline {2.4}Samoloty solarne}{10}{}%
+\contentsline {subsection}{\numberline {2.4}Samoloty solarne}{11}{}%
 \contentsline {subsection}{\numberline {2.5}Sztuczne sieci neuronowe}{12}{}%
-\contentsline {subsection}{\numberline {2.6}Autonomiczne sterowanie statkiem powietrznym}{12}{}%
-\contentsline {section}{\numberline {3}Implementacja rozwiązania}{13}{}%
-\contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{13}{}%
-\contentsline {paragraph}{Wytworzenie elementów kompozytowych}{15}{}%
-\contentsline {paragraph}{Łączenie elementów}{18}{}%
-\contentsline {paragraph}{Kadłub}{19}{}%
-\contentsline {paragraph}{Złożenie samolotu}{21}{}%
-\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{22}{}%
-\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{26}{}%
-\contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{32}{}%
-\contentsline {paragraph}{Algorytm estymacji trajektorii}{34}{}%
-\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{38}{}%
-\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{39}{}%
-\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{40}{}%
-\contentsline {paragraph}{Układ czteropanelowy}{41}{}%
-\contentsline {paragraph}{Strona: Wizualizacja}{43}{}%
-\contentsline {paragraph}{Strona: Mapa}{44}{}%
-\contentsline {paragraph}{Strona: Konsola}{45}{}%
-\contentsline {paragraph}{Strona: Konfiguracja}{45}{}%
-\contentsline {paragraph}{Strona: Ustawienia}{46}{}%
-\contentsline {paragraph}{Strona: Odtwarzacz}{46}{}%
-\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{47}{}%
-\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{55}{}%
-\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{58}{}%
-\contentsline {subsection}{\numberline {4.1}Podsumowanie efektów prac}{58}{}%
-\contentsline {subsection}{\numberline {4.2}Problemy}{58}{}%
-\contentsline {subsection}{\numberline {4.3}Możliwości rozwoju projektu}{59}{}%
-\contentsline {subsection}{\numberline {4.4}Wnioski}{60}{}%
+\contentsline {subsection}{\numberline {2.6}Autonomiczne sterowanie statkiem powietrznym}{13}{}%
+\contentsline {section}{\numberline {3}Implementacja rozwiązania}{15}{}%
+\contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{15}{}%
+\contentsline {paragraph}{Wytworzenie elementów kompozytowych}{17}{}%
+\contentsline {paragraph}{Łączenie elementów}{20}{}%
+\contentsline {paragraph}{Kadłub}{21}{}%
+\contentsline {paragraph}{Złożenie samolotu}{23}{}%
+\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{24}{}%
+\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{28}{}%
+\contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{34}{}%
+\contentsline {paragraph}{Algorytm estymacji trajektorii}{36}{}%
+\contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{40}{}%
+\contentsline {subsection}{\numberline {3.6}Protokół komunikacji}{41}{}%
+\contentsline {subsection}{\numberline {3.7}Oprogramowanie naziemne}{42}{}%
+\contentsline {paragraph}{Układ czteropanelowy}{43}{}%
+\contentsline {paragraph}{Strona: Wizualizacja}{45}{}%
+\contentsline {paragraph}{Strona: Mapa}{46}{}%
+\contentsline {paragraph}{Strona: Konsola}{47}{}%
+\contentsline {paragraph}{Strona: Konfiguracja}{47}{}%
+\contentsline {paragraph}{Strona: Ustawienia}{48}{}%
+\contentsline {paragraph}{Strona: Odtwarzacz}{48}{}%
+\contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{49}{}%
+\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{57}{}%
+\contentsline {subsection}{\numberline {3.10}Pliki źródłowe projektu}{59}{}%
+\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{60}{}%
+\contentsline {subsection}{\numberline {4.1}Podsumowanie wykonanych prac}{60}{}%
+\contentsline {subsection}{\numberline {4.2}Możliwości rozwoju projektu}{60}{}%
+\contentsline {subsection}{\numberline {4.3}Dyskusja}{61}{}%
+\contentsline {subsection}{\numberline {4.4}Podziękowania}{62}{}%
+\contentsline {subsection}{\numberline {4.5}Wnioski}{62}{}%
