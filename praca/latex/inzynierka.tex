@@ -55,7 +55,7 @@ Bezzałogowe statki powietrzne w ostatnich latach zyskały bardzo dużą popular
 
 Pomysł na stworzenie autorskiego kontrolera lotu powstał w Studenckim Kole Naukowym AGH Solar Plane podczas przygotowań do odbywających się co roku międzynarodowych zawodów autonomicznych bezzałogowych statków powietrznych TUBITAK w Turcji. Z uwagi na dodatkowe punkty w ocenie finałowej za autorskie rozwiązania systemów pokładowych, podjęte zostały pierwsze próby przygotowania koncepcji takiego modułu. Jedną z misji konkursowych było wykonanie przez autonomiczny statek powietrzny trasy "leniwej ósemki" pomiędzy dwoma kolumnami. Postawione zostało więc pytanie: w jaki sposób można by przelać doświadczenie pilotów modeli samolotów (którzy są w stanie bardzo szybko i optymalnie pokonać trasę sterując samolotem manualnie) na system kontroli lotu? Jednym z pomysłów było wykorzystanie w tym celu algorytmów uczenia maszynowego, konkretnie treningu sztucznej sieci neuronowej. Projekt ostatecznie nie został rozwinięty przed wspomnianymi zawodami, czas na jego realizację przyszedł w późniejszym terminie, jednak część celów i założeń została zapożyczona z regulaminu.
 
-\subsection{Cel i zakres pracy}
+\subsection{Cel, zakres i organizacja pracy}
 Podstawowym założeniem projektu jest przygotowanie platformy testowej i kontrolera lotu, który za pomocą sieci neuronowej będzie w autonomiczny sposób sterować modelem samolotu. Docelowo ma on wykonać trasę ósemki pomiędzy dwoma kolumnami, jak pokazano na rysunku \ref{fig:osemka}. Odległość między nimi wynosi 80 metrów. Dodatkowo samolot nie może przekroczyć wyznaczonego obszaru o wymiarach 120 na 170 metrów.
 
 \begin{figure}[ht]
@@ -81,7 +81,15 @@ Przygotowanie opisanego algorytmu wiąże się z koniecznością przygotowania s
 
 Poniższa praca zawiera opis wiedzy potrzebnej do zrozumienia opisu działań wykonywanych w części implementacyjnej, przegląd literatury naukowej i istniejących rozwiązań, opis procesu wdrożenia wymienionych powyżej elementów, a także omówienie rezultatu i podsumowanie wniosków.
 
-\textbf{Uwaga}: określenie ``środowisko'' używane w poniższej pracy, w kontekście stworzonych programów, odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej.
+\textbf{Rozdział 1} jest wprowadzeniem do tematu oraz koncepcji projektu, jego celów i zakresu.
+
+\textbf{Rozdział 2} jest zbiorem wiedzy teoretycznej potrzebnej do prawidłowego zrozumienia części implementacyjnej oraz przeglądu literatury i aktualnego stanu wiedzy.
+
+\textbf{Rozdział 3} zawiera szczegółowy opis rozwoju projektu, jego części konstrukcyjnej, elektronicznej, przygotowania oprogramowania oraz algorytmów sztucznej inteligencji.
+
+\textbf{Rozdział 4} podsumowuje wykonane prace, opisuje możliwości dalszego rozwoju projektu, napotkane problemy oraz sukcesy oraz wnioski.
+
+Określenie ``środowisko'' używane w poniższej pracy, w kontekście stworzonych programów, odnosi się do połączenia wszystkich systemów po stronie samolotu jak i stacji naziemnej.
 
 \clearpage
 \section{Wstęp teoretyczny}
@@ -588,9 +596,7 @@ W pamięci EEPROM mikrokontrolera zapisywane są dane dotyczące kalibracji loka
 \FloatBarrier
 \paragraph{Algorytm estymacji trajektorii}\mbox{}
 
-Jednym z najważniejszych aspektów wykonania precyzyjnego manewru samolotem jest wzięcie pod uwagę kilku kolejnych punktów na planowej trasie, ze względu na charakter sterowania tego typu statkiem powietrznym. Aby umożliwić jak najkrótszy czas przygotowania samolotu do lotu, jego trasa określana jest przy pomocy pozycji dwóch kolumn, wokół których automatycznie ustalane są waypointy. Obliczenia pozycji punktów na mapie prowadzone są po stronie aplikacji webowej, a następnie wysyłane na samolot. Dla ułatwienia obliczeń i wizualizacji, po skalibrowaniu terenu, samolot korzysta z lokalnego układu współrzędnych, do którego transformowane są koordynaty GPS. Powierzchnia, po której porusza się samolot jest na tyle mała w skali krzywizny planety, że przyjąć można lokalny układ współrzędnych jako dwuwymiarowy układ kartezjański. 
-
-\textbf{Uwaga:} zgodnie z założeniem projektowym obszar lotu oraz odległość między kolumnami są stałe.
+Jednym z najważniejszych aspektów wykonania precyzyjnego manewru samolotem jest wzięcie pod uwagę kilku kolejnych punktów na planowej trasie, ze względu na charakter sterowania tego typu statkiem powietrznym. Aby umożliwić jak najkrótszy czas przygotowania samolotu do lotu, jego trasa określana jest przy pomocy pozycji dwóch kolumn, wokół których automatycznie ustalane są waypointy. Obliczenia pozycji punktów na mapie prowadzone są po stronie aplikacji webowej, a następnie wysyłane na samolot. Dla ułatwienia obliczeń i wizualizacji, po skalibrowaniu terenu, samolot korzysta z lokalnego układu współrzędnych, do którego transformowane są koordynaty GPS. Powierzchnia, po której porusza się samolot jest na tyle mała w skali krzywizny planety, że przyjąć można lokalny układ współrzędnych jako dwuwymiarowy układ kartezjański. Zgodnie z założeniem projektowym obszar lotu oraz odległość między kolumnami są stałe.
 
  \begin{figure}[ht]
     \centering
@@ -640,7 +646,7 @@ Cała definicja trasy składa się więc z kąta zawartego między osią samolot
     \label{fig:katy}
 \end{figure}
 
-\textbf{Uwaga:} zgodnie z założeniem projektowym, wszystkie waypointy znajdują się na tej samej wysokości. Z perspektywy programu możliwe by było wprowadzenie trzeciej zmiennej pozycji, jednak podczas lotu manualnego (w trakcie którego zbierane są dane treningowe) oszacowanie wysokości, na której znajduje się samolot jest bardzo nieprecyzyjne i mogło by negatywnie wpłynąć na wynik działania kontrolera.
+Zgodnie z założeniem projektowym, wszystkie waypointy znajdują się na tej samej wysokości. Z perspektywy programu możliwe by było wprowadzenie trzeciej zmiennej pozycji, jednak podczas lotu manualnego (w trakcie którego zbierane są dane treningowe) oszacowanie wysokości, na której znajduje się samolot jest bardzo nieprecyzyjne i mogło by negatywnie wpłynąć na wynik działania kontrolera.
 
 \begin{figure}[ht]
     \centering
@@ -710,7 +716,7 @@ Program został przygotowany w formie strony internetowej tak, aby możliwy był
 
 Pojawił się więc pomysł stworzenia aplikacji, która pozwoli na podgląd danych w czasie rzeczywistym, konfigurację samolotu oraz zapis i analizę zebranych danych. Projektując system największy nacisk położony został na jego przejrzystość, łatwość obsługi i praktyczność tak, aby pozwolić zaoszczędzić każdą cenną sekundę podczas wykonywania lotów testowych. Ekran główny wykonanej aplikacji można zobaczyć na grafice \ref{fig:weball}.
 
-\textbf{Uwaga:} Na potrzeby czytelnej wizualizacji w aplikacji zastosowano odwróconą szatę kolorystyczną. Domyślnie dominuje ciemna paleta barw, znacznie wygodniejsza w użyciu.
+Na potrzeby czytelnej wizualizacji w aplikacji zastosowano odwróconą szatę kolorystyczną. Domyślnie dominuje ciemna paleta barw, znacznie wygodniejsza w użyciu.
 
  \begin{figure}[ht]
     \centering
@@ -805,7 +811,7 @@ Strona ta jest kluczowa przy konfiguracji samolotu przed startem. Umożliwia zar
 
 Jeżeli nie powiedzie się próba podłączenia aplikacji do samolotu, najszybszym sposobem zlokalizowania problemu jest zakładka ustawień - za pomocą mapy połączeń w całym środowisku możliwe jest określenie miejsca występowania błędu. Na grafice \ref{fig:settings} wszystkie elementy na drodze między aplikacją internetową a samolotem są podświetlone na kolor zielony, co oznacza poprawne połączenie. W przypadku wystąpienia błędu - dla przykładu rozłączenia aplikacji przekaźnikowej - jej pole i wszystkie po nim następujące wyłączą podświetlenie, zatem od razu widać, który element nie działa. Wywołanie funkcji Echo skutkuje wysłaniem prośby do kolejnych programów o odesłanie informacji zwrotnej o prawidłowym działaniu. Podczas prac strona okazała się bardzo praktyczna i pozwoliła każdorazowo na oszczędzenie nawet kilku minut na szukanie błędów. 
 
-\textbf{Uwaga:} z przyczyn praktycznych aplikacja do treningu sztucznej inteligencji ostatecznie nie została podłączona do środowiska.
+Z przyczyn praktycznych aplikacja do treningu sztucznej inteligencji ostatecznie nie została podłączona do środowiska.
 
  \begin{figure}[H]
     \centering
@@ -856,7 +862,7 @@ Problem sterowania samolotem jest dość liniowo zależny od jego stanu - wychyl
 
 W bibliotece TensorFlow sieć ta zdefiniowana jest jako model typu Sequential, z przyjętą sigmoidalną funkcją aktywacji oraz definicją błędu pomiarowego jako średni błąd kwadratowy. Do procesu nauczania wykorzystano dane zebrane podczas przelotów treningowych.
 
-Trening został przeprowadzony na podstawie około 1500 chwil czasowych. Po około 35 epokach spadek błędu jest nieznaczny (wykres \ref{fig:tren1}). Po przetestowaniu działania na przykładowych danych testowych otrzymany wynik predykcji sieci zdaje się być poprawny, zatem sieć można wstępnie uznać za wytrenowaną.
+Trening został przeprowadzony na podstawie około 1500 chwil czasowych. Po około 35 epokach spadek błędu jest nieznaczny (wykres \ref{fig:tren1}).
 
  \begin{figure}[H]
     \centering
@@ -867,7 +873,7 @@ Trening został przeprowadzony na podstawie około 1500 chwil czasowych. Po oko�
 
 Sposobem na wyeksportowanie modelu przygotowanego przy użyciu biblioteki TensorFlow jest jego konwersja do pliku typu TFlite. Biblioteka TensorFlowLite jest biblioteką dedykowaną dla urządzeń mobilnych, która umożliwia wykorzystanie modelu na docelowym urządzeniu, takim jak telefon, mikrokontroler czy w aplikacji komputerowej. Modele TFlite są lżejsze oraz zoptymalizowane do pracy z wykorzystaniem mniejszych zasobów obliczeniowych i pamięciowych.
 
-Wersja biblioteki TensorFlowLite dostępna na mikrokontrolery jest kompatybilna ze środowiskiem Arduino IDE. Jednak nie jest ona dostępna dla wszystkich mikroprocesorów, oficjalnie wspierane jest niewiele urządzeń takich jak Arduino Nano 33 BLE Sense, STM32F746 czy ESP-EYE. Mimo braku oficjalnego wsparcia, na wykorzystanym w projekcie Teensy 4.0 (mikroprocesor ARM Cortex-M7) istnieje możliwość uruchomienia biblioteki. Plik z modelem sieci neuronowej TFlite musi uprzednio zostać przemieniony na tablicę znaków w systemie szesnastkowym, która może zostać zinterpretowana przez język C/C++. W tym celu można wykorzystać dostępną w systemach UNIX komendę xdd lub użyć skryptu w Pythonie. Finalnie otrzymany plik można zapisać z rozszerzeniem .h i zaimportować przez kompilator AVR-GCC po stronie środowiska Arduino. Model można poddać dodatkowemu procesowi kwantyzacji, co pozwala jeszcze bardziej ograniczyć jego zapotrzebowanie na moc obliczeniową oraz pamięciową - podczas treningu liczby zmiennoprzecinkowe zapisane są w formacie float64, kwantyzacja pozwala na implementację z wykorzystaniem na przykład postaci float32 czy float16.
+Wersja biblioteki TensorFlowLite dostępna na mikrokontrolery jest kompatybilna ze środowiskiem Arduino IDE. Jednak nie jest ona dostępna dla wszystkich mikroprocesorów, oficjalnie wspierane jest niewiele urządzeń takich jak Arduino Nano 33 BLE Sense, STM32F746 czy ESP-EYE. Mimo braku oficjalnego wsparcia, na wykorzystanym w projekcie Teensy 4.0 (mikroprocesor ARM Cortex-M7) istnieje możliwość uruchomienia biblioteki. Plik z modelem sieci neuronowej TFlite musi uprzednio zostać przemieniony na tablicę znaków w systemie szesnastkowym, która może zostać zinterpretowana przez język C/C++. W tym celu można wykorzystać dostępną w systemach UNIX komendę \textit{xdd} lub użyć skryptu w Pythonie. Finalnie otrzymany plik można zapisać z rozszerzeniem .h i zaimportować przez kompilator AVR-GCC po stronie środowiska Arduino. Model można poddać dodatkowemu procesowi kwantyzacji, co pozwala jeszcze bardziej ograniczyć jego zapotrzebowanie na moc obliczeniową oraz pamięciową - podczas treningu liczby zmiennoprzecinkowe zapisane są w formacie float64, kwantyzacja pozwala na implementację z wykorzystaniem na przykład postaci float32 czy float16.
 
 Niestety, przykładowych rozwiązań zastosowania modelu TensofFlow na mikrokontrolerach ze szczegółowym opisem ich implementacji jest w Internecie bardzo niewielka ilość, oficjalna dokumentacja również jest skromna i nie zawiera opisu rozwiązań wielu problemów. To wszystko sprawiło, że praca z biblioteką okazała się bardzo uciążliwa. Po wielu próbach udało uruchomić wytrenowaną sieć, jednak problemem okazała się rozbieżność odpowiedzi sieci dla danych testowych w oryginalnej aplikacji uczącej i na mikrokontrolerze. Rozbieżność ta wynika najprawdopodobniej z konieczności skalowania danych wejściowych i wyjściowych (co jest częstą procedurą w implementacji tego typu sieci neuronowych), jednak próby naprawienia tego problemu nie powiodły się. 
 
@@ -896,7 +902,7 @@ Drugim równocześnie testowym oprogramowaniem do uczenia maszynowego było narz
 
 Stałe skalowania i translacji są indywidualne dla każdego neuronu wejściowego i wyjściowego. W pierwszej warstwie ukrytej funkcją aktywacji jest tangens hiperboliczny, w warstwie wyjściowej nie jest użyta funkcja aktywacji, wynik jest tylko liniowy skalowany. Wykorzystany algorytm zwraca taką samą odpowiedź w środowisku treningowym (Matlab) jak i na mikrokontrolerze, osiągnięty zatem został cel implementacji zadanej sieci.
 
-\textbf{Uwaga:} przygotowany algorytm umożliwia automatyczną zmianę ilości neuronów w każdej z warstw. Dopiero modyfikacja struktury sieci (ilości warstw ukrytych) wymagałaby ręcznej interwencji w oprogramowanie i powielenia głębokości algorytmu propagacji między warstwami.
+Przygotowany algorytm umożliwia automatyczną zmianę ilości neuronów w każdej z warstw. Dopiero modyfikacja struktury sieci (ilości warstw ukrytych) wymagałaby ręcznej interwencji w oprogramowanie i powielenia głębokości algorytmu propagacji między warstwami.
 
 Podczas lotów treningowych udało się zgromadzić 20 000 punktów danych, co odpowiada ponad 16 minutom samego lotu po trasie ósemki. Przy pomocy narzędzia Neural Net Fitting App możliwy jest trening opisanej sieci neuronowej z wykorzystaniem algorytmu Levenberga-Marquardta. 
 
@@ -959,17 +965,44 @@ Sterowanie w trybie autonomicznym zostaje uruchomione w trakcie lotu manualnego,
     \label{fig:leci3}
 \end{figure}
 
-Przy pomocy odtwarzacza zwizualizowano wybrane fragmenty lotu. Żółtą linią zaznaczony został automatycznie wyznaczony ślad lotu samolotu w trybie całkowicie autonomicznym. Możemy zaobserwować wykonanie pełnego zakrętu (grafika \ref{fig:leci1}), wyprostowanie lotu po wyjściu z zakrętu (grafika \ref{fig:leci2}) oraz manewr wejścia w zakręt z lotu po linii prostej (grafika \ref{fig:leci3}). Fakt wykonania wymienionych manewrów świadczy o powodzeniu początkowego pomysłu projektu, ponieważ ich wykonanie w sposób przypadkowy jest praktycznie niemożliwe.
+Przy pomocy odtwarzacza zwizualizowano wybrane fragmenty lotu. Żółtą linią zaznaczony został automatycznie wyznaczony ślad lotu samolotu w trybie całkowicie autonomicznym. Możemy zaobserwować wykonanie pełnego zakrętu (grafika \ref{fig:leci1}), wyprostowanie lotu po wyjściu z zakrętu (grafika \ref{fig:leci2}) oraz manewr wejścia w zakręt z lotu po linii prostej (grafika \ref{fig:leci3}). Fakt wykonania wymienionych manewrów świadczy o powodzeniu początkowego pomysłu projektu, ponieważ ich wykonanie w sposób przypadkowy jest praktycznie niemożliwe. Początek i koniec krzywej linii oznaczają momenty odpowiednio uruchomienia i wyłączenia trybu autonomicznego. 
 
-\textbf{Uwaga:} początek i koniec krzywej linii oznaczają momenty odpowiednio uruchomienia i wyłączenia trybu autonomicznego. 
+Sieci neuronowe wytrenowane zarówno poprzez bibliotekę TensorFlow jak i środowisko Matlab mają bardzo podobną charakterystykę odpowiedzi, dlatego w poniższym zestawieniu umówiono drugą z nich. Predykcja algorytmu sterowania praktycznie pokrywa się z kolejnym ruchem wykonanym przez pilota, jak zobrazowano na wykresie \ref{fig:aivskac} - przedstawiono na nim porównanie sygnałów dla jednej z lotek. Należy zaznaczyć, że w celu lepszego zobrazowania wykres odpowiedzi pilota został przesunięty o jedną ramkę względem odpowiedzi sieci, dzięki czemu nakładane są na siebie predykcja sieci oraz sygnał od pilota z tej same chwili czasowej.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{nnvskac}
+    \caption{Porównanie sygnału sterowania przez pilota oraz predykcji sieci neuronowej dla prawej lotki. Wartość sygnału jest znormalizowana w przedziale [0, 1].}
+    \label{fig:aivskac}
+\end{figure}
+
+Na wykresie \ref{fig:nnturn} przedstawione zostało porównanie sterowania przez pilota oraz w locie autonomicznym przez sieć neuronową podczas manewru wejścia w zakręt (sygnał sterowania prawą lotką). Należy zaznaczyć, że wykres jest tylko jakościowym porównaniem sterowania, każdy zakręt zależy od początkowej pozycji i warunków, w których wykonywany jest taki manewr. Zachowanie sieci jest zbliżone do sterowania w locie manualnym, co potwierdza fakt, że wykonanie manewru nie było przypadkowe. 
 
 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{nnturn}
+    \caption{Porównanie sygnału sterowania pilota oraz sieci neuronowej przy wejściu w zakręt w lewo. Wartość sygnału jest zadanym w stopniach wychyleniem prawej lotki.}
+    \label{fig:nnturn}
+\end{figure}
+
+
+Wejście w zakręt samolot w tym przypadku wykonał prawidłowo, algorytm miał jednak problem z ustabilizowaniem dalszej części manewru, co widać na wykresie \ref{fig:nnturn2}, który jest rozszerzeniem poprzedniego o dane sterowania po wejściu w zakręt. Samolot znalazł się wtedy po zbyt dużym kątem, a algorytm próbuje to skorygować zbyt gwałtownymi wychyleniami. W efekcie niedokładności sterowania samolot przepada na skrzydło i zaczyna spadać, wtedy przełączony został na tryb manualny. Inne udane manewry miały podobny charakter, związany z brakiem korygowania trajektorii w dłuższym ujęciu czasowym.
+
+
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{nnturn2}
+    \caption{Porównanie sygnału sterowania pilota oraz sieci neuronowej przy wejściu w zakręt w lewo. Wartość sygnału jest zadanym w stopniach wychyleniem prawej lotki.}
+    \label{fig:nnturn}
+\end{figure}
 \FloatBarrier
 
 
 
 \subsection{Pliki źródłowe projektu}
-Ze względu na czytelność pracy, nie załączony w niej został kod źródłowy projektu. Jest on dostępny w publicznym repozytorium razem ze wszystkimi innymi plikami z wykorzystanych programów. Repozytorium znajduje się pod adresem:
+Ze względu na czytelność pracy, nie załączony w niej został kod źródłowy projektu, którego dodanie znacząco zwiększyło by jej objętość. Jest on dostępny w publicznym repozytorium razem ze wszystkimi innymi plikami z wykorzystanych programów. Repozytorium znajduje się pod adresem:
 
 \begin{center}
 \url{github.com/bialykostek/kontroler}
@@ -1015,14 +1048,211 @@ Problemy występowały także przy budowie samolotu i wynikały z braku doświad
 
 Paradoksalnie, najmniej problematycznym systemem do zaprogramowania okazała się być aplikacja webowa do przetwarzania danych, mimo że tej kod jest kilkanaście razy dłuższy niż oprogramowania kontrolera, serwera czy aplikacji przekaźnikowej.
 
-Opisane problemy nie okazały się zablokować projektu, który został dokończony i działa zgodnie z założeniem. Duża część prac polegała na przygotowaniu możliwości dalszego działania lub jego usprawnienia. Wydawać by się mogło, że niektóre z nich były bezcelowe lub różnica czasu poświęconego ich przygotowanie oraz czasu, które pozwoliły bezpośrednio zaoszczędzić nie jest na korzyść twórcy. Jednakże, jako że projekt rozwijany był równocześnie na kilku płaszczyznach, na bieżąco projektowane były funkcje lub elementy mogące tylko poprawić bilans czasu oszczędzonego w przyszłych działaniach. Należy również zaznaczyć ich pośredni wpływ biorąc pod uwagę czynnik ludzki. W projekcie indywidualnym nietrudno jest wpaść w efekt potwierdzenia bez świeżego spojrzenia innej osoby, co przekładać się może na utrudnione poszukiwanie źródeł nawet powtarzających się problemów. Każde narzędzie, dające możliwość monitorowania i usprawnienia działania środowiska z perspektywy testów każdorazowo okazało się być inwestycją zwrotną. Wszystkie te działania pozwoliły na zakończenie projektu z sukcesem. Jego podstawowe założenia zostały spełnione -  przygotowany został kontroler lotu oraz platforma testowa do jego badań. Algorytm sterowania działa poprawnie i wykonuje część manewrów, możliwy jest także dalszy jego rozwój jak i innych aspektów środowiska.
+Opisane problemy nie okazały się zablokować projektu, który został dokończony i działa zgodnie z założeniem. Jak wykazano w rozdziale 3.9 wykonane manewry nie były przypadkowe co potwierdza możliwość użycia sieci neuronowych do sterowania modelami samolotów. 
 
-
-\subsection{Podziękowania}
-Powyżej opisany projekt nie powstałby bez badań prowadzonych w zespole AGH Solar Plane. Kilkuletnie doświadczenie i wiedza zarówno energetyczna oraz konstrukcyjna pozwoliła realizację samolotu ``Dodo''. Szczególne podziękowania należą się opiekunowi pracy doktorowi habilitowanemu inżynierowi Ziemowitowi Dworakowskiemu za pomoc w przygotowaniu pracy oraz algorytmów sztucznej inteligencji, Kacprowi Krempie oraz Filipowi Pieniążkowi za bezcenną wiedzę i doświadczenie modelarskie, doktorowi inżynierowi Krzysztofowi Sornkowi za pomoc w przeprowadzeniu badań instalacji fotowoltaicznej, oraz wszystkich innych osób, które w sposób bezpośredni lub pośredni przyczyniły się do realizacji projektu.
-
+Duża część prac polegała na przygotowaniu możliwości dalszego działania lub jego usprawnienia. Wydawać by się mogło, że niektóre z nich były bezcelowe lub różnica czasu poświęconego ich przygotowanie oraz czasu, które pozwoliły bezpośrednio zaoszczędzić nie jest na korzyść twórcy. Jednakże, jako że projekt rozwijany był równocześnie na kilku płaszczyznach, na bieżąco projektowane były funkcje lub elementy mogące tylko poprawić bilans czasu oszczędzonego w przyszłych działaniach. Należy również zaznaczyć ich pośredni wpływ biorąc pod uwagę czynnik ludzki. W projekcie indywidualnym nietrudno jest wpaść w efekt potwierdzenia bez świeżego spojrzenia innej osoby, co przekładać się może na utrudnione poszukiwanie źródeł nawet powtarzających się problemów. Każde narzędzie, dające możliwość monitorowania i usprawnienia działania środowiska z perspektywy testów każdorazowo okazało się być inwestycją zwrotną. Wszystkie te działania pozwoliły na zakończenie projektu z sukcesem. Jego podstawowe założenia zostały spełnione -  przygotowany został kontroler lotu oraz platforma testowa do jego badań. Algorytm sterowania działa poprawnie i wykonuje część manewrów, możliwy jest także dalszy jego rozwój jak i innych aspektów środowiska.
 
 \subsection{Wnioski}
 W ramach projektu neuronowego kontrolera lotu do sterowania bezzałogowym statkiem powietrznym wykonano szereg składowych środowiska, zarówno sprzętowego jak model samolotu testowego, umieszczona na nim instalacja fotowoltaiczna czy elektronika pokładowa, a także oprogramowania systemów kontroli czy naziemnej stacji odbiorczej. Wykorzystanie wszystkich tych elementów pozwoliło na zbieranie i przetwarzanie danych w czasie rzeczywistym oraz ich wizualizację, a docelowo wykorzystane zostały one do treningu rekurencyjnej sieci neuronowej, która jest bazą algorytmu sterowania. Wykorzystanie jej w powietrzu pozwoliło na wykonanie części planowanych manewrów, co dowodzi możliwości wykorzystania tego typu struktury w sterowaniu modelem samolotu. Planowanym dalszym rozwojem projektu jest użycie sieci LSTM zamiast wielowarstwowego perceptronu w celu wyeliminowania nawarstwiających się błędów sterowania.
+
+\clearpage
+\section*{Podziękowania}
+Powyżej opisany projekt nie powstałby bez badań prowadzonych w zespole AGH Solar Plane. Kilkuletnie doświadczenie i wiedza zarówno energetyczna oraz konstrukcyjna a także badania prowadzone nad metodami laminowania ogniw fotowoltaicznych pozwoliły realizację samolotu ``Dodo''. Szczególne podziękowania należą się Kacprowi Krempie oraz Filipowi Pieniążkowi za bezcenną wiedzę i doświadczenie modelarskie, doktorowi inżynierowi Krzysztofowi Sornkowi za pomoc w przeprowadzeniu badań instalacji fotowoltaicznej, ANdrzejowi Rusinowskiemu i Erykowi Halaburdzie za pełnienie roli pilotów rezerwowych, oraz wszystkich innych osób, które w sposób bezpośredni lub pośredni przyczyniły się do realizacji projektu.
+
+\clearpage
+
+\begin{center}
+\textbf{Załącznik 1 - zbiór komend protokołu komunikacyjnego}
+\end{center}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| l | l |}
+\hline
+\textbf{Numer} & \textbf{Akcja} \\
+\hline
+0 & Nakaz uzbrojenia silnika \\
+\hline
+1 & Nakaz rozbrojenia silnika \\
+\hline
+2 & Nakaz wysłania jednej ramki danych \\
+\hline
+3 & Nakaz restartu urządzenia \\
+\hline
+4 & Nakaz restartu urządzenia - krok 2 \\
+\hline
+
+\end{tabular}
+\caption{Zbiór komend nakazu wykonania akcji.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| l | l |}
+\hline
+\textbf{Numer} & \textbf{Zapytanie} \\
+\hline
+0 & Echo środowiska \\
+\hline
+1 & Zapytanie o uzbrojenie silnika \\
+\hline
+2 & Zapytanie o pozycje waypointów \\
+\hline
+3 & Zapytanie o pozycję lewej kolumny \\
+\hline
+4 & Zapytanie o pozycję prawej kolumny \\
+\hline
+5 & Zapytanie o skalę w osi poziomej \\
+\hline
+6 & Zapytanie o skalę w osi pionowej \\
+\hline
+7 & Zapytanie o kąt ułożenia układu \\
+\hline
+
+\end{tabular}
+\caption{Zbiór komend zapytania o informację.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| l | l |}
+\hline
+\textbf{Numer} & \textbf{Akcja} \\
+\hline
+0 & Włączenie/wyłączenie wysyłania danych \\
+\hline
+1 & Zmiana indeksu wysyłanego waypointa \\
+\hline
+2 & Wartość zmiany waypointa \\
+\hline
+3 & Ustawienie aktualnej pozycji jako lewej kolumny \\
+\hline
+4 & Ustawienie aktualnej pozycji jako prawej kolumny \\
+\hline
+5 & Zmiana skali pionowej \\
+\hline
+6 & Zmiana skali poziomej \\
+\hline
+7 & Zmiana kąta ułożenia układu \\
+\hline
+8 & Zmiana numeru obecnego waypointa \\
+\hline
+9 & Kalibracja kompasu \\
+\hline
+10 & Zmiana trybu wysyłania danych \\
+\hline
+11 & Zmiana częstotliwości pracy modułu GPS \\
+\hline
+
+\end{tabular}
+\caption{Zbiór komend zmiany wartości.}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| l | l |}
+\hline
+\textbf{Numer} & \textbf{Informacja} \\
+\hline
+0 & Odpowiedź na echo środowiska \\
+\hline
+1 & Tryb startu urządzenia \\
+\hline
+2 & Informacja o uzbrojeniu silnika \\
+\hline
+3 & Wynik inicjalizacji modułu ICM \\
+\hline
+4 & Wynik inicjalizacji algorytmu DMP \\
+\hline
+5 & Wynik inicjalizacji modułu GPS \\
+\hline
+6 & Wynik inicjalizacji modułu LPS \\
+\hline
+7 & Informacja o trybie awaryjnym \\
+\hline
+8 & Potwierdzenie zmiany informacji \\
+\hline
+9 & Informacja o położeniu lewej kolumny \\
+\hline
+10 & Informacja o położeniu prawej kolumny \\
+\hline
+11 & Informacja o skali w osi pionowej \\
+\hline
+12 & Informacja o skali w osi poziomej \\
+\hline
+13 & Informacja o kącie ułożenia układu \\
+\hline
+14 & Informacja o gotowości urządzenia \\
+\hline
+\end{tabular}
+\caption{Zbiór typów informacji wysyłanych z kontrolera.}
+\end{table}
+
+
+
+Setting chanel value:
+0-50 - manual
+15-30 - stop sending messages
+75-105 - auto mode
+
+Websocket message type:
+0 - Web App -> Ground Station
+1 - Ground Station -> Web App
+2 - Connection device type
+3 - Echo request
+4 - Echo response
+5 - Telemetry Data
+6 - Web App -> Server (settings)
+7 - Server -> WebApp (settings)
+
+Server settings actions (type 6):
+0 - turn on saving
+1 - turn of saving
+2 - ask if saving
+3 - ask for logs
+
+Server settings responses (type 7):
+0 - server on/off
+1 - log list
+
+Controler EEPROM adresses:
+0 - arm info
+1 - 113 - waypoints
+114-117 - left column long
+118-121 - left column lat
+122-125 - right column long
+126-129 - right column lat
+130-133 - scale NS
+134-137 - scale EW
+138-141 - angle 
+
+Neural Network inputs:
+0 - roll
+1 - pitch
+2 - roll previous
+3 - pitch previous
+4 - ground speed
+5 - altitute
+6 - vPitot
+7 - angles[0]
+8 - angles[1]
+9 - angles[2]
+10 - angles[3]
+11 - angles[4]
+12 - angles[5]
+13 - angles[6]
+14 - angles[7]
+15 - distance to current
+16 - input1 previous
+17 - input2 previous
+18 - input3 previous
+19 - input4 previous
+20 - input5 previous
+21 - output1
+22 - output2
+23 - output3
+24 - output4
+25 - output5
 
 \end{document}

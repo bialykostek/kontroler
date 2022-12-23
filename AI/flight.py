@@ -122,10 +122,16 @@ with open(c_model_name + '.h', 'w') as file:
   file.write(hex_to_c_array(tflite_model, c_model_name))
 
 print("Training finished!")
-print(x_test[0])
-print(x_test[1])
-print(model.predict(x_test[:2]))
+print(y_train[0])
+print(y_train[1])
+print(y_train[2])
+print(model.predict(x_train[:]))
 
+plt.plot(epochs, loss, 'bo', label='Training loss')
+plt.plot(epochs, val_loss, 'b', label='Validation loss')
+plt.title('Training and validation loss')
+plt.legend()
+plt.show()
 
 
 '''

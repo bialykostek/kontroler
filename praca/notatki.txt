@@ -9,16 +9,12 @@
 9. Obrócenie kolorów w aplikacji - na szybko przygotowałem tryb jasny, jest jedna grafika podmieniona, resztę analogicznie podmienię przy formatowaniu
 10. Praca nie jest jeszcze finalnie złożona, błędy edytorskie poprawię na samym końcu.
 11. Niepodpisane zdjęcia są domyślnie moje - czy to poprawne założenie?
+12. Czy rozwijać dok hab inz
 
 TODO
-
-teoria nn nauczanie algorytmem kogos tam
 bibliografia
-nazwy rozdzialow
 dodać tabele z komendami z protokolu
-do przeglądu/obecnych rozwiązań dodać sterowanie pixhawkiem
-na koniec implementacji pokazać porównanie sekwencji i napisać że jest to ddużyh sukces i że tylko błąd się namnaża, nie jest przypadkowe
-test modelu z tensforflow
+dopisać na wykresach ze wynika z charakterystyki pracy
 
 
 url z url
