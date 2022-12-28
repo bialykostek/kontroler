@@ -1,55 +1,68 @@
 This is BibTeX, Version 0.99d
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: inzynierka.aux
-White space in argument---line 22 of file inzynierka.aux
- : \citation{Design
- :                  of Solar Powered Airplane}
-I'm skipping whatever remains of this command
-White space in argument---line 28 of file inzynierka.aux
- : \citation{developing
- :                      a solar}
-I'm skipping whatever remains of this command
-I found no \bibdata command---while reading file inzynierka.aux
-I found no \bibstyle command---while reading file inzynierka.aux
-You've used 2 entries,
-            0 wiz_defined-function locations,
-            85 strings with 508 characters,
-and the built_in function-call counts, 0 in all, are:
-= -- 0
-> -- 0
+Reallocating 'name_of_file' (item size: 1) to 6 items.
+The style file: unsrt.bst
+Reallocating 'name_of_file' (item size: 1) to 7 items.
+Database file #1: export.bib
+Warning--entry type for "Engel2007" isn't style-file defined
+--line 1 of file export.bib
+Warning--entry type for "Rapinett2009" isn't style-file defined
+--line 16 of file export.bib
+Warning--entry type for "px4pid" isn't style-file defined
+--line 64 of file export.bib
+Warning--entry type for "px4diag" isn't style-file defined
+--line 67 of file export.bib
+Warning--entry type for "mat" isn't style-file defined
+--line 144 of file export.bib
+Warning--empty publisher in mech
+Warning--empty publisher in IEEE2013
+Warning--empty journal in devasol
+Warning--empty booktitle in Xu2022
+Warning--empty booktitle in 3dpath
+Warning--empty booktitle in Chowdhury2022
+Warning--empty booktitle in Emaletdinova2017
+Warning--empty publisher in IEEE2017
+Warning--empty year in IEEE2017
+You've used 20 entries,
+            1791 wiz_defined-function locations,
+            538 strings with 6952 characters,
+and the built_in function-call counts, 3105 in all, are:
+= -- 203
+> -- 181
 < -- 0
-+ -- 0
-- -- 0
-* -- 0
-:= -- 0
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
++ -- 70
+- -- 50
+* -- 137
+:= -- 497
+add.period$ -- 49
+call.type$ -- 20
+change.case$ -- 16
 chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 0
-format.name$ -- 0
-if$ -- 0
+cite$ -- 29
+duplicate$ -- 162
+empty$ -- 361
+format.name$ -- 50
+if$ -- 697
 int.to.chr$ -- 0
-int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 0
-num.names$ -- 0
-pop$ -- 0
-preamble$ -- 0
+int.to.str$ -- 20
+missing$ -- 18
+newline$ -- 92
+num.names$ -- 16
+pop$ -- 118
+preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 0
+skip$ -- 80
 stack$ -- 0
 substring$ -- 0
-swap$ -- 0
+swap$ -- 19
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 0
-while$ -- 0
-width$ -- 0
-write$ -- 0
-(There were 4 error messages)
+warning$ -- 9
+while$ -- 16
+width$ -- 22
+write$ -- 172
+(There were 14 warnings)

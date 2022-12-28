@@ -3,7 +3,7 @@
 \contentsline {subsection}{\numberline {1.1}Koncepcja}{3}{}%
 \contentsline {subsection}{\numberline {1.2}Cel, zakres i organizacja pracy}{3}{}%
 \contentsline {section}{\numberline {2}Wstęp teoretyczny}{6}{}%
-\contentsline {subsection}{\numberline {2.1}Budowa modeli samolotów kompozytowych}{6}{}%
+\contentsline {subsection}{\numberline {2.1}Budowa kompozytowych modeli samolotów}{6}{}%
 \contentsline {subsection}{\numberline {2.2}Technika sterowania samolotem}{7}{}%
 \contentsline {subsection}{\numberline {2.3}Rozwiązania dostępne na rynku}{9}{}%
 \contentsline {subsection}{\numberline {2.4}Samoloty solarne}{12}{}%
@@ -13,10 +13,10 @@
 \contentsline {subsection}{\numberline {3.1}Budowa modelu samolotu}{16}{}%
 \contentsline {paragraph}{Wytworzenie elementów kompozytowych}{18}{}%
 \contentsline {paragraph}{Łączenie elementów}{21}{}%
-\contentsline {paragraph}{Kadłub}{22}{}%
+\contentsline {paragraph}{Kadłub}{23}{}%
 \contentsline {paragraph}{Złożenie samolotu}{24}{}%
-\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{25}{}%
-\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{29}{}%
+\contentsline {subsection}{\numberline {3.2}Moduł instalacji fotowoltaicznej}{26}{}%
+\contentsline {subsection}{\numberline {3.3}Moduł kontrolera lotu}{30}{}%
 \contentsline {subsection}{\numberline {3.4}Oprogramowanie kontrolera lotu}{35}{}%
 \contentsline {paragraph}{Algorytm estymacji trajektorii}{37}{}%
 \contentsline {subsection}{\numberline {3.5}Stacja odbiorcza}{41}{}%
@@ -28,12 +28,14 @@
 \contentsline {paragraph}{Strona: Konsola}{48}{}%
 \contentsline {paragraph}{Strona: Konfiguracja}{48}{}%
 \contentsline {paragraph}{Strona: Ustawienia}{49}{}%
-\contentsline {paragraph}{Strona: Odtwarzacz}{49}{}%
+\contentsline {paragraph}{Strona: Odtwarzacz}{50}{}%
 \contentsline {subsection}{\numberline {3.8}Trening sieci neuronowej}{50}{}%
-\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{58}{}%
-\contentsline {subsection}{\numberline {3.10}Pliki źródłowe projektu}{62}{}%
-\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{63}{}%
-\contentsline {subsection}{\numberline {4.1}Podsumowanie wykonanych prac}{63}{}%
-\contentsline {subsection}{\numberline {4.2}Możliwości rozwoju projektu}{63}{}%
-\contentsline {subsection}{\numberline {4.3}Dyskusja}{64}{}%
-\contentsline {subsection}{\numberline {4.4}Wnioski}{65}{}%
+\contentsline {subsection}{\numberline {3.9}Wyniki działania algorytmu sterowania}{57}{}%
+\contentsline {subsection}{\numberline {3.10}Pliki źródłowe projektu}{61}{}%
+\contentsline {section}{\numberline {4}Podsumowanie i wnioski}{62}{}%
+\contentsline {subsection}{\numberline {4.1}Podsumowanie wykonanych prac}{62}{}%
+\contentsline {subsection}{\numberline {4.2}Możliwości rozwoju projektu}{62}{}%
+\contentsline {subsection}{\numberline {4.3}Dyskusja}{63}{}%
+\contentsline {subsection}{\numberline {4.4}Wnioski}{64}{}%
+\contentsline {section}{\numberline {5}Bibliografia}{66}{}%
+\contentsline {section}{\numberline {6}Załączniki}{68}{}%

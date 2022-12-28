@@ -1,0 +1,15 @@
+$('body').css('background-color', 'white');
+$('.dataName').css('color', 'black');
+$('.inverted').removeClass('inverted');
+$('#console').css('background-color', '#cdcdcd');
+$('.info').css('color', 'black');
+$('.order').css('color', 'black');
+$('#consoleInputText').css('border-color', 'black');
+$('#consoleInputText').css('background-color', '#cdcdcd');
+$('body').css('color', 'black');
+$('#echoTestTable').css('color', 'white');
+$('#player').css('background-color', '#cdcdcd');
+$('.pageTitle').css('background-color', 'white');
+$('.pageTitle.active').css('background-color', 'darkgreen');
+$('.pageTitle').css('color', 'black');
+$('.pageTitle.active').css('color', 'white');

@@ -6,6 +6,7 @@ data = table2array(readtable('pomiary/lewe_przetarte_11_30_2022_11-34-10.csv'));
 
 figure();
 yyaxis left
+set(gca,'fontsize', 13);
 plot(data(1:67, 1), data(1:67, 2));
 hold on
 
@@ -22,6 +23,7 @@ data = table2array(readtable('pomiary/lewe_przetarte_11_30_2022_11-34-30.csv'));
 
 figure();
 yyaxis left
+set(gca,'fontsize', 13);
 plot(data(1:67, 1), data(1:67, 2));
 hold on
 title("Charakterystyka - próba 2")

@@ -34,7 +34,8 @@ function chartInit(){
             type: "line",
             dataPoints: chartData
         }],
-        theme: "dark1"
+        //theme: "dark1"
+		theme: "light1"
     });
 
     clog("Chart ready", "info");

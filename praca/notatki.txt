@@ -12,15 +12,5 @@
 12. Czy rozwijać dok hab inz
 
 TODO
-bibliografia
-dodać tabele z komendami z protokolu
-dopisać na wykresach ze wynika z charakterystyki pracy
 
-
-url z url
-jednostki i znak stopnia
-czcionka
-tytul pracy
-graikifi obrócić kolory
 posprzątać gita i dać md
-formatowanie końcowe i korekta

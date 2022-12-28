@@ -5,6 +5,7 @@ clc
 data = table2array(readtable('pomiary/prawe_przetarte_11_30_2022_11-39-38.csv'));
 
 figure();
+set(gca,'fontsize', 13);
 yyaxis left
 plot(data(1:67, 1), data(1:67, 2));
 hold on
@@ -21,6 +22,7 @@ title("Charakterystyka - prawe skrzydło")
 data = table2array(readtable('pomiary/lewe_przetarte_11_30_2022_11-34-10.csv'));
 
 figure();
+set(gca,'fontsize', 13);
 yyaxis left
 plot(data(1:65, 1), data(1:65, 2));
 hold on
