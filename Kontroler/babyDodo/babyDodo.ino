@@ -74,6 +74,7 @@ const int NNinpLen = 27;
 
 float NNlearnOut[5] = {0, 0, 0, 0, 0};
 
+
 const int waypointsNumber = 28;
 int waypoints[waypointsNumber][2];
 int sendingWaypointsIndex = 0;
@@ -170,7 +171,7 @@ void queryValue(int query){
       COM.println("#0|1");
       break;
     case 1:
-      //server echo
+      //arm info
       COM.println();
       if(armed){
         COM.println("#2|1");
@@ -300,14 +301,19 @@ void executeOrder(int order){
   switch(order) {
     case 0:
       //arm
+      COM.println();
+      Serial.println(armed);
       armed = true;
-      altiPressOffset = (float)GPSaltitude/1000;
       EEPROM.write(0, 1);
+      COM.println("#2|1");
+      Serial.println(armed);
       break;
     case 1:
       //disarm
+      COM.println();
       armed = false;
       EEPROM.write(0, 0);
+      COM.println("#2|0");
       break;
     case 2:
       sendOne = true;
@@ -329,7 +335,9 @@ void executeOrder(int order){
 
 void checkForMessage(){ 
   if(COM.available()){
+    
     int in = COM.read();
+    
     if(in == 46){
       requestComma = true;
     }
@@ -531,8 +539,8 @@ float getPitot() {
 
 void readReceiver(){
   inp1_elevator = map(ch4_elevator.getValue(), 1100, 1900, 30, 150);
-  inp2_leftail = map(ch2_leftail.getValue(), 1100, 1900, 40, 160);
-  inp3_rightail = map(ch5_rightail.getValue(), 1100, 1900, 30, 150);
+  inp2_leftail = map(ch2_leftail.getValue(), 1100, 1900, 70, 130);
+  inp3_rightail = map(ch5_rightail.getValue(), 1100, 1900, 65, 135);
   inp4_rudder = map(ch3_rudder.getValue(), 1100, 1900, 30, 130);
   inp5_esc = map(ch6_esc.getValue(), 1100, 1900, 0, 180);
   inp6_settings = map(ch1_settings.getValue(), 1100, 1900, 0, 180);
@@ -734,10 +742,6 @@ void setup() {
     COM.println("#1|1");
     
   }
-
-
-  
-  
 
   COM.println("#14|1");
 }
@@ -1121,7 +1125,7 @@ if(inp6_settings > 75 && inp6_settings < 105){
   }
   
  debugTimer = millis();
-    if (false && millis()-gpsTimer>100 && myGNSS.getPVT()){
+    if (millis()-gpsTimer>100 && myGNSS.getPVT()){
       latitude = myGNSS.getLatitude();
       longitude = myGNSS.getLongitude();
       GPSaltitude = myGNSS.getAltitude();

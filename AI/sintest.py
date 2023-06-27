@@ -3,118 +3,253 @@
 #tensorflow(-gpu)==2.1
 #python 3.7.9
 
-import os
-os.add_dll_directory(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin")
-os.add_dll_directory(r"D:\INSTALATORY\cudnn-10.1-windows10-x64-v8.0.4.30\cuda\bin")
+#https://colab.research.google.com/github/tensorflow/tensorflow/blob/master/tensorflow/lite/examples/experimental_new_converter/Keras_LSTM_fusion_Codelab.ipynb#scrollTo=0-b0IKK2FGuO
 
+import os
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import math
 from tensorflow.keras import layers
 
-nsamples = 1000
+EPOCHS = 300
+BATCH_SIZE = 32
+
 val_ratio = 0.2
-test_ratio = 0.2
-tflite_model_name = "sine_model"
-c_model_name = "some_model"
+test_ratio = 0.05
 
-# Generate some random samples
-np.random.seed(1234)
-x_values = np.random.uniform(low=0, high=(2 * math.pi), size=nsamples)
-plt.plot(x_values)
+tflite_model_name = "flight_model"
+c_model_name = "flight_model"
 
-# Create a noisy sinewave with these values
-y_values = np.sin(x_values) + (0.1 * np.random.randn(x_values.shape[0]))
-plt.plot(x_values, y_values, '.')
+file = open('log_21_06_17_17_21.txt' , 'r')
 
-# Split the dataset into training, validation, and test sets
-val_split = int(val_ratio * nsamples)
-test_split = int(val_split + (test_ratio * nsamples))
+inputdata = []
+inputres = []
+s=0
+while True:
+    line = file.readline() 
+
+    s+=1
+    if s<269:
+      continue
+    if s > 6888:
+      break
+       
+    
+    if not line:
+        break
+  
+    try:
+
+      line = line.split(",")
+      line = line[33]
+
+      line = line.split("|")[0]
+      line = line.split(">")
+      
+      ok = True
+      for i in range(21):
+        if math.isnan(float(line[i])):
+          ok = False
+          break
+      if not ok:
+        continue
+
+      tmp = []
+      #!!!16
+      for i in range(16):
+        tmp.append(float(line[i]))
+  
+      inputres.append([float(line[21]), float(line[22]), float(line[23]), float(line[24]), float(line[25])])
+      inputdata.append(tmp)
+    except:
+      pass
+
+x_values = np.array(inputdata)
+y_values = np.array(inputres)
+
+val_split = int(val_ratio * len(x_values))
+test_split = int(val_split + (test_ratio * len(x_values)))
 x_val, x_test, x_train = np.split(x_values, [val_split, test_split])
 y_val, y_test, y_train = np.split(y_values, [val_split, test_split])
 
-# Check that our splits add up correctly
-assert(x_train.size + x_val.size + x_test.size) == nsamples
+print(x_train.shape)
+print(y_train.shape)
 
-# Plot the data in each partition in different colors:
-plt.plot(x_train, y_train, 'b.', label="Train")
-plt.plot(x_test, y_test, 'r.', label="Test")
-plt.plot(x_val, y_val, 'y.', label="Validate")
-plt.legend()
-plt.show()
 
-# Create a model
 model = tf.keras.Sequential()
-model.add(layers.Dense(16, activation='relu', input_shape=(1,)))
-model.add(layers.Dense(16, activation='relu'))
-model.add(layers.Dense(1))
+#!!!!16
+model = tf.keras.Sequential()
+model.add(layers.Dense(30, activation='relu', input_shape=(16,)))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(5))
 
-# Add optimizer, loss function, and metrics to model and compile it
-model.compile(optimizer='rmsprop', loss='mae', metrics=['mae'])
+#model.add(layers.LSTM(22, activation='sigmoid', input_shape=x_train.shape, return_sequences=True))
+#model.optimizer.learning_rate = 0.01
 
-# Train model
-history = model.fit(x_train,
-                    y_train,
-                    epochs=500,
-                    batch_size=100,
-                    validation_data=(x_val, y_val))
 
-# Plot the training history
-loss = history.history['loss']
-val_loss = history.history['val_loss']
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3), loss=tf.keras.losses.MeanSquaredError())
 
-epochs = range(1, len(loss) + 1)
+es_callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=15)
 
-plt.plot(epochs, loss, 'bo', label='Training loss')
-plt.plot(epochs, val_loss, 'b', label='Validation loss')
-plt.title('Training and validation loss')
-plt.legend()
-plt.show()
+history = model.fit(x_values, y_values, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_data=(x_val, y_val), callbacks=[es_callback])
 
-# Convert Keras model to a tflite model
+
+#loss = history.history['loss']
+#val_loss = history.history['val_loss']
+
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_SIZE]
 tflite_model = converter.convert()
 
 open(tflite_model_name + '.tflite', 'wb').write(tflite_model)
 
-
-# Function: Convert some hex value into an array for C programming
 def hex_to_c_array(hex_data, var_name):
-
-  c_str = ''
-
-  # Create header guard
-  c_str += '#ifndef ' + var_name.upper() + '_H\n'
-  c_str += '#define ' + var_name.upper() + '_H\n\n'
-
-  # Add array length at top of file
-  c_str += '\nunsigned int ' + var_name + '_len = ' + str(len(hex_data)) + ';\n'
-
-  # Declare C variable
-  c_str += 'unsigned char ' + var_name + '[] = {'
+  c_str = """
+#define TENSORFLOW_LITE_EXPERIMENTAL_MICRO_EXAMPLES_HELLO_WORLD_SINE_MODEL_DATA_H_
+#ifdef __has_attribute
+#define HAVE_ATTRIBUTE(x) __has_attribute(x)
+#else
+#define HAVE_ATTRIBUTE(x) 0
+#endif
+#if HAVE_ATTRIBUTE(aligned) || (defined(__GNUC__) && !defined(__clang__))
+#define DATA_ALIGN_ATTRIBUTE __attribute__((aligned(4)))
+#else
+#define DATA_ALIGN_ATTRIBUTE
+#endif
+"""
+  c_str += '\nconst int ' + var_name + '_len = ' + str(len(hex_data)) + ';\n'
+  c_str += 'const unsigned char ' + var_name + '[] DATA_ALIGN_ATTRIBUTE = {'
   hex_array = []
   for i, val in enumerate(hex_data) :
-
-    # Construct string from hex
     hex_str = format(val, '#04x')
-
-    # Add formatting so each line stays within 80 characters
     if (i + 1) < len(hex_data):
       hex_str += ','
     if (i + 1) % 12 == 0:
       hex_str += '\n '
     hex_array.append(hex_str)
-
-  # Add closing brace
   c_str += '\n ' + format(' '.join(hex_array)) + '\n};\n\n'
-
-  # Close out header guard
-  c_str += '#endif //' + var_name.upper() + '_H'
 
   return c_str
 
-# Write TFLite model to a C source (or header) file
 with open(c_model_name + '.h', 'w') as file:
   file.write(hex_to_c_array(tflite_model, c_model_name))
+
+'''
+output = []
+for i in range(len(x_test)-1):
+  print(str(i) + "/"+str(len(x_test)))
+  out = model.predict(x_test[i:i+1])
+  output.append(out[0].tolist())
+  x_test[i+1][16] = out[0][0]
+  x_test[i+1][17] = out[0][1]
+  x_test[i+1][18] = out[0][2]
+  x_test[i+1][19] = out[0][3]
+  x_test[i+1][20] = out[0][4]
+
+output = np.array(output)
+
+print(output)
+
+fig, axs = plt.subplots(5)
+for i in range(5):
+  axs[i].plot(y_test[:, i])
+  axs[i].plot(output[:, i])
+
+plt.show()
+'''
+
+fig, axs = plt.subplots(5)
+for i in range(5):
+  axs[i].plot(y_test[:, i])
+  axs[i].plot(model.predict(x_test)[:, i])
+axs[3].set_ylim([0.2, 0.8])
+plt.show()
+
+
+'''
+models:
+1:
+model = tf.keras.Sequential()
+model.add(layers.Dense(21, activation='sigmoid', input_shape=(21,)))
+model.add(layers.Dropout(0.01))
+model.add(layers.Dense(10, activation='linear'))
+model.add(layers.Dropout(0.01))
+model.add(layers.Dense(5))
+
+2:
+model = tf.keras.Sequential()
+model.add(layers.Dense(21, activation='sigmoid', input_shape=(21,)))
+model.add(layers.Dropout(0.01))
+model.add(layers.Dense(10, activation='sigmoid'))
+model.add(layers.Dropout(0.01))
+model.add(layers.Dense(5))
+
+3:
+model = tf.keras.Sequential()
+model.add(layers.Dense(21, activation='sigmoid', input_shape=(21,)))
+model.add(layers.Dropout(0.01))
+model.add(layers.Dense(5))
+
+4:
+model = tf.keras.Sequential()
+model.add(layers.Dense(16, activation='relu', input_shape=(16,)))
+model.add(layers.Dense(100, activation='relu'))
+model.add(layers.Dense(100, activation='relu'))
+model.add(layers.Dense(50, activation='relu'))
+model.add(layers.Dense(25, activation='relu'))
+model.add(layers.Dense(10, activation='relu'))
+model.add(layers.Dense(5))
+
+5:
+
+model = tf.keras.Sequential()
+model.add(layers.Dense(16, activation='relu', input_shape=(16,)))
+model.add(layers.Dense(20, activation='relu'))
+model.add(layers.Dense(20, activation='relu'))
+model.add(layers.Dense(20, activation='relu'))
+model.add(layers.Dense(20, activation='relu'))
+model.add(layers.Dense(20, activation='relu'))
+model.add(layers.Dense(20, activation='relu'))
+model.add(layers.Dense(10, activation='relu'))
+model.add(layers.Dense(5))
+
+16:
+model = tf.keras.Sequential()
+model.add(layers.Dense(30, activation='relu', input_shape=(16,)))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(5))
+
+17:
+with recurent
+model = tf.keras.Sequential()
+model.add(layers.Dense(30, activation='relu', input_shape=(21,)))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(5))
+
+18:
+model = tf.keras.Sequential()
+model.add(layers.Dense(30, activation='relu', input_shape=(16,)))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(30, activation='relu'))
+model.add(layers.Dense(5))
+'''

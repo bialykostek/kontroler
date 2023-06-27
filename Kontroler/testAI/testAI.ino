@@ -1,6 +1,6 @@
 #include <TensorFlowLite.h>
 
-#include "second_model.h"
+#include "flight_model.h"
 #include "tensorflow/lite/experimental/micro/kernels/all_ops_resolver.h"
 #include "tensorflow/lite/experimental/micro/micro_error_reporter.h"
 #include "tensorflow/lite/experimental/micro/micro_interpreter.h"
@@ -29,7 +29,7 @@ void setup() {
   static tflite::MicroErrorReporter micro_error_reporter;
   error_reporter = &micro_error_reporter;
   
-  model = tflite::GetModel(g_second_model_data);
+  model = tflite::GetModel(flight_model);
   if (model->version() != TFLITE_SCHEMA_VERSION) {
     Serial.println("Model version error");
     return;
@@ -49,28 +49,37 @@ void setup() {
   output = interpreter->output(0);
 
   inference_count = 0;
-}
+  
+  float x[27] = {0.49,0.51,0.49,0.51,0.00,-0.50,3.92,0.80,0.25,0.24,0.53,0.58,0.57,0.57,0.63,0.50,0.85,0.85,0.85,0.85,0.85};
+  for(int i=0; i<1; i++){
 
-void loop() {
-
-  float position = static_cast<float>(inference_count) / static_cast<float>(kInferencesPerCycle);
-  float x_val = position * kXrange;
-
-  input->data.f[0] = x_val;
-  input->data.f[1] = x_val;
-
-  TfLiteStatus invoke_status = interpreter->Invoke();
+    for(int k = 0; k < 27; k++){
+   input->data.f[k] = x[k];
+    }
+   
+   TfLiteStatus invoke_status = interpreter->Invoke();
   if (invoke_status != kTfLiteOk) {
     Serial.println("Model invoke error");
     return;
   }
-  
-  float y_val1 = output->data.f[0];
-  float y_val2 = output->data.f[1];
-  Serial.print(y_val1);
+  float y1 = output->data.f[0];
+  float y2 = output->data.f[1];
+  float y3 = output->data.f[2];
+  float y4 = output->data.f[3];
+  float y5 = output->data.f[4];
+  Serial.print(y1);
   Serial.print(" ");
-  Serial.println(y_val2);
-  inference_count += 1;
-  if (inference_count >= kInferencesPerCycle) inference_count = 0;
-  delay(50);
+  Serial.print(y2);
+  Serial.print(" ");
+  Serial.print(y3);
+  Serial.print(" ");
+  Serial.print(y4);
+  Serial.print(" ");
+  Serial.println(y5);
+
+  }
+  
+}
+
+void loop() {
 }

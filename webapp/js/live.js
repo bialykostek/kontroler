@@ -5,6 +5,15 @@ function updateLiveData(data){
     });
     //updateChart(parseFloat(data[3]));
 
+    if(!drawing && parseInt(data[5]) > 180){
+        drawing = true;
+        drawLine = true;
+        trackHis = [];
+    }
+    if(drawing && parseInt(data[5]) < 180 && parseInt(data[5]) > 10){
+        drawing = false;
+    }
+
     planeVis.x = parseInt(data[20]);
     planeVis.y = parseInt(data[21]);
     planeVis.long = parseInt(data[10])/10000000;

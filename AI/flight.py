@@ -4,8 +4,8 @@
 #python 3.7.9
 
 import os
-os.add_dll_directory(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin")
-os.add_dll_directory(r"D:\INSTALATORY\cudnn-10.1-windows10-x64-v8.0.4.30\cuda\bin")
+#os.add_dll_directory(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin")
+#os.add_dll_directory(r"D:\INSTALATORY\cudnn-10.1-windows10-x64-v8.0.4.30\cuda\bin")
 import sys
 import tensorflow as tf
 import numpy as np
@@ -18,9 +18,15 @@ file = open('log_27_10_14_40_41.txt', 'r')
 
 inputdata = []
 inputres = []
+
+lines = file.readlines()
+for line in lines:
+  line = line.strip().split(",")
+
+  
 while True:
     line = file.readline()
-    
+    print(line)
     if not line:
         break
   
@@ -28,7 +34,9 @@ while True:
 
       line = line.split(",")
       line = line[33]
-
+      print(line)
+      print(line[33])
+      break
       line = line.split("|")[0]
       line = line.split(">")
       

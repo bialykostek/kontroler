@@ -271,6 +271,10 @@ function initConfig(){
         planeExecute(2);
     });
 
+    $('#forceDisarmButton').click(_ => {
+        planeExecute(1);
+    });
+
     $('#getLeftColumnBtn').click(_ => {
         getLeftColumn();
     });

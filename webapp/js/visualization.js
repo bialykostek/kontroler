@@ -23,6 +23,7 @@ var lineC = 1;
 var currentWaypoint = 0;
 
 var drawLine = false;
+var drawing = false;
 var trackHis = [];
 
 var nextPathAngles = [0, 0, 0, 0, 0, 0, 0];
@@ -275,8 +276,11 @@ function visualizationFrame(){
     ctx.rotate(planeVis.angle);
     ctx.translate(-planeVis.size/2, -planeVis.size/2);
     ctx.drawImage(planeVis.img, 0, 0, planeVis.size, planeVis.size);
-    if(drawLine && planeVis.x > 0 && planeVis.y > 0){
-      trackHis.push([planeVis.x, planeVis.y]);  
+    if(drawing){
+        if(trackHis.length == 0 || ((planeVis.x-trackHis[trackHis.length-1][0])*(planeVis.x-trackHis[trackHis.length-1][0]) + (planeVis.y-trackHis[trackHis.length-1][1])*(planeVis.y-trackHis[trackHis.length-1][1]) < 5000)){
+          
+            trackHis.push([planeVis.x, planeVis.y]);  
+        }
     }
     ctx.restore();
     
