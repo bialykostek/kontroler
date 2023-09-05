@@ -1,4 +1,4 @@
-# Neural controller dor Unmanned Aerial Vehicle control
+# Neural controller for Unmanned Aerial Vehicle control
 Official repositiry 
 
 List of most important files:
