@@ -74,7 +74,8 @@ function playerInit(){
         onChecked: function(){
             liveData = false;
             currentLogData = [];
-            $.get("http://jkostecki.ddns.net:8080/"+currentLogFile, (data) => {
+            //$.get("http://jkostecki.ddns.net:8080/"+currentLogFile, (data) => {
+            $.get("http://192.168.0.199:8080/"+currentLogFile, (data) => {
                 currentLogData = data.split('\n');
                 for(var i=0; i < currentLogData.length; i++){
                     currentLogData[i] = [currentLogData[i].split('|')[0], parseInt(currentLogData[i].split('|')[1])];

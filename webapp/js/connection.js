@@ -49,7 +49,8 @@ function confirmChangeValue(){
 }
 
 function connectToServer(){
-    websocket = new WebSocket('ws://jkostecki.ddns.net:1111');
+    //websocket = new WebSocket('ws://jkostecki.ddns.net:1111');
+    websocket = new WebSocket('ws://192.168.0.199:1111');
     websocket.onopen = _ => {
         websocket.send(JSON.stringify({
             type: 2,
