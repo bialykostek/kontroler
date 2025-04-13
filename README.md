@@ -1,10 +1,11 @@
-# Neural controller dor Unmanned Aerial Vehicle control
+# Neural controller for Unmanned Aerial Vehicle control
 Official repositiry 
 
 List of most important files:
 
 - [jan_kostecki_praca_inzynierska.pdf](/praca/jan_kostecki_praca_inzynierska.pdf) - Engineering Thesis
-- [flight.py](/AI/flight.py) - Tensorflow model training
+- [flight_model_18.h](/Kontroler/babyDodoTFPPM/flight_model_18.h) - best AI model (2 minutes in the air!)
+- [flight.py](/AI/sintest.py) - Tensorflow model training
 - [nettocpp.m](/AI/nettocpp.m) - matlab neural network to C++ converter
 - [groundStation.ino](/Ground%20Station/groundStation/groundStation.ino) - ground station software
 - [websockeetCOM.py](/Ground%20Station/websocketCOM.py) - relay app
