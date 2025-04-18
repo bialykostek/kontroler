@@ -6,10 +6,10 @@ import json
 import time
 import serial
 
-PORT = "COM14"
+PORT = "COM13"
 
 def reconnect():
-    ws = websocket.WebSocketApp("ws://jkostecki.ddns.net:1111", on_message = on_message, on_open = on_open, on_close=on_close)
+    ws = websocket.WebSocketApp("wss://dodo.jkostecki.pl", on_message = on_message, on_open = on_open, on_close=on_close)
     wst = threading.Thread(target=ws.run_forever)
     wst.daemon = False
     wst.start()
@@ -42,7 +42,7 @@ def on_open(ws):
     print("Connected to websocket")
 
 if __name__ == "__main__":
-    ws = websocket.WebSocketApp("ws://jkostecki.ddns.net:1111", on_message = on_message, on_open = on_open)
+    ws = websocket.WebSocketApp("wss://dodo.jkostecki.pl", on_message = on_message, on_open = on_open)
     wst = threading.Thread(target=ws.run_forever)
     wst.daemon = True
     wst.start()
